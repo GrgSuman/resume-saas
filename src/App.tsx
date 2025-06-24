@@ -4,10 +4,14 @@ import { Route, Routes } from "react-router"
 import Dashboard from "./pages/dashboard/Dashboard"
 import Layout from "./components/layouts/BaseLayout"
 import NewResume from "./pages/new-resume/NewResume"
+
 import { ResumeProvider } from "./context/ResumeContext"
+import { ResumeProvider as ResumeProvider2 } from "./context/new/ResumeContextData"
 
 function App() {
   return (
+    <ResumeProvider2>
+
     <ResumeProvider>
     <Routes>
      <Route path="/" element={<Layout/>}>
@@ -17,6 +21,8 @@ function App() {
      <Route path="/dashboard/new" element={<NewResume/>}/>
     </Routes>
     </ResumeProvider>
+    </ResumeProvider2>
+
   )
 }
 

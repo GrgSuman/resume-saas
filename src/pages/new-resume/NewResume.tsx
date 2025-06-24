@@ -49,7 +49,7 @@ const NewResume = () => {
               Settings
             </button>
           </div>
-          
+         
           {/* Tab Content */}
           <div className="flex-1 overflow-hidden">
             {activeTab === 'assistant' && <Chat />}

@@ -6,15 +6,24 @@ import { demoData } from "../demo_data";
 interface ResumeContextType {
   resumeData: ResumeData;
   setResumeData: (data: ResumeData) => void;
+  editResumeMode: boolean;
+  setEditResumeMode: (mode: boolean) => void;
+  resumeDownloading: boolean;
+  setResumeDownloading: (downloading: boolean) => void;
 }
 
 const ResumeContext = createContext<ResumeContextType | undefined>(undefined);
 
 export const ResumeProvider = ({ children }: { children: ReactNode }) => {
-  const [resumeData, setResumeData] = useState<ResumeData>(demoData);
+
+  // const [resumeData, dispatch] = useReducer(resumeReducer, demoData);
+  const [resumeData, setResumeData] = useState(demoData);
+  const [editResumeMode, setEditResumeMode] = useState(false);
+  const [resumeDownloading, setResumeDownloading] = useState(false);
+ 
 
   return (
-    <ResumeContext.Provider value={{ resumeData, setResumeData }}>
+    <ResumeContext.Provider value={{ resumeData, setResumeData, editResumeMode, setEditResumeMode,resumeDownloading,setResumeDownloading }}>
       {children}
     </ResumeContext.Provider>
   );

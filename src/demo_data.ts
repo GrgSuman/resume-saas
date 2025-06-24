@@ -70,18 +70,18 @@ export const demoData: ResumeData = {
     {
       items: ["JavaScript (ES6+)", "TypeScript", "Python", "HTML5", "CSS3"],
     },
-    {
-      category: "Frameworks & Libraries",
-      items: ["React", "Node.js", "Express.js", "Redux", "Jest"],
-    },
-    {
-      category: "Databases",
-      items: ["MongoDB", "PostgreSQL", "Redis"],
-    },
-    {
-      category: "Tools & Platforms",
-      items: ["Docker", "AWS (EC2, S3)", "Git & GitHub", "CI/CD", "Webpack"],
-    },
+    // {
+    //   category: "Frameworks & Libraries",
+    //   items: ["React", "Node.js", "Express.js", "Redux", "Jest"],
+    // },
+    // {
+    //   category: "Databases",
+    //   items: ["MongoDB", "PostgreSQL", "Redis"],
+    // },
+    // {
+    //   category: "Tools & Platforms",
+    //   items: ["Docker", "AWS (EC2, S3)", "Git & GitHub", "CI/CD", "Webpack"],
+    // },
   ],
   certifications: [
     {

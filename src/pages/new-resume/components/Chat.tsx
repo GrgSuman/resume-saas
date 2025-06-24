@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Button } from '../../../components/ui/button'
 import { Input } from '../../../components/ui/input'
 import { Send, Bot, User } from 'lucide-react'
+import { useResume } from '../../../context/ResumeContext'
 
 const Chat = () => {
   const [message, setMessage] = useState('')
@@ -14,6 +15,7 @@ const Chat = () => {
     }
   ])
 
+  const { resumeData, setResumeData } = useResume();
   const handleSendMessage = () => {
     if (!message.trim()) return
 
@@ -23,6 +25,8 @@ const Chat = () => {
       content: message,
       timestamp: new Date()
     }
+
+    setResumeData({...resumeData, personalInfo: {...resumeData.personalInfo, name: "RAMU"}})
 
     setMessages([...messages, newMessage])
     setMessage('')
