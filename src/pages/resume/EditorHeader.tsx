@@ -1,7 +1,7 @@
 import React,{useEffect, useState} from "react";
 import { Button } from "../../components/ui/button";
 import { ArrowLeft, Save, Download, Eye, Edit3 } from "lucide-react";
-import { useResume } from "../../context/resume/ResumeContext";
+import { useResume } from "../../hooks/useResume";
 import { useNavigate } from "react-router";
 
 const EditorHeader = ({resumeRef}:{resumeRef:React.RefObject<HTMLDivElement | null>}) => {

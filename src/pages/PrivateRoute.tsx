@@ -1,8 +1,9 @@
 import { Navigate, Outlet, useLocation } from "react-router";
+import { useAuth } from "../hooks/useAuth";
 
 export const PrivateRoute = () => {
-  const isAuthenticated = true; // Change this to true to test the other path
+  const { authStates } = useAuth();
   const location = useLocation();
 
- return isAuthenticated ? <Outlet /> : <Navigate to="/login" state={{ from: location }} replace />;
+ return authStates.isAuthenticated ? <Outlet /> : <Navigate to="/login" state={{ from: location }} replace />;
 };

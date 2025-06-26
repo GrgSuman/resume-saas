@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, type Dispatch } from "react";
+import React, { createContext, useReducer, type Dispatch } from "react";
 import { demoData } from "../../demo_data";
 import type { ResumeData, ResumeMetaData, ResumeSettings } from "../../types/resumeDataType";
 
@@ -76,11 +76,4 @@ export const ResumeProvider: React.FC<{children: React.ReactNode}> = ({ children
     );
 };
 
-// Custom hook for using the context
-export const useResume = () => {
-    const context = useContext(ResumeContext);
-    if (context === undefined) {
-        throw new Error('useResume must be used within a ResumeProvider');
-    }
-    return context;
-};
+export default ResumeContext;

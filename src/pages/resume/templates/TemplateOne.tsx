@@ -7,7 +7,7 @@ import CertificationSection from "./sections/CertificationSection";
 import ReferenceSection from "./sections/ReferenceSection";
 import InterestSection from "./sections/InterestSection";
 import CustomSection from "./sections/CustomSection";
-import { useResume } from "../../../context/resume/ResumeContext";
+import { useResume } from "../../../hooks/useResume";
 
 const ResumeTemplate = ({ref}:{ref:React.RefObject<HTMLDivElement | null>}) => {
 

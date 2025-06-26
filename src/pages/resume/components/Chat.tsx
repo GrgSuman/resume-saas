@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { Button } from '../../../components/ui/button'
 import { Input } from '../../../components/ui/input'
 import { Send, Bot, User } from 'lucide-react'
-import { useResume } from '../../../context/resume/ResumeContext'
+import { useResume } from '../../../hooks/useResume'
 
 const Chat = () => {
   const { state, dispatch } = useResume();

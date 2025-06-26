@@ -3,7 +3,7 @@ import { Input } from '../../../components/ui/input'
 import { Label } from '../../../components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select'
 import { Settings as SettingsIcon, Eye, EyeOff, GripVertical } from 'lucide-react'
-import { useResume } from '../../../context/resume/ResumeContext'
+import { useResume } from '../../../hooks/useResume'
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import type { DropTargetMonitor, DragSourceMonitor } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';

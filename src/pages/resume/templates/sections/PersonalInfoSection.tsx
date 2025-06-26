@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { PersonalInfo } from "../../../../types/resumeTypes";
 import { Edit3, X } from "lucide-react";
-import { useResume } from "../../../../context/resume/ResumeContext";
+import { useResume } from "../../../../hooks/useResume";
 
 // Modal Component
 const Modal = ({

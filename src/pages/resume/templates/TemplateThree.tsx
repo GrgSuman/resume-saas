@@ -6,7 +6,7 @@ import CertificationSection from "./sections/CertificationSection";
 import ReferenceSection from "./sections/ReferenceSection";
 import InterestSection from "./sections/InterestSection";
 import CustomSection from "./sections/CustomSection";
-import { useResume } from "../../../context/resume/ResumeContext";
+import { useResume } from "../../../hooks/useResume";
 import PersonalInfoSectionTwo from "./sections/PersonalInfoSectionTwo";
 
 const TemplateThree = ({ ref }: { ref: React.RefObject<HTMLDivElement | null> }) => {

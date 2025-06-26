@@ -1,7 +1,7 @@
 import TemplateOne from "../templates/TemplateOne"
 import TemplateTwo from "../templates/TemplateTwo"
 import TemplateThree from "../templates/TemplateThree"
-import { useResume } from "../../../context/resume/ResumeContext"
+import { useResume } from "../../../hooks/useResume"
 
 const ResumePreview = ({resumeRef}:{resumeRef:React.RefObject<HTMLDivElement | null>}) => {
 
