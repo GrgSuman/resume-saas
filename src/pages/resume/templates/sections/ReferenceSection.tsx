@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { Reference } from "../../../../types/resumeTypes";
 import { Plus, Edit3, Trash2, X } from "lucide-react";
-import { useResume } from "../../../../context/new/ResumeContextData";
+import { useResume } from "../../../../context/resume/ResumeContext";
 
 // Modal Component
 const Modal = ({
@@ -105,14 +105,14 @@ const ReferenceSection = ({ references }: { references: Reference[] }) => {
             <div className="flex justify-between items-start">
               <div className="flex-1">
                 <div className="font-bold">
-                  {ref.name}
-                  {ref.position && <> — {ref.position}</>}
+                  {ref.name}{ref.name && ref.position && ' — '}{ref.position}
                 </div>
                 <div>
-                  {ref.company && <span>{ref.company}</span>}
-                  {ref.company && ref.contact && <span> | </span>}
-                  {ref.contact && <span>{ref.contact}</span>}
-                  {ref.relationship && <span> | {ref.relationship}</span>}
+                  {ref.company}
+                  {ref.company && ref.contact && ' | '}
+                  {ref.contact}
+                  {((ref.company || ref.contact) && ref.relationship) && ' | '}
+                  {ref.relationship}
                 </div>
               </div>
               {state.resumeEditingMode && (

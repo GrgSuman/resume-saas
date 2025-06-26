@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { Certification } from "../../../../types/resumeTypes";
 import { Plus, Edit3, Trash2, X } from "lucide-react";
-import { useResume } from "../../../../context/new/ResumeContextData";
+import { useResume } from "../../../../context/resume/ResumeContext";
 
 // Modal Component
 const Modal = ({

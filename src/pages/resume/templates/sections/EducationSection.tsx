@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { Education } from "../../../../types/resumeTypes";
 import { Plus, Edit3, Trash2, X } from "lucide-react";
-import { useResume } from "../../../../context/new/ResumeContextData";
+import { useResume } from "../../../../context/resume/ResumeContext";
 
 // Modal Component
 const Modal = ({ isOpen, onClose, title, children }: { 
@@ -89,8 +89,8 @@ const EducationSection = ({ education }: { education: Education[] }) => {
           <div className="flex justify-between items-start mb-1">
             <div><span className="font-bold">{edu.institution}</span></div>
             <div className="flex gap-2">
-              <div>{edu.startDate}-{edu.endDate}</div>
-                {state.resumeEditingMode && (
+              <div>{edu.startDate}{edu.startDate && edu.endDate && ' - '}{edu.endDate}</div>
+              {state.resumeEditingMode && (
                 <div className="flex gap-1">
                   <button onClick={() => handleEdit(index, edu)} className="text-blue-500 hover:text-blue-700 text-xs" title="Edit">
                     <Edit3 className="h-3 w-3" />
@@ -104,7 +104,7 @@ const EducationSection = ({ education }: { education: Education[] }) => {
           </div>
           <div className="ml-4">
             <div className="mb-1">
-              {edu.degree} {edu.grade && <span> - {edu.grade}</span>}
+              {edu.degree}{edu.degree && edu.grade && ' - '}{edu.grade}
               {edu.description && <p className="text-sm text-gray-600 mt-1">{edu.description}</p>}
             </div>
           </div>

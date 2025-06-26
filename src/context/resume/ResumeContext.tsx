@@ -6,7 +6,7 @@ import type { ResumeData, ResumeMetaData, ResumeSettings } from "../../types/res
 const ResumeDefaultData: ResumeMetaData = {
     resumeData: demoData,
     resumeSettings: {
-        fontSize: 12,
+        fontSize: 13,
         fontFamily: "Arial, sans-serif",
         lineHeight: 1.5,
         template: "Creative",
@@ -17,10 +17,10 @@ const ResumeDefaultData: ResumeMetaData = {
             { key: "education", order: 2, visible: true },
             { key: "projects", order: 3, visible: true },
             { key: "skills", order: 4, visible: true },
-            { key: "certifications", order: 5, visible: true },
+            { key: "certifications", order: 5, visible: false },
             { key: "references", order: 6, visible: false },
             { key: "interests", order: 7, visible: true },
-            { key: "customSections", order: 8, visible: true }
+            { key: "customSections", order: 8, visible: false }
         ]
     },
     resumeDownloading: false,

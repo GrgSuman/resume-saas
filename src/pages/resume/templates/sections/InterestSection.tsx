@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Plus, Trash2, X, Edit } from "lucide-react";
-import { useResume } from "../../../../context/new/ResumeContextData";
+import { useResume } from "../../../../context/resume/ResumeContext";
 
 // Modal Component
 const Modal = ({
@@ -106,7 +106,7 @@ const InterestSection = ({ interests  }: { interests: string[] }) => {
       <div className="flex flex-wrap gap-2">
         {interests.map((interest, index) => (
           <div key={index} className="flex items-center gap-1">
-            <span className="text-sm">{interest}</span>
+            <span>{interest}</span>
             {state.resumeEditingMode && (
               <div className="flex gap-1">
                 <button

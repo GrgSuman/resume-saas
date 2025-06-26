@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { Experience } from "../../../../types/resumeTypes";
 import { Plus, Edit3, Trash2, X, Edit } from "lucide-react";
-import { useResume } from "../../../../context/new/ResumeContextData";
+import { useResume } from "../../../../context/resume/ResumeContext";
 
 // Modal Component
 const Modal = ({ isOpen, onClose, title, children }: { 
@@ -136,7 +136,7 @@ const ExperienceSection = ({ experience }: { experience: Experience[] }) => {
           <div className="flex justify-between items-start mb-1">
             <div><span className="font-bold">{exp.role}</span></div>
             <div className="flex gap-2">
-              <div>{exp.startDate}-{exp.endDate}</div>
+              <div>{exp.startDate}{exp.startDate && exp.endDate && ' - '}{exp.endDate}</div>
               {state.resumeEditingMode && (
                 <div className="flex gap-1">
                   <button onClick={() => handleEdit(index, exp)} className="text-blue-500 hover:text-blue-700 text-xs" title="Edit">
@@ -149,7 +149,7 @@ const ExperienceSection = ({ experience }: { experience: Experience[] }) => {
               )}
             </div>
           </div>
-          <div><span>{exp.company} - {exp.location}</span></div>
+          <div><span>{exp.company}{exp.company && exp.location && ' - '}{exp.location}</span></div>
           {exp.achievements && (
             <div className="mt-1 ml-4">
               {exp.achievements.map((achievement, achIndex) => (

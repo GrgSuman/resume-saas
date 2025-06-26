@@ -3,7 +3,7 @@ import { Input } from '../../../components/ui/input'
 import { Label } from '../../../components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select'
 import { Settings as SettingsIcon, Eye, EyeOff, GripVertical } from 'lucide-react'
-import { useResume } from '../../../context/new/ResumeContextData'
+import { useResume } from '../../../context/resume/ResumeContext'
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import type { DropTargetMonitor, DragSourceMonitor } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -132,7 +132,7 @@ const Settings = () => {
           <div className="flex gap-4">
             <div className="flex-1">
               <Label className='my-1 mt-4' htmlFor="font-family">Font Family</Label>
-              <Select defaultValue="sans-serif">
+              <Select defaultValue="sans-serif" onValueChange={(value) => dispatch({ type: "RESUME_SETTINGS", payload: { fontFamily: value } })}>
                 <SelectTrigger className="w-32 mt-1">
                   <SelectValue placeholder="Select font" />
                 </SelectTrigger>
@@ -145,15 +145,15 @@ const Settings = () => {
             </div>
             <div className="flex-1">
               <Label className='my-1 mt-4' htmlFor="font-size">Font Size</Label>
-              <Select defaultValue="12">
+              <Select defaultValue={state.resumeSettings.fontSize.toString()} onValueChange={(value) => dispatch({ type: "RESUME_SETTINGS", payload: { fontSize: parseInt(value) } })}>
                 <SelectTrigger className="w-32 mt-1">
                   <SelectValue placeholder="Select size" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="11">11</SelectItem>
                   <SelectItem value="12">12</SelectItem>
                   <SelectItem value="13">13</SelectItem>
+                  <SelectItem value="14">14</SelectItem>
+                  <SelectItem value="15">15</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -163,14 +163,17 @@ const Settings = () => {
         {/* Template Settings */}
         <div>
           <Label className='my-1 mt-4' htmlFor="template">Template</Label>
-          <Select defaultValue="templateOne">
+          <Select
+            defaultValue="Creative"
+            onValueChange={(value) => dispatch({ type: "RESUME_SETTINGS", payload: { template: value } })}
+          >
             <SelectTrigger className="w-48 mt-1">
               <SelectValue placeholder="Select template" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="templateOne">Template One</SelectItem>
-              <SelectItem value="templateTwo">Template Two</SelectItem>
-              <SelectItem value="templateThree">Template Three</SelectItem>
+              <SelectItem value="Creative">Creative</SelectItem>
+              <SelectItem value="Professional">Professional</SelectItem>
+              <SelectItem value="Two Column">Two Column</SelectItem>
             </SelectContent>
           </Select>
         </div>

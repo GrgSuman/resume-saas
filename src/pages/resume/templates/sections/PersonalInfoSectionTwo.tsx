@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { PersonalInfo } from "../../../../types/resumeTypes";
 import { Edit3, X } from "lucide-react";
-import { useResume } from "../../../../context/new/ResumeContextData";
+import { useResume } from "../../../../context/resume/ResumeContext";
 
 // Modal Component
 const Modal = ({
@@ -68,106 +68,55 @@ const PersonalInfoSection = ({personalInfo}:{personalInfo:PersonalInfo}) => {
           </button>
         </div>
       )}
-      <div className="text-center mb-3 border-b-1 border-black pb-2">
-        <div className="flex justify-between items-start mb-1">
-          <div className="text-left flex-1">
-            {personalInfo.address && <div>{personalInfo.address}</div>}
-            {personalInfo.github && (
-              <div className="mt-1">
-                <a
-                  href={personalInfo.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {personalInfo.github}
-                </a>
-              </div>
-            )}
-            {personalInfo.linkedin && (
-              <div className="mt-1">
-                <a
-                  href={personalInfo.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {personalInfo.linkedin}
-                </a>
-              </div>
-            )}
-            {personalInfo.twitter && (
-              <div className="mt-1">
-                <a
-                  href={personalInfo.twitter}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {personalInfo.twitter}
-                </a>
-              </div>
-            )}
-          </div>
-          <div className="flex-1 text-center">
-            <h1
-              className="font-bold tracking-wider"
-              style={{ fontSize: "20px" }}
-            >
-              {personalInfo.name.toUpperCase()}
-            </h1>
-            {personalInfo.label && (
-              <div className="text-sm text-gray-600 mt-1">
-                {personalInfo.label}
-              </div>
-            )}
-          </div>
-          <div className="text-right flex-1">
-            {personalInfo.phone && <div>{personalInfo.phone}</div>}
-            {personalInfo.email && (
-              <div className="mt-1">
-                <a
-                  href={`mailto:${personalInfo.email}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {personalInfo.email}
-                </a>
-              </div>
-            )}
-            {personalInfo.website && (
-              <div className="mt-1">
-                <a
-                  href={personalInfo.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {personalInfo.website}
-                </a>
-              </div>
-            )}
-            {personalInfo.portfolio && (
-              <div className="mt-1">
-                <a
-                  href={personalInfo.portfolio}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {personalInfo.portfolio}
-                </a>
-              </div>
-            )}
-          </div>
+
+      {/* Name */}
+      <div className="text-center mb-1">
+        <h1
+          className="font-bold tracking-wider text-black"
+          style={{ fontSize: "20px", textTransform: "uppercase" }}
+        >
+          {personalInfo.name}
+        </h1>
+        <div className="text-sm my-1 flex flex-wrap justify-center gap-x-2">
+          {[
+            personalInfo.label,
+            personalInfo.email && <a href={`mailto:${personalInfo.email}`}>{personalInfo.email}</a>,
+            personalInfo.phone,
+            personalInfo.address
+          ].filter(Boolean).map((item, idx, arr) => (
+            <span key={idx} className="block">
+              {item}{idx < arr.length - 1 && " | "}
+            </span>
+          ))}
+        </div>
+        <div className="text-sm flex mt-1 flex-wrap justify-center gap-x-2">
+          {[
+            personalInfo.linkedin && <a href={personalInfo.linkedin}>LinkedIn</a>,
+            personalInfo.github && <a href={personalInfo.github}>GitHub</a>,
+            personalInfo.twitter && <a href={personalInfo.twitter}>Twitter</a>,
+            personalInfo.portfolio && <a href={personalInfo.portfolio}>Portfolio</a>
+          ].filter(Boolean).map((item, idx, arr) => (
+            <span key={idx} className="block">
+              {item}{idx < arr.length - 1 && " | "}
+            </span>
+          ))}
         </div>
       </div>
 
+      {/* Horizontal line */}
+      <hr className="border-black my-4" />
       {/* Summary */}
       {personalInfo.summary && (
         <div className="mb-4">
-          <h2 className="font-bold mb-1 tracking-wide uppercase">SUMMARY</h2>
-          <div className="border-b border-black mb-2"></div>
-          <div>
-            <div className="mb-1">{personalInfo.summary}</div>
+          <div className="font-bold mb-1 tracking-wide uppercase text-black">
+            SUMMARY
           </div>
+          <div className="text-black">{personalInfo.summary}</div>
         </div>
       )}
+
+      {/* Horizontal line */}
+      <hr className="border-black my-4" />
 
       {/* Modal */}
       <Modal
@@ -271,20 +220,6 @@ const PersonalInfoSection = ({personalInfo}:{personalInfo:PersonalInfo}) => {
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Website
-              </label>
-              <input
-                type="url"
-                value={formData.website || ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, website: e.target.value })
-                }
-                placeholder="https://johndoe.com"
-                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Portfolio

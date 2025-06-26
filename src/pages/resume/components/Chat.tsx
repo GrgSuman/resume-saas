@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { Button } from '../../../components/ui/button'
 import { Input } from '../../../components/ui/input'
 import { Send, Bot, User } from 'lucide-react'
-import { useResume } from '../../../context/ResumeContext'
+import { useResume } from '../../../context/resume/ResumeContext'
 
 const Chat = () => {
+  const { state, dispatch } = useResume();
   const [message, setMessage] = useState('')
   const [messages, setMessages] = useState([
     {
@@ -14,19 +15,26 @@ const Chat = () => {
       timestamp: new Date()
     }
   ])
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  const { resumeData, setResumeData } = useResume();
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   const handleSendMessage = () => {
     if (!message.trim()) return
+
+    // TODO: Add AI response
+    if(message.toLowerCase().includes('change name')){
+     dispatch({type: 'RESUME_DATA', payload: {personalInfo: {...state.resumeData.personalInfo, name: 'RAMU'}}})
+    }
 
     const newMessage = {
       id: messages.length + 1,
       type: 'user' as const,
-      content: message,
+      content: JSON.stringify(state.resumeData),
       timestamp: new Date()
     }
-
-    setResumeData({...resumeData, personalInfo: {...resumeData.personalInfo, name: "RAMU"}})
 
     setMessages([...messages, newMessage])
     setMessage('')
@@ -89,6 +97,7 @@ const Chat = () => {
             )}
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Input Area */}

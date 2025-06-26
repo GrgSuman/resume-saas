@@ -1,20 +1,17 @@
 import ExperienceSection from "./sections/ExperienceSection";
 import EducationSection from "./sections/EducationSection";
 import ProjectsSection from "./sections/ProjectSection";
-import PersonalInfoSection from "./sections/PersonalInfoSection";
 import SkillsSection from "./sections/SkillsSection";
 import CertificationSection from "./sections/CertificationSection";
 import ReferenceSection from "./sections/ReferenceSection";
 import InterestSection from "./sections/InterestSection";
 import CustomSection from "./sections/CustomSection";
-
-import { useResume } from "../../../context/new/ResumeContextData";
-
+import { useResume } from "../../../context/resume/ResumeContext";
+import PersonalInfoSectionTwo from "./sections/PersonalInfoSectionTwo";
 
 const ResumeTemplate = ({ref}:{ref:React.RefObject<HTMLDivElement | null>}) => {
 
   const {state} = useResume()
-
   const {
     personalInfo,
     education,
@@ -33,8 +30,8 @@ const ResumeTemplate = ({ref}:{ref:React.RefObject<HTMLDivElement | null>}) => {
       className="max-w-[210mm] min-w-[210mm]  min-h-[297mm] max-h-[297mm]"
     >
       <div
-        className="max-w-[210mm] min-w-[210mm]  min-h-[297mm] max-h-[297mm] mx-auto bg-white text-black leading-tight font-serif p-6 py-8 overflow-hidden"
-        style={{ fontSize: `${state.resumeSettings.fontSize}px`, boxSizing: "border-box" }}
+        className="max-w-[210mm] min-w-[210mm]  min-h-[297mm] max-h-[297mm] mx-auto bg-white text-black leading-tight p-6 py-8 overflow-hidden"
+        style={{ fontSize: `${state.resumeSettings.fontSize}px`, boxSizing: "border-box", fontFamily: state.resumeSettings.fontFamily }}
       >
       {state.resumeSettings.sections
         .slice()
@@ -43,7 +40,7 @@ const ResumeTemplate = ({ref}:{ref:React.RefObject<HTMLDivElement | null>}) => {
           if(x.visible){
             switch(x.key){
               case "personalInfo":
-                return <PersonalInfoSection key={index} personalInfo={personalInfo} />
+                return <PersonalInfoSectionTwo key={index} personalInfo={personalInfo} />
               case "experience":
                 return <ExperienceSection key={index} experience={experience} />
               case "education":
