@@ -1,29 +1,57 @@
 import img from "../../assets/illustration.jpg"
-import { GoogleLogin } from '@react-oauth/google';
+import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import { useAuth } from "../../hooks/useAuth";
 import { Navigate } from "react-router";
 
 const Login = () => {
-  const { authStates } = useAuth();
+  const { authStates, setUser, setAuthStates, user } = useAuth();
 
-  if(authStates.isLoading) return <div>Loading...</div>;
+  if(authStates.isLoading) return <div>
+    <div className="min-h-screen flex items-center justify-center px-6 bg-gradient-to-b from-white via-purple-50 to-purple-200">
+      <div className="max-w-md w-full">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Loading...</h1>
+        </div>
+      </div>
+    </div></div>;
+
   if(authStates.isAuthenticated) return <Navigate to="/dashboard" />;
 
-  const handleSuccess = async (credentialResponse: any) => {
-    console.log(credentialResponse);
-    // // credentialResponse.credential is the Google ID token (JWT)
-    // const res = await fetch('http://localhost:5000/api/auth/google', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ token: credentialResponse.credential }),
-    // });
-    // const data = await res.json();
-    // // Save your JWT (data.token) to localStorage/cookie, redirect, etc.
+  const handleSuccess = async (credentialResponse: CredentialResponse) => {
+    const res = await fetch('http://localhost:8000/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: credentialResponse.credential }),
+      credentials: 'include'
+    });
+    const data = await res.json();
+    console.log(data);
+    if(data.success) {
+      console.log(data.user.token);
+     localStorage.setItem('token', JSON.stringify(data.user.token));
+     setUser(data.user);
+     setAuthStates({
+      isAuthenticated: true,
+      isLoading: false,
+      error: null
+     })
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center px-6 bg-gradient-to-b from-white via-purple-50 to-purple-200">
       <div className="max-w-md w-full">
+        <h1 className="text-red-500 mt-16">{JSON.stringify(user)}</h1>
+        <button onClick={() => {
+          fetch('http://localhost:8000/api/auth/logout', {
+            credentials: 'include',
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+          }).then(res => res.json()).then(data => console.log(data));
+        }}>Validate</button>
+
+<h1>{JSON.stringify(authStates)}</h1>
+
         {/* Illustration */}
         <div className="flex justify-center mb-8">
           <img

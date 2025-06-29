@@ -9,6 +9,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu";
+import { useAuth } from "../../hooks/useAuth"
+import axiosInstance from "../../api/axios";
 
 interface Resume {
   id: string;
@@ -19,6 +21,8 @@ interface Resume {
 }
 
 export default function Dashboard() {
+  const { user } = useAuth();
+
   const [resumes] = useState<Resume[]>([
     {
       id: "1",
@@ -38,7 +42,7 @@ export default function Dashboard() {
           <div className="mb-12">
             <div className="mb-6">
               <h1 className="text-6xl font-medium text-gray-900 tracking-tight">
-                Welcome back, Suman!
+                Welcome back, {user?.email}!
               </h1>
               <p className="text-lg text-gray-600 my-5">
                 Ready to create your next resume?
@@ -51,6 +55,17 @@ export default function Dashboard() {
               </Button>
             </Link>}
           </div>
+
+          <Button onClick={async () => {
+            try {
+              const res = await axiosInstance.get('/auth/get-user');
+              console.log(res);
+            } catch (error) {
+              console.log("error is:", error);
+            }
+          }}>
+            Get User
+          </Button> 
 
           {/* Resumes Grid - 3 Cards Per Row */}
             <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-6">
