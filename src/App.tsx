@@ -7,31 +7,34 @@ import "./App.css";
 import Login from "./pages/auth/Login";
 import Layout from "./components/layouts/BaseLayout";
 import { PrivateRoute } from "./pages/PrivateRoute";
-import { GoogleOAuthProvider } from '@react-oauth/google';
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthProvider } from "./context/auth/AuthContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 function App() {
+  const queryClient = new QueryClient();
   return (
-    <GoogleOAuthProvider clientId="620421156218-1vl05kpbr9ljs8uqok8pssamo40qaa0o.apps.googleusercontent.com">
-      <AuthProvider>
-      <ResumeProvider>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Layout />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-          </Route>
+    <QueryClientProvider client={queryClient}>
+      <GoogleOAuthProvider clientId="620421156218-1vl05kpbr9ljs8uqok8pssamo40qaa0o.apps.googleusercontent.com">
+        <AuthProvider>
+          <ResumeProvider>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<Layout />}>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+              </Route>
 
-            {/* Dashboard and Protected Routes */}
-            <Route path="/dashboard" element={<PrivateRoute />}>
-              <Route path="/dashboard" index element={<Dashboard />} />
-              <Route path="/dashboard/new" element={<NewResume />} />
-            </Route>
-            
-        </Routes>
-      </ResumeProvider>
-      </AuthProvider>
-    </GoogleOAuthProvider>
+              {/* Dashboard and Protected Routes */}
+              <Route path="/dashboard" element={<PrivateRoute />}>
+                <Route path="/dashboard" index element={<Dashboard />} />
+                <Route path="/dashboard/resume/:id" element={<NewResume />} />
+              </Route>
+            </Routes>
+          </ResumeProvider>
+        </AuthProvider>
+      </GoogleOAuthProvider>
+    </QueryClientProvider>
   );
 }
 

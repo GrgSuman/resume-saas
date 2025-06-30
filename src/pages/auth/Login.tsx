@@ -1,10 +1,14 @@
 import img from "../../assets/illustration.jpg"
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import { useAuth } from "../../hooks/useAuth";
-import { Navigate } from "react-router";
+import { Navigate, useLocation } from "react-router";
 
 const Login = () => {
   const { authStates, setUser, setAuthStates, user } = useAuth();
+  const location = useLocation();
+
+  // Get the redirect path from location state, or default to dashboard
+  const from = location.state?.from?.pathname || "/dashboard";
 
   if(authStates.isLoading) return <div>
     <div className="min-h-screen flex items-center justify-center px-6 bg-gradient-to-b from-white via-purple-50 to-purple-200">
@@ -15,7 +19,7 @@ const Login = () => {
       </div>
     </div></div>;
 
-  if(authStates.isAuthenticated) return <Navigate to="/dashboard" />;
+  if(authStates.isAuthenticated) return <Navigate to={from} replace />;
 
   const handleSuccess = async (credentialResponse: CredentialResponse) => {
     const res = await fetch('http://localhost:8000/api/auth/register', {
