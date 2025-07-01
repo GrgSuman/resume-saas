@@ -10,11 +10,13 @@ import { PrivateRoute } from "./pages/PrivateRoute";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthProvider } from "./context/auth/AuthContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "sonner";
 
 function App() {
   const queryClient = new QueryClient();
   return (
     <QueryClientProvider client={queryClient}>
+       <Toaster />
       <GoogleOAuthProvider clientId="620421156218-1vl05kpbr9ljs8uqok8pssamo40qaa0o.apps.googleusercontent.com">
         <AuthProvider>
           <ResumeProvider>

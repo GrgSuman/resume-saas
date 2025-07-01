@@ -1,56 +1,62 @@
 import { Button } from "../../components/ui/button";
 import { Plus } from "lucide-react";
-import { Link } from "react-router";
 import DashboardHeader from "../../components/layouts/DashboardHeader";
 import { useAuth } from "../../hooks/useAuth";
 import ResumeCard from "./ResumeCard";
+import NewResumeForm from "./NewResumeForm";
 import axiosInstance from "../../api/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
 export default function Dashboard() {
   const { user } = useAuth();
   const queryClient = useQueryClient(); 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
   const {
     data: resumeData,
     isLoading,
-    isError,
+    // isError,
   } = useQuery({
     queryKey: ["resumes"],
     queryFn: () => axiosInstance.get("/resume/user"),
   });
 
-  console.log(resumeData, isLoading, isError);
-
   const mutation = useMutation({
-    mutationFn: () => axiosInstance.post("/resume/create"),
+    mutationFn: (resumeName: string) => axiosInstance.post("/resume", { title: resumeName }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["resumes"] });
+      setIsModalOpen(false);
     },
   });
 
+  const createNewResume = async (resumeName: string) => {
+    mutation.mutate(resumeName);
+  };
 
-  const createNewResume = async () => {
-    mutation.mutate();
+  const openModal = () => {
+    setIsModalOpen(true);
   };
 
   return (
     <div>
       <DashboardHeader />
-      <div className="py-10 bg-gradient-to-b from-white via-purple-50 to-purple-200 min-h-screen">
+      <div className="py-10
+        min-h-screen">
         <div className="max-w-7xl mx-auto px-4">
           {/* Welcome and Create Section */}
           <div className="mb-12">
             <div className="mb-6">
               <h1 className="text-6xl font-medium text-gray-900 tracking-tight">
-                Welcome back, {user?.email}!
+                Welcome back, {user?.name}!
               </h1>
               <p className="text-lg text-gray-600 my-5">
                 Ready to create your next resume?
               </p>
             </div>
-              <Button onClick={createNewResume} className="cursor-pointer text-white border-0 transition-all duration-200 shadow-lg hover:shadow-xl">
+              <Button onClick={openModal} className="cursor-pointer text-white border-0 transition-all duration-200 shadow-lg hover:shadow-xl">
                 <Plus className="mr-2 h-4 w-4" />
-                {mutation.isPending ? "Creating..." : "Create New Resume"}
+                Create New Resume
               </Button>
           </div>
 
@@ -65,7 +71,7 @@ export default function Dashboard() {
           }
 
           {/* Empty State - Google Keep Style */}
-          {resumeData?.data.length === 0 && (
+          {resumeData?.data?.resume.length === 0 && (
             <div className="flex flex-col items-center justify-center py-20">
               <div className="mb-6">
                 <div className="w-20 h-20 rounded-full flex items-center justify-center bg-gradient-to-br from-purple-100 via-pink-100 to-red-100 shadow-md">
@@ -79,16 +85,22 @@ export default function Dashboard() {
                 Create your first resume to get started with your job search.
                 You can always edit, duplicate, or download your resumes later.
               </p>
-              <Link to="/dashboard/new">
-                <Button className="px-6 py-3 text-white border-0 shadow-lg transition-all duration-200">
+                <Button onClick={openModal} className="px-6 py-3 text-white border-0 shadow-lg transition-all duration-200">
                   <Plus className="mr-2 h-5 w-5" />
                   Create Your First Resume
                 </Button>
-              </Link>
             </div>
           )}
         </div>
       </div>
+      
+      <NewResumeForm
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        onSubmit={createNewResume}
+        isLoading={mutation.isPending}
+        isError={mutation.isError}
+      />
     </div>
   );
 }

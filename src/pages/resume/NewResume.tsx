@@ -3,11 +3,11 @@ import EditorHeader from './EditorHeader'
 import ResumePreview from './components/ResumePreview'
 import Chat from './components/Chat'
 import Settings from './components/Settings'
-import { MessageSquare, Settings as SettingsIcon } from 'lucide-react'
+import { MessageSquare, Palette } from 'lucide-react'
 
 
 const NewResume = () => {
-  const [activeTab, setActiveTab] = useState<'assistant' | 'settings'>('assistant')
+  const [activeTab, setActiveTab] = useState<'assistant' | 'style'>('assistant')
   const resumeRef = useRef<HTMLDivElement|null>(null)
 
   return (
@@ -30,7 +30,7 @@ const NewResume = () => {
               onClick={() => setActiveTab('assistant')}
               className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium transition-colors ${
                 activeTab === 'assistant'
-                  ? 'text-teal-600 border-b-2 border-teal-600 bg-white'
+                  ? 'text-teal-600 border-b-2 border-teal-600 bg-teal-50'
                   : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
               }`}
             >
@@ -38,22 +38,22 @@ const NewResume = () => {
               Assistant
             </button>
             <button
-              onClick={() => setActiveTab('settings')}
+              onClick={() => setActiveTab('style')}
               className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium transition-colors ${
-                activeTab === 'settings'
-                  ? 'text-teal-600 border-b-2 border-teal-600 bg-white'
+                activeTab === 'style'
+                  ? 'text-teal-600 border-b-2 border-teal-600 bg-teal-50'
                   : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
               }`}
             >
-              <SettingsIcon className="h-4 w-4" />
-              Settings
+              <Palette className="h-4 w-4" />
+              Style
             </button>
           </div>
          
           {/* Tab Content */}
           <div className="flex-1 overflow-hidden">
             {activeTab === 'assistant' && <Chat />}
-            {activeTab === 'settings' && <Settings />}
+            {activeTab === 'style' && <Settings />}
           </div>
         </div>
       </div>
