@@ -12,6 +12,9 @@ import { useResume } from "../../../hooks/useResume";
 const ResumeTemplate = ({ref}:{ref:React.RefObject<HTMLDivElement | null>}) => {
 
   const {state} = useResume()
+
+  if(!state.resumeData) return null;
+
   const {
     personalInfo,
     education,
@@ -24,6 +27,9 @@ const ResumeTemplate = ({ref}:{ref:React.RefObject<HTMLDivElement | null>}) => {
     customSections,
   } = state.resumeData;
 
+  // Early return if resumeSettings is null
+  if (!state.resumeSettings) return null;
+
   return (
     <div
       ref={ref}
@@ -34,17 +40,17 @@ const ResumeTemplate = ({ref}:{ref:React.RefObject<HTMLDivElement | null>}) => {
         style={{ fontSize: `${state.resumeSettings.fontSize}px`, boxSizing: "border-box", fontFamily: state.resumeSettings.fontFamily }}
       >
       {state.resumeSettings.sections
-        .slice()
+        ?.slice()
         .sort((a, b) => a.order - b.order)
         .map((x,index)=>{
           if(x.visible){
             switch(x.key){
               case "personalInfo":
-                return <PersonalInfoSection key={index} personalInfo={personalInfo} />
+                return <PersonalInfoSection key={index} personalInfo={personalInfo || {}} />
               case "experience":
-                return <ExperienceSection key={index} experience={experience} />
+                return <ExperienceSection key={index} experience={experience || []} />
               case "education":
-                return <EducationSection key={index} education={education} />
+                return <EducationSection key={index} education={education || []} />
               case "projects":
                 return <ProjectsSection key={index} projects={projects || []} />
               case "skills":

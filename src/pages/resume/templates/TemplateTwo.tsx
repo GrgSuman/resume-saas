@@ -12,6 +12,7 @@ import PersonalInfoSectionTwo from "./sections/PersonalInfoSectionTwo";
 const ResumeTemplate = ({ref}:{ref:React.RefObject<HTMLDivElement | null>}) => {
 
   const {state} = useResume()
+  if(!state.resumeData) return null;
   const {
     personalInfo,
     education,
@@ -31,20 +32,20 @@ const ResumeTemplate = ({ref}:{ref:React.RefObject<HTMLDivElement | null>}) => {
     >
       <div
         className="max-w-[210mm] min-w-[210mm]  min-h-[297mm] max-h-[297mm] mx-auto bg-white text-black leading-tight p-6 py-8 overflow-hidden"
-        style={{ fontSize: `${state.resumeSettings.fontSize}px`, boxSizing: "border-box", fontFamily: state.resumeSettings.fontFamily }}
+        style={{ fontSize: `${state.resumeSettings?.fontSize}px`, boxSizing: "border-box", fontFamily: state.resumeSettings?.fontFamily }}
       >
-      {state.resumeSettings.sections
-        .slice()
+      {state?.resumeSettings?.sections
+        ?.slice()
         .sort((a, b) => a.order - b.order)
         .map((x,index)=>{
           if(x.visible){
             switch(x.key){
               case "personalInfo":
-                return <PersonalInfoSectionTwo key={index} personalInfo={personalInfo} />
+                return <PersonalInfoSectionTwo key={index} personalInfo={personalInfo || {}} />
               case "experience":
-                return <ExperienceSection key={index} experience={experience} />
+                return <ExperienceSection key={index} experience={experience || []} />
               case "education":
-                return <EducationSection key={index} education={education} />
+                return <EducationSection key={index} education={education || []} />
               case "projects":
                 return <ProjectsSection key={index} projects={projects || []} />
               case "skills":

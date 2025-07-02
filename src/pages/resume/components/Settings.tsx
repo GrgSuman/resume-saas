@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Settings as SettingsIcon, Eye, EyeOff, GripVertical } from 'lucide-react'
 import { useResume } from '../../../hooks/useResume'
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
-import type { DropTargetMonitor, DragSourceMonitor } from 'react-dnd';
+import type {  DragSourceMonitor } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
 const sectionLabels: Record<string, string> = {
@@ -44,7 +44,7 @@ function SectionRow({ section, index, moveSection, toggleSectionVisibility }: Se
 
   const [, drop] = useDrop<DragItem, void, unknown>({
     accept: ItemType,
-    hover(item: DragItem, _monitor: DropTargetMonitor) {
+    hover(item: DragItem) {
       if (!ref.current) return;
       if (item.index === index) return;
       moveSection(item.index, index);
@@ -92,19 +92,19 @@ const Settings = () => {
 
   // DnD reorder logic
   const moveSection = (from: number, to: number) => {
-    const sections = [...state.resumeSettings.sections];
+    const sections = [...state?.resumeSettings?.sections || []];
     const [moved] = sections.splice(from, 1);
     sections.splice(to, 0, moved);
     // Update order property to match new array order
     const reordered = sections.map((s, idx) => ({ ...s, order: idx }));
-    dispatch({ type: "RESUME_SETTINGS", payload: { sections: reordered } });
+    dispatch({ type: "UPDATE_RESUME_SETTINGS", payload: { sections: reordered } });
   };
 
   const toggleSectionVisibility = (key: string) => {
-    const sections = state.resumeSettings.sections.map((s: Section) =>
+    const sections = state?.resumeSettings?.sections?.map((s: Section) =>
       s.key === key ? { ...s, visible: !s.visible } : s
     );
-    dispatch({ type: "RESUME_SETTINGS", payload: { sections } });
+    dispatch({ type: "UPDATE_RESUME_SETTINGS", payload: { sections } });
   };
 
   return (
@@ -123,7 +123,8 @@ const Settings = () => {
           <Input
             id="resume-title"
             placeholder="e.g., Software Engineer Resume"
-            defaultValue="My Professional Resume"
+            value={state.resumeTitle}
+            onChange={(e) => dispatch({ type: "SET_RESUME_TITLE", payload: e.target.value })}
           />
         </div>
 
@@ -132,7 +133,7 @@ const Settings = () => {
           <div className="flex gap-4">
             <div className="flex-1">
               <Label className='my-1 mt-4' htmlFor="font-family">Font Family</Label>
-              <Select defaultValue="sans-serif" onValueChange={(value) => dispatch({ type: "RESUME_SETTINGS", payload: { fontFamily: value } })}>
+              <Select defaultValue="sans-serif" onValueChange={(value) => dispatch({ type: "UPDATE_RESUME_SETTINGS", payload: { fontFamily: value } })}>
                 <SelectTrigger className="w-32 mt-1">
                   <SelectValue placeholder="Select font" />
                 </SelectTrigger>
@@ -145,7 +146,7 @@ const Settings = () => {
             </div>
             <div className="flex-1">
               <Label className='my-1 mt-4' htmlFor="font-size">Font Size</Label>
-              <Select defaultValue={state.resumeSettings.fontSize.toString()} onValueChange={(value) => dispatch({ type: "RESUME_SETTINGS", payload: { fontSize: parseInt(value) } })}>
+              <Select defaultValue={state.resumeSettings?.fontSize?.toString()} onValueChange={(value) => dispatch({ type: "UPDATE_RESUME_SETTINGS", payload: { fontSize: parseInt(value) } })}>
                 <SelectTrigger className="w-32 mt-1">
                   <SelectValue placeholder="Select size" />
                 </SelectTrigger>
@@ -165,7 +166,7 @@ const Settings = () => {
           <Label className='my-1 mt-4' htmlFor="template">Template</Label>
           <Select
             defaultValue="Creative"
-            onValueChange={(value) => dispatch({ type: "RESUME_SETTINGS", payload: { template: value } })}
+            onValueChange={(value) => dispatch({ type: "UPDATE_RESUME_SETTINGS", payload: { template: value } })}
           >
             <SelectTrigger className="w-48 mt-1">
               <SelectValue placeholder="Select template" />
@@ -183,8 +184,7 @@ const Settings = () => {
           <Label className="mb-2 block text-base font-semibold">Sections</Label>
           <DndProvider backend={HTML5Backend}>
             <div className="flex flex-col gap-2 pb-5">
-              {state.resumeSettings.sections
-                .slice()
+              {state?.resumeSettings?.sections?.slice()
                 .sort((a, b) => a.order - b.order)
                 .map((section: Section, idx: number) => (
                   <SectionRow

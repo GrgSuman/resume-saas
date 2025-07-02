@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Project } from "../../../../types/resumeTypes";
+import type { Project } from "../../../../context/resume/types";
 import { Plus, Edit3, Trash2, X, Edit } from "lucide-react";
 import { useResume } from "../../../../hooks/useResume";
 
@@ -73,10 +73,10 @@ const ProjectsSection = ({ projects }: { projects: Project[] }) => {
       // Editing existing
       const updatedProjects = [...projects];
       updatedProjects[editingIndex] = formData;
-      dispatch({ type: 'RESUME_DATA', payload: { projects: updatedProjects } });
+      dispatch({ type: 'UPDATE_RESUME_DATA', payload: { projects: updatedProjects } });
     } else {
       // Adding new
-      dispatch({ type: 'RESUME_DATA', payload: { projects: [...projects, formData] } });
+      dispatch({ type: 'UPDATE_RESUME_DATA', payload: { projects: [...projects, formData] } });
     }
     handleClose();
   };
@@ -92,7 +92,7 @@ const ProjectsSection = ({ projects }: { projects: Project[] }) => {
 
   const handleDelete = (index: number) => {
     const updatedProjects = projects.filter((_, i) => i !== index);
-    dispatch({ type: 'RESUME_DATA', payload: { projects: updatedProjects } });
+    dispatch({ type: 'UPDATE_RESUME_DATA', payload: { projects: updatedProjects } });
   };
 
   const handleAddAchievement = () => {
@@ -156,7 +156,7 @@ const ProjectsSection = ({ projects }: { projects: Project[] }) => {
       {projects.map((project, index) => (
         <div key={index} className="mb-3">
           <div className="flex justify-between items-start mb-1">
-            {project.name}
+          <span className="font-bold">{project.name}</span>
             <div className="flex gap-3">
               {project.link && (
                 <a

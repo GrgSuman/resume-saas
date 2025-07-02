@@ -1,73 +1,134 @@
-import React, { createContext, useReducer, type Dispatch } from "react";
-import { demoData } from "../../demo_data";
-import type { ResumeData, ResumeMetaData, ResumeSettings } from "../../types/resumeDataType";
+import React, { createContext, useEffect, useReducer, type Dispatch } from "react";
+import { useParams } from "react-router";
+import axiosInstance from "../../api/axios";
+import type { InitialStateType, ResumeData, ResumeSettings } from "./types";
 
-// Default data
-const ResumeDefaultData: ResumeMetaData = {
-    resumeData: demoData,
-    resumeSettings: {
-        fontSize: 13,
-        fontFamily: "Arial, sans-serif",
-        lineHeight: 1.5,
-        template: "Creative",
-        resumeTitle: "My Professional Resume",
-        sections: [
-            { key: "personalInfo", order: 0, visible: true },
-            { key: "experience", order: 1, visible: true },
-            { key: "education", order: 2, visible: true },
-            { key: "projects", order: 3, visible: true },
-            { key: "skills", order: 4, visible: true },
-            { key: "certifications", order: 5, visible: false },
-            { key: "references", order: 6, visible: false },
-            { key: "interests", order: 7, visible: true },
-            { key: "customSections", order: 8, visible: false }
-        ]
-    },
+
+const initialState: InitialStateType = {
+    resumeData: null,
+    resumeSettings: null,
     resumeDownloading: false,
-    resumeEditingMode: true
-};
+    resumeEditingMode: true,
+    resumeTitle: "",
+    isLoading: true,
+    error: null
+}
 
 // Action Types
 export type ResumeAction = 
-  | { type: 'RESUME_DATA'; payload: Partial<ResumeData> }
-  | { type: 'RESUME_SETTINGS'; payload: Partial<ResumeSettings> }
-  | { type: 'RESUME_DOWNLOADING'; payload: boolean }
-  | { type: 'RESUME_EDITING_MODE'; payload: boolean };
+  // Loading and error states
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_ERROR'; payload: string | null } 
+
+  // Initial load
+  | { type: 'INITIALIZE_RESUME'; payload: { resumeData: ResumeData; resumeSettings: ResumeSettings; resumeTitle: string } }
+  
+  // Data updates
+  | { type: 'UPDATE_RESUME_DATA'; payload: Partial<ResumeData> }
+  | { type: 'UPDATE_RESUME_SETTINGS'; payload: Partial<ResumeSettings> }
+  | { type: 'SET_RESUME_TITLE'; payload: string }
+  
+  // UI states
+  | { type: 'SET_DOWNLOADING'; payload: boolean }
+  | { type: 'SET_EDITING_MODE'; payload: boolean }
+
 
 // Context Type
 type ResumeContextType = {
-    state: ResumeMetaData;
+    state: InitialStateType;
     dispatch: Dispatch<ResumeAction>;
 };
 
 // Create context
 const ResumeContext = createContext<ResumeContextType | undefined>(undefined);
 
+
 // Reducer function
-const resumeReducer = (state: ResumeMetaData, action: ResumeAction): ResumeMetaData => {
+const resumeReducer = (state: InitialStateType, action: ResumeAction) => {
     switch(action.type) {
-        case 'RESUME_DATA':
+        case 'SET_LOADING':
+            return { ...state, isLoading: action.payload };
+
+        case 'SET_ERROR':
+            return { ...state, error: action.payload };
+
+        case 'INITIALIZE_RESUME':
             return { 
-                ...state, 
-                resumeData: { ...state.resumeData, ...action.payload } 
+                ...state,
+                resumeData: action.payload.resumeData, 
+                resumeSettings: action.payload.resumeSettings,
+                resumeTitle: action.payload.resumeTitle
             };
-        case 'RESUME_SETTINGS':
-            return { 
-                ...state, 
-                resumeSettings: { ...state.resumeSettings, ...action.payload } 
-            };
-        case 'RESUME_DOWNLOADING':
+        
+        case 'SET_RESUME_TITLE':
+            return { ...state, resumeTitle: action.payload };
+
+        case 'UPDATE_RESUME_DATA':
+            return { ...state, resumeData: { ...state.resumeData, ...action.payload } };
+
+        case 'UPDATE_RESUME_SETTINGS':
+            return { ...state, resumeSettings: { ...state.resumeSettings, ...action.payload } };
+
+        case 'SET_DOWNLOADING':
             return { ...state, resumeDownloading: action.payload };
-        case 'RESUME_EDITING_MODE':
+
+        case 'SET_EDITING_MODE':
             return { ...state, resumeEditingMode: action.payload };
+
         default:
             return state;
     }
 };
 
+const updateResume = async (id: string, resumeData?: ResumeData, resumeSettings?: ResumeSettings, title?: string | null) => {
+    try {
+        const payload: {resumeData?: ResumeData, resumeSettings?: ResumeSettings, title?: string | null} = {};
+        if (resumeData !== undefined) payload.resumeData = resumeData;
+        if (resumeSettings !== undefined) payload.resumeSettings = resumeSettings;
+        if (title !== undefined && title !== null) payload.title = title;
+        await axiosInstance.patch(`/resume/${id}`, payload);
+        console.log(payload)
+    } catch (error) {
+        console.error('Error updating resume:', error);
+    }
+};
+
 // Context Provider component
 export const ResumeProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
-    const [state, dispatch] = useReducer(resumeReducer, ResumeDefaultData);
+    const [state, dispatch] = useReducer(resumeReducer, initialState);
+    const {id} = useParams()
+
+useEffect(() => {
+    const fetchResume = async () => {
+        try {
+            const response = await axiosInstance.get(`/resume/${id}`);
+            dispatch({type: 'INITIALIZE_RESUME', payload: {resumeData: response.data.resume.resumeData, resumeSettings: response.data.resume.resumeSettings, resumeTitle: response.data.resume.title}});
+            dispatch({type: 'SET_LOADING', payload: false});
+        } catch (error) {
+            console.error('Error fetching resume:', error);
+        }
+    }
+    if(id){
+        fetchResume();
+    }
+}, [id])
+
+
+useEffect(()=>{
+    if(id && state.resumeData && state.resumeSettings){
+        updateResume(id, state.resumeData, state.resumeSettings)
+    }
+}, [id, state.resumeData, state.resumeSettings])
+
+useEffect(() => {
+  if (id && state.resumeTitle) {
+    const handler = setTimeout(() => {
+      updateResume(id, undefined, undefined, state.resumeTitle);
+    }, 1000);
+
+    return () => clearTimeout(handler);
+  }
+}, [id, state.resumeTitle]);
 
     return (
         <ResumeContext.Provider value={{ state, dispatch }}>

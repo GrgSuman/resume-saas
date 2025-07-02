@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { PersonalInfo } from "../../../../types/resumeTypes";
+import type { PersonalInfo } from "../../../../context/resume/types";
 import { Edit3, X } from "lucide-react";
 import { useResume } from "../../../../hooks/useResume";
 
@@ -46,7 +46,7 @@ const PersonalInfoSection = ({personalInfo}:{personalInfo:PersonalInfo}) => {
   };
 
   const handleSave = () => {
-    dispatch({ type: 'RESUME_DATA', payload: { personalInfo: formData } });
+    dispatch({ type: 'UPDATE_RESUME_DATA', payload: { personalInfo: formData } });
     handleClose();
   };
 

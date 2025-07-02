@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { CustomSection } from "../../../../types/resumeTypes";
+import type { CustomSection } from "../../../../context/resume/types";
 import { Plus, Edit3, Trash2, X } from "lucide-react";
 import { useResume } from "../../../../hooks/useResume";
 
@@ -61,10 +61,10 @@ const Modal = ({
       // Editing existing
       const updatedCustomSections = [...customSections];
       updatedCustomSections[editingIndex] = formData;
-      dispatch({ type: 'RESUME_DATA', payload: { customSections: updatedCustomSections } });
+      dispatch({ type: 'UPDATE_RESUME_DATA', payload: { customSections: updatedCustomSections } });
     } else {
       // Adding new
-      dispatch({ type: 'RESUME_DATA', payload: { customSections: [...customSections, formData] } });
+      dispatch({ type: 'UPDATE_RESUME_DATA', payload: { customSections: [...customSections, formData] } });
     }
     handleClose();
   };
@@ -77,7 +77,7 @@ const Modal = ({
 
   const handleDelete = (index: number) => {
     const updatedCustomSections = customSections.filter((_, i) => i !== index);
-    dispatch({ type: 'RESUME_DATA', payload: { customSections: updatedCustomSections } });
+    dispatch({ type: 'UPDATE_RESUME_DATA', payload: { customSections: updatedCustomSections } });
   };
 
   return (

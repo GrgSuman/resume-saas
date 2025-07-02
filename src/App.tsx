@@ -1,7 +1,6 @@
 import { Route, Routes } from "react-router";
 import Dashboard from "./pages/dashboard/Dashboard";
-import NewResume from "./pages/resume/NewResume";
-import { ResumeProvider } from "./context/resume/ResumeContext";
+import ResumeDetail from "./pages/resume/ResumeDetail";
 import Home from "./pages/home/Home";
 import "./App.css";
 import Login from "./pages/auth/Login";
@@ -19,7 +18,7 @@ function App() {
        <Toaster />
       <GoogleOAuthProvider clientId="620421156218-1vl05kpbr9ljs8uqok8pssamo40qaa0o.apps.googleusercontent.com">
         <AuthProvider>
-          <ResumeProvider>
+          {/* <ResumeProvider> */}
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<Layout />}>
@@ -30,10 +29,10 @@ function App() {
               {/* Dashboard and Protected Routes */}
               <Route path="/dashboard" element={<PrivateRoute />}>
                 <Route path="/dashboard" index element={<Dashboard />} />
-                <Route path="/dashboard/resume/:id" element={<NewResume />} />
+                <Route path="/dashboard/resume/:id" element={<ResumeDetail />} />
               </Route>
             </Routes>
-          </ResumeProvider>
+          {/* </ResumeProvider> */}
         </AuthProvider>
       </GoogleOAuthProvider>
     </QueryClientProvider>

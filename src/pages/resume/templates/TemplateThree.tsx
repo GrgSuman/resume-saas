@@ -11,6 +11,7 @@ import PersonalInfoSectionTwo from "./sections/PersonalInfoSectionTwo";
 
 const TemplateThree = ({ ref }: { ref: React.RefObject<HTMLDivElement | null> }) => {
   const { state } = useResume();
+  if(!state.resumeData) return null;
   const {
     personalInfo,
     education,
@@ -24,8 +25,7 @@ const TemplateThree = ({ ref }: { ref: React.RefObject<HTMLDivElement | null> })
   } = state.resumeData;
 
   // Sort sections by order
-  const sortedSections = state.resumeSettings.sections
-    .slice()
+  const sortedSections = state?.resumeSettings?.sections?.slice()
     .sort((a, b) => a.order - b.order)
     .filter(x => x.visible);
 

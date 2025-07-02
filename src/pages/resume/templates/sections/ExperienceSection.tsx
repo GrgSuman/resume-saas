@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Experience } from "../../../../types/resumeTypes";
+import type { Experience } from "../../../../context/resume/types";
 import { Plus, Edit3, Trash2, X, Edit } from "lucide-react";
 import { useResume } from "../../../../hooks/useResume";
 
@@ -61,10 +61,10 @@ const ExperienceSection = ({ experience }: { experience: Experience[] }) => {
       // Editing existing
       const updatedExperience = [...experience];
       updatedExperience[editingIndex] = formData;
-      dispatch({ type: 'RESUME_DATA', payload: { experience: updatedExperience } });
+      dispatch({ type: 'UPDATE_RESUME_DATA', payload: { experience: updatedExperience } });
     } else {
       // Adding new
-      dispatch({ type: 'RESUME_DATA', payload: { experience: [...experience, formData] } });
+      dispatch({ type: 'UPDATE_RESUME_DATA', payload: { experience: [...experience, formData] } });
     }
     handleClose();
   };
@@ -80,7 +80,7 @@ const ExperienceSection = ({ experience }: { experience: Experience[] }) => {
 
   const handleDelete = (index: number) => {
     const updatedExperience = experience.filter((_, i) => i !== index);
-    dispatch({ type: 'RESUME_DATA', payload: { experience: updatedExperience } });
+    dispatch({ type: 'UPDATE_RESUME_DATA', payload: { experience: updatedExperience } });
   };
 
   const handleAddAchievement = () => {

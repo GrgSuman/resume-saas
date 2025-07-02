@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Education } from "../../../../types/resumeTypes";
+import type { Education } from "../../../../context/resume/types";
 import { Plus, Edit3, Trash2, X } from "lucide-react";
 import { useResume } from "../../../../hooks/useResume";
 
@@ -52,10 +52,10 @@ const EducationSection = ({ education }: { education: Education[] }) => {
       // Editing existing
       const updatedEducation = [...education];
       updatedEducation[editingIndex] = formData;
-      dispatch({ type: 'RESUME_DATA', payload: { education: updatedEducation } });
+      dispatch({ type: 'UPDATE_RESUME_DATA', payload: { education: updatedEducation } });
     } else {
       // Adding new
-      dispatch({ type: 'RESUME_DATA', payload: { education: [...education, formData] } });
+      dispatch({ type: 'UPDATE_RESUME_DATA', payload: { education: [...education, formData] } });
     }
     handleClose();
   };
@@ -68,7 +68,7 @@ const EducationSection = ({ education }: { education: Education[] }) => {
 
   const handleDelete = (index: number) => {
     const updatedEducation = education.filter((_, i) => i !== index);
-    dispatch({ type: 'RESUME_DATA', payload: { education: updatedEducation } });
+    dispatch({ type: 'UPDATE_RESUME_DATA', payload: { education: updatedEducation } });
   };
 
   return (

@@ -1,17 +1,20 @@
 import React,{useEffect, useState} from "react";
 import { Button } from "../../components/ui/button";
-import { ArrowLeft, Save, Download, Eye, Edit3 } from "lucide-react";
+import { ArrowLeft, Download, Eye, Edit3 } from "lucide-react";
 import { useResume } from "../../hooks/useResume";
 import { useNavigate } from "react-router";
+// import { toast } from "sonner";
 
 const EditorHeader = ({resumeRef}:{resumeRef:React.RefObject<HTMLDivElement | null>}) => {
 
   const { state, dispatch } = useResume();
   const navigate = useNavigate();
-  const handleSave = () => {
-    // TODO: Implement save functionality
-    console.log("Save button clicked");
-  };
+  // const handleSave = () => {
+  //   toast.success("All changes saved",{
+  //     duration: 3000,
+  //     position: "top-center",
+  //   })
+  // };
 
   const [shouldDownload, setShouldDownload] = useState(false);
 
@@ -31,25 +34,25 @@ const EditorHeader = ({resumeRef}:{resumeRef:React.RefObject<HTMLDivElement | nu
       a.download = "resume.pdf";
       a.click();
       setShouldDownload(false)
-      dispatch({ type: 'RESUME_DOWNLOADING', payload: false })
+      dispatch({ type: 'SET_DOWNLOADING', payload: false })
     };
 
-    if (resumeRef.current && !state.resumeEditingMode && shouldDownload) {
-      dispatch({ type: 'RESUME_DOWNLOADING', payload: true })
+    if (resumeRef.current && !state?.resumeEditingMode && shouldDownload) {
+      dispatch({ type: 'SET_DOWNLOADING', payload: true })
       const html = resumeRef.current.innerHTML;
       downloadPDF(html);
     }
 
 
-  },[state.resumeEditingMode,shouldDownload,resumeRef,dispatch])
+  },[state?.resumeEditingMode,shouldDownload,resumeRef,dispatch])
 
   const handleDownloadPDF = () => {
-    dispatch({ type: 'RESUME_EDITING_MODE', payload: false })
+    dispatch({ type: 'SET_EDITING_MODE', payload: false })
     setShouldDownload(true)
   };
 
   const toggleEditMode = () => {
-    dispatch({ type: 'RESUME_EDITING_MODE', payload: !state.resumeEditingMode })
+    dispatch({ type: 'SET_EDITING_MODE', payload: !state?.resumeEditingMode })
   };
 
   return (
@@ -75,7 +78,7 @@ const EditorHeader = ({resumeRef}:{resumeRef:React.RefObject<HTMLDivElement | nu
             <button
               onClick={toggleEditMode}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
-                state.resumeEditingMode
+                state?.resumeEditingMode
                   ? "bg-white text-black shadow-sm"
                   : "text-gray-600 hover:text-gray-800"
               }`}
@@ -86,7 +89,7 @@ const EditorHeader = ({resumeRef}:{resumeRef:React.RefObject<HTMLDivElement | nu
             <button
               onClick={toggleEditMode}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
-                !state.resumeEditingMode
+                !state?.resumeEditingMode
                   ? "bg-white text-black shadow-sm"
                   : "text-gray-600 hover:text-gray-800"
               }`}
@@ -99,7 +102,7 @@ const EditorHeader = ({resumeRef}:{resumeRef:React.RefObject<HTMLDivElement | nu
 
         {/* Right side - Save and Download buttons */}
         <div className="flex items-center gap-2">
-          <Button
+          {/* <Button
             variant="outline"
             size="sm"
             onClick={handleSave}
@@ -107,20 +110,20 @@ const EditorHeader = ({resumeRef}:{resumeRef:React.RefObject<HTMLDivElement | nu
           >
             <Save className="h-4 w-4" />
             Save
-          </Button>
+          </Button> */}
           <Button
             size="sm"
             onClick={handleDownloadPDF}
-            disabled={state.resumeDownloading}
+            disabled={state?.resumeDownloading}
             className="gap-2 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:from-purple-600 hover:via-pink-600 hover:to-red-600 text-white border-0 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
             <Download className={`h-4 w-4 transition-transform duration-300 ${
-              state.resumeDownloading ? 'animate-bounce' : 'group-hover:translate-y-[-2px]'
+              state?.resumeDownloading ? 'animate-bounce' : 'group-hover:translate-y-[-2px]'
             }`} />
             <span className="transition-all duration-300">
-              {state.resumeDownloading ? "Downloading..." : "Download PDF"}
+              {state?.resumeDownloading ? "Downloading..." : "Download PDF"}
             </span>
-            {state.resumeDownloading && (
+            {state?.resumeDownloading && (
               <div className="ml-2 w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
             )}
           </Button>

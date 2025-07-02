@@ -57,14 +57,14 @@ const InterestSection = ({ interests  }: { interests: string[] }) => {
 
   const handleAddInterest = () => {
     if (newInterest.trim()) {
-      dispatch({ type: 'RESUME_DATA', payload: { interests: [...interests, newInterest.trim()] } });
+      dispatch({ type: 'UPDATE_RESUME_DATA', payload: { interests: [...interests, newInterest.trim()] } });
       setNewInterest("");
     }
   };
 
   const handleRemoveInterest = (index: number) => {
     const updatedInterests = interests.filter((_, i) => i !== index);
-    dispatch({ type: 'RESUME_DATA', payload: { interests: updatedInterests } });
+    dispatch({ type: 'UPDATE_RESUME_DATA', payload: { interests: updatedInterests } });
   };
 
   const handleEditInterestStart = (index: number, interest: string) => {
@@ -76,7 +76,7 @@ const InterestSection = ({ interests  }: { interests: string[] }) => {
     if (editingIndex !== null && editingText.trim()) {
       const updatedInterests = [...interests];
       updatedInterests[editingIndex] = editingText.trim();
-      dispatch({ type: 'RESUME_DATA', payload: { interests: updatedInterests } });
+      dispatch({ type: 'UPDATE_RESUME_DATA', payload: { interests: updatedInterests } });
       setEditingIndex(null);
       setEditingText("");
     }

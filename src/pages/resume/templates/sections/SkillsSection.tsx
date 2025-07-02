@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { SkillCategory } from "../../../../types/resumeTypes";
+import type { SkillCategory } from "../../../../context/resume/types";
 import { Plus, Edit3, Trash2, X, Edit } from "lucide-react";
 import { useResume } from "../../../../hooks/useResume";
 
@@ -70,10 +70,10 @@ const Modal = ({
       // Editing existing
       const updatedSkills = [...skills];
       updatedSkills[editingIndex] = formData;
-      dispatch({ type: 'RESUME_DATA', payload: { skills: updatedSkills } });
+      dispatch({ type: 'UPDATE_RESUME_DATA', payload: { skills: updatedSkills } });
     } else {
       // Adding new
-      dispatch({ type: 'RESUME_DATA', payload: { skills: [...skills, formData] } });
+      dispatch({ type: 'UPDATE_RESUME_DATA', payload: { skills: [...skills, formData] } });
     }
     handleClose();
   };
@@ -89,7 +89,7 @@ const Modal = ({
 
   const handleDelete = (index: number) => {
     const updatedSkills = skills.filter((_, i) => i !== index);
-    dispatch({ type: 'RESUME_DATA', payload: { skills: updatedSkills } });
+    dispatch({ type: 'UPDATE_RESUME_DATA', payload: { skills: updatedSkills } });
   };
 
   const handleAddSkill = () => {

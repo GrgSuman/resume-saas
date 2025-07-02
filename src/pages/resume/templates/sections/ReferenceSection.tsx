@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Reference } from "../../../../types/resumeTypes";
+import type { Reference } from "../../../../context/resume/types";
 import { Plus, Edit3, Trash2, X } from "lucide-react";
 import { useResume } from "../../../../hooks/useResume";
 
@@ -64,10 +64,10 @@ const ReferenceSection = ({ references }: { references: Reference[] }) => {
       // Editing existing
       const updatedReferences = [...references];
       updatedReferences[editingIndex] = formData;
-      dispatch({ type: 'RESUME_DATA', payload: { references: updatedReferences } });
+      dispatch({ type: 'UPDATE_RESUME_DATA', payload: { references: updatedReferences } });
     } else {
       // Adding new
-      dispatch({ type: 'RESUME_DATA', payload: { references: [...references, formData] } });
+      dispatch({ type: 'UPDATE_RESUME_DATA', payload: { references: [...references, formData] } });
     }
     handleClose();
   };
@@ -80,7 +80,7 @@ const ReferenceSection = ({ references }: { references: Reference[] }) => {
 
   const handleDelete = (index: number) => {
     const updatedReferences = references.filter((_, i) => i !== index);
-    dispatch({ type: 'RESUME_DATA', payload: { references: updatedReferences } });
+    dispatch({ type: 'UPDATE_RESUME_DATA', payload: { references: updatedReferences } });
   };
 
   return (

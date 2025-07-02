@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Certification } from "../../../../types/resumeTypes";
+import type { Certification } from "../../../../context/resume/types";
 import { Plus, Edit3, Trash2, X } from "lucide-react";
 import { useResume } from "../../../../hooks/useResume";
 
@@ -63,10 +63,10 @@ const CertificationSection = ({ certifications }: { certifications: Certificatio
       // Editing existing
       const updatedCertifications = [...certifications];
       updatedCertifications[editingIndex] = formData;
-      dispatch({ type: 'RESUME_DATA', payload: { certifications: updatedCertifications } });
+      dispatch({ type: 'UPDATE_RESUME_DATA', payload: { certifications: updatedCertifications } });
     } else {
       // Adding new
-      dispatch({ type: 'RESUME_DATA', payload: { certifications: [...certifications, formData] } });
+      dispatch({ type: 'UPDATE_RESUME_DATA', payload: { certifications: [...certifications, formData] } });
     }
     handleClose();
   };
@@ -79,7 +79,7 @@ const CertificationSection = ({ certifications }: { certifications: Certificatio
 
   const handleDelete = (index: number) => {
     const updatedCertifications = certifications.filter((_, i) => i !== index);
-    dispatch({ type: 'RESUME_DATA', payload: { certifications: updatedCertifications } });
+    dispatch({ type: 'UPDATE_RESUME_DATA', payload: { certifications: updatedCertifications } });
   };
 
   return (
