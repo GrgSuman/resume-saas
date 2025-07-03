@@ -133,7 +133,7 @@ const Settings = () => {
           <div className="flex gap-4">
             <div className="flex-1">
               <Label className='my-1 mt-4' htmlFor="font-family">Font Family</Label>
-              <Select defaultValue="sans-serif" onValueChange={(value) => dispatch({ type: "UPDATE_RESUME_SETTINGS", payload: { fontFamily: value } })}>
+              <Select defaultValue={state.resumeSettings?.fontFamily} onValueChange={(value) => dispatch({ type: "UPDATE_RESUME_SETTINGS", payload: { fontFamily: value } })}>
                 <SelectTrigger className="w-32 mt-1">
                   <SelectValue placeholder="Select font" />
                 </SelectTrigger>

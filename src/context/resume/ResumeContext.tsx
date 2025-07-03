@@ -11,7 +11,8 @@ const initialState: InitialStateType = {
     resumeEditingMode: true,
     resumeTitle: "",
     isLoading: true,
-    error: null
+    error: null,
+    isInitialized: false
 }
 
 // Action Types
@@ -31,6 +32,7 @@ export type ResumeAction =
   // UI states
   | { type: 'SET_DOWNLOADING'; payload: boolean }
   | { type: 'SET_EDITING_MODE'; payload: boolean }
+  | { type: 'SET_INITIALIZED'; payload: boolean }
 
 
 // Context Type
@@ -61,19 +63,22 @@ const resumeReducer = (state: InitialStateType, action: ResumeAction) => {
             };
         
         case 'SET_RESUME_TITLE':
-            return { ...state, resumeTitle: action.payload };
+            return { ...state, isInitialized: true, resumeTitle: action.payload };
 
         case 'UPDATE_RESUME_DATA':
-            return { ...state, resumeData: { ...state.resumeData, ...action.payload } };
+            return { ...state, isInitialized: true, resumeData: { ...state.resumeData, ...action.payload } };
 
         case 'UPDATE_RESUME_SETTINGS':
-            return { ...state, resumeSettings: { ...state.resumeSettings, ...action.payload } };
+            return { ...state, isInitialized: true, resumeSettings: { ...state.resumeSettings, ...action.payload } };
 
         case 'SET_DOWNLOADING':
             return { ...state, resumeDownloading: action.payload };
 
         case 'SET_EDITING_MODE':
             return { ...state, resumeEditingMode: action.payload };
+
+        case 'SET_INITIALIZED':
+            return { ...state, isInitialized: action.payload };
 
         default:
             return state;
@@ -98,37 +103,36 @@ export const ResumeProvider: React.FC<{children: React.ReactNode}> = ({ children
     const [state, dispatch] = useReducer(resumeReducer, initialState);
     const {id} = useParams()
 
-useEffect(() => {
-    const fetchResume = async () => {
-        try {
-            const response = await axiosInstance.get(`/resume/${id}`);
-            dispatch({type: 'INITIALIZE_RESUME', payload: {resumeData: response.data.resume.resumeData, resumeSettings: response.data.resume.resumeSettings, resumeTitle: response.data.resume.title}});
-            dispatch({type: 'SET_LOADING', payload: false});
-        } catch (error) {
-            console.error('Error fetching resume:', error);
+    useEffect(() => {
+        const fetchResume = async () => {
+            try {
+                const response = await axiosInstance.get(`/resume/${id}`);
+                dispatch({type: 'INITIALIZE_RESUME', payload: {resumeData: response.data.resume.resumeData, resumeSettings: response.data.resume.resumeSettings, resumeTitle: response.data.resume.title}});
+                dispatch({type: 'SET_LOADING', payload: false});
+            } catch (error) {
+                console.error('Error fetching resume:', error);
+            }
         }
-    }
-    if(id){
-        fetchResume();
-    }
-}, [id])
+        if(id){
+            fetchResume();
+        }
+    }, [id])
 
+    useEffect(()=>{
+        if(id && state.resumeData && state.resumeSettings && state.isInitialized){
+            updateResume(id, state.resumeData, state.resumeSettings)
+        }
+    }, [id, state.resumeData, state.resumeSettings, state.isInitialized])
 
-useEffect(()=>{
-    if(id && state.resumeData && state.resumeSettings){
-        updateResume(id, state.resumeData, state.resumeSettings)
-    }
-}, [id, state.resumeData, state.resumeSettings])
+    useEffect(() => {
+        if (id && state.resumeTitle && state.isInitialized) {
+            const handler = setTimeout(() => {
+                updateResume(id, undefined, undefined, state.resumeTitle);
+            }, 1000);
 
-useEffect(() => {
-  if (id && state.resumeTitle) {
-    const handler = setTimeout(() => {
-      updateResume(id, undefined, undefined, state.resumeTitle);
-    }, 1000);
-
-    return () => clearTimeout(handler);
-  }
-}, [id, state.resumeTitle]);
+            return () => clearTimeout(handler);
+        }
+    }, [id, state.resumeTitle, state.isInitialized]);
 
     return (
         <ResumeContext.Provider value={{ state, dispatch }}>

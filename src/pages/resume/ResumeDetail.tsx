@@ -8,7 +8,7 @@ import { ResumeProvider } from "../../context/resume/ResumeContext";
 
 const ResumeDetail = () => {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<"settings" | "assistant">("settings");
+  const [activeTab, setActiveTab] = useState<"settings" | "assistant">("assistant");
   const resumeRef = useRef<HTMLDivElement | null>(null);
 
   return (

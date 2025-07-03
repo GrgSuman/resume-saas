@@ -3,6 +3,7 @@ import { Button } from '../../../components/ui/button'
 import { Input } from '../../../components/ui/input'
 import { Send, Bot, User } from 'lucide-react'
 import { useResume } from '../../../hooks/useResume'
+import axiosInstance from '../../../api/axios'
 
 const Chat = () => {
   const { state, dispatch } = useResume();
@@ -21,34 +22,43 @@ const Chat = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSendMessage = () => {
-    if (!message.trim()) return
 
-    // TODO: Add AI response
-    if(message.toLowerCase().includes('change name')){
-     dispatch({type: 'RESUME_DATA', payload: {personalInfo: {...state.resumeData.personalInfo, name: 'RAMU'}}})
+  const sendMessage = async (userPrompt:string) => {
+    const {resumeData,resumeSettings} = state
+    dispatch({type: 'SET_LOADING', payload: true});
+    try{
+      const response = await axiosInstance.post('/resumegpt/', {resumeData,resumeSettings,userPrompt})
+      dispatch({type: 'UPDATE_RESUME_DATA', payload: response.data.resume.resumeData})
+      dispatch({type: 'UPDATE_RESUME_SETTINGS', payload: response.data.resume.resumeSettings})
+      dispatch({type: 'SET_LOADING', payload: false});
+      console.log(response.data)
+      return response.data.resume.message
+    }catch(error){
+      console.error('Error sending message:', error)
     }
+  }
+
+  const handleSendMessage = async() => {
+    if (!message.trim()) return
 
     const newMessage = {
       id: messages.length + 1,
       type: 'user' as const,
-      content: JSON.stringify(state.resumeData),
+      content: message,
       timestamp: new Date()
     }
-
     setMessages([...messages, newMessage])
     setMessage('')
 
-    // Simulate AI response
-    setTimeout(() => {
-      const aiResponse = {
-        id: messages.length + 2,
-        type: 'bot' as const,
-        content: 'I understand you want to improve your resume. Could you tell me more about your experience or what specific section you\'d like help with?',
-        timestamp: new Date()
-      }
-      setMessages(prev => [...prev, aiResponse])
-    }, 1000)
+    const aiResponseMsg = await sendMessage(message)
+
+    const aiResponse = {
+      id: messages.length + 2,
+      type: 'bot' as const,
+      content: aiResponseMsg,
+      timestamp: new Date()
+    }
+    setMessages(prev => [...prev, aiResponse])
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {

@@ -6,6 +6,7 @@ export type InitialStateType = {
     error: string | null;
     resumeDownloading: boolean;
     resumeEditingMode: boolean;
+    isInitialized: boolean;
 }
 
 export type ResumeData = {
