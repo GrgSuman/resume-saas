@@ -1,6 +1,3 @@
-import { Button } from "../../../components/ui/button"
-import { ArrowRight } from "lucide-react"
-
 export default function Features() {
   return (
     <section className="py-20 px-6">
@@ -162,14 +159,6 @@ export default function Features() {
               </li>
             </ul>
           </div>
-        </div>
-
-        {/* Feature CTA */}
-        <div className="text-center mt-12">
-          <Button size="lg" className="bg-black hover:bg-gray-800 h-12 px-8">
-            Explore all features
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
         </div>
       </div>
     </section>

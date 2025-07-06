@@ -17,7 +17,6 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { useNavigate } from "react-router";
-import img from '../../assets/logo.png'
 
 export default function DashboardHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
