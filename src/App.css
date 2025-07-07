@@ -118,3 +118,23 @@
     @apply bg-background text-foreground;
   }
 }
+
+.light-scrollbar {
+  scrollbar-width: thin;              /* For Firefox */
+  scrollbar-color: #e5e7eb #f9fafb;   /* thumb color, track color */
+}
+
+.light-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.light-scrollbar::-webkit-scrollbar-thumb {
+  background: #e5e7eb;    /* light gray thumb */
+  border-radius: 4px;
+}
+
+.light-scrollbar::-webkit-scrollbar-track {
+  background: #f9fafb;    /* even lighter track */
+  border-radius: 4px;
+}
