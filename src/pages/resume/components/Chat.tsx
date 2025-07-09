@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "../../../components/ui/button";
-import { Paperclip, Send, X, Edit3 } from "lucide-react";
+import { Paperclip, Send, X, Edit3, Sparkles } from "lucide-react";
 import { useResume } from "../../../hooks/useResume";
 
 const Chat = () => {
@@ -90,16 +90,17 @@ const Chat = () => {
   const isEmpty = messages.length === 0;
 
   return (
-    <div className="flex flex-col h-full bg-white">
-      {/* Header matching the editor style */}
-      <div className="w-full border-b border-gray-200 bg-white px-6 py-4">
+    <div className="flex flex-col h-full">
+      {/* Header with shadow */}
+      <div className="w-full bg-white px-6 py-4 shadow-sm sticky top-0 z-10">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Resume Assistant</h2>
-          
+          <h2 className="text-lg font-medium text-gray-900 tracking-tight flex items-center gap-2">
+            Resume Assistant
+          </h2>
           <div className="flex items-center gap-2">
             {editingTitle ? (
               <input
-                className="text-sm text-gray-900 border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                className="text-sm text-gray-900 border border-blue-200 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 bg-blue-50 transition-shadow shadow-sm"
                 value={titleInput}
                 autoFocus
                 onChange={(e) => setTitleInput(e.target.value)}
@@ -121,9 +122,9 @@ const Chat = () => {
               />
             ) : (
               <>
-                <span className="text-sm text-gray-700 font-medium">{resumeTitle}</span>
+                <span className="text-sm text-gray-700 font-medium max-w-[180px] truncate">{resumeTitle}</span>
                 <button
-                  className="text-gray-500 hover:text-gray-700 p-1 rounded hover:bg-gray-100"
+                  className="text-gray-400 hover:text-blue-600 p-1 rounded hover:bg-blue-50 transition focus:outline-none focus:ring-2 focus:ring-blue-200"
                   title="Edit title"
                   onClick={() => setEditingTitle(true)}
                 >
@@ -137,45 +138,43 @@ const Chat = () => {
 
       <div className="flex flex-col flex-1 min-h-0">
         {isEmpty ? (
-          <div className="flex flex-col items-center px-4 flex-none mt-12">
+          <div className="flex flex-col items-center px-4 flex-none mt-16 animate-fade-in">
+            <div className="mb-4">
+              <Sparkles className="h-12 w-12 text-blue-200" />
+            </div>
             <div className="text-lg font-semibold text-gray-900 mb-2">
               How can I help you get noticed?
             </div>
             <div className="text-sm text-gray-600 text-center my-4 max-w-md">
-              Ask for resume tips, section ideas, or upload your file for
-              instant feedback. Try one of these to get started:
+              Ask for resume tips, section ideas, or upload your file for instant feedback. Try one of these to get started:
             </div>
-            <div className="flex flex-wrap gap-3 justify-center max-w-lg">
+            <div className="flex flex-wrap gap-3 justify-center max-w-lg  p-4">
               <button
-                className="bg-gray-100 rounded-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 transition border border-gray-200"
-                onClick={() =>
-                  setMessage("Rewrite my work experience for impact")
-                }
+                className="rounded-full px-4 py-2 text-sm text-gray-700 bg-white hover:text-blue-700 border border-gray-200 shadow transition focus:outline-none focus:ring-2 focus:ring-blue-100"
+                onClick={() => setMessage("Rewrite my work experience for impact")}
               >
                 Rewrite work experience
               </button>
               <button
-                className="bg-gray-100 rounded-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 transition border border-gray-200"
+                className="rounded-full px-4 py-2 text-sm text-gray-700  bg-white shadow transition focus:outline-none focus:ring-2 focus:ring-blue-100"
                 onClick={() => setMessage("Add a summary section")}
               >
                 Add summary section
               </button>
               <button
-                className="bg-gray-100 rounded-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 transition border border-gray-200"
+                className="rounded-full px-4 py-2 text-sm text-gray-700 bg-white hover:text-blue-700 border border-gray-200 shadow transition focus:outline-none focus:ring-2 focus:ring-blue-100"
                 onClick={() => setMessage("Make my resume ATS-friendly")}
               >
                 Make ATS-friendly
               </button>
               <button
-                className="bg-gray-100 rounded-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 transition border border-gray-200"
-                onClick={() =>
-                  setMessage("Suggest skills for a software engineer")
-                }
+                className="rounded-full px-4 py-2 text-sm text-gray-700 bg-white hover:text-blue-700 border border-gray-200 shadow transition focus:outline-none focus:ring-2 focus:ring-blue-100"
+                onClick={() => setMessage("Suggest skills for a software engineer")}
               >
                 Suggest skills
               </button>
               <button
-                className="bg-gray-100 rounded-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 transition border border-gray-200"
+                className="rounded-full px-4 py-2 text-sm text-gray-700 bg-white hover:text-blue-700 border border-gray-200 shadow transition focus:outline-none focus:ring-2 focus:ring-blue-100"
                 onClick={() => setMessage("Review my uploaded resume")}
               >
                 Review my resume
@@ -184,7 +183,7 @@ const Chat = () => {
           </div>
         ) : (
           <div
-            className="flex-1 overflow-y-auto px-6 mt-5 pb-5 light-scrollbar"
+            className="flex-1 overflow-y-auto px-6 mt-5 pb-5 light-scrollbar animate-fade-in"
             style={{
               WebkitOverflowScrolling: "touch",
               overflowAnchor: "none",
@@ -193,15 +192,15 @@ const Chat = () => {
             {messages.map((msg) => (
               <div
                 key={msg.id}
-                className={`flex flex-col mb-4 transform-gpu ${
+                className={`flex flex-col mb-4 transform-gpu transition-all duration-300 animate-fade-in ${
                   msg.type === "user" ? "items-end" : "items-start"
                 }`}
               >
                 <div
-                  className={`max-w-[80%] whitespace-pre-wrap px-4 py-3 rounded-xl shadow-sm text-sm leading-relaxed ${
+                  className={`max-w-[80%] whitespace-pre-wrap px-5 py-3 rounded-2xl shadow-md text-sm leading-relaxed transition-all duration-300 ${
                     msg.type === "user"
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-800"
+                      ? "bg-blue-100 text-blue-900"
+                      : "bg-white text-gray-800 border border-gray-100"
                   }`}
                 >
                   {msg.content}
@@ -217,14 +216,15 @@ const Chat = () => {
             <div ref={messagesEndRef} />
           </div>
         )}
-        
         {/* Input Bar at Bottom */}
-        <div className="px-4 pb-4 pt-2 bg-white mt-auto border-t border-gray-200">
+        <div className="px-4 pb-4 pt-2 bg-white mt-auto shadow-lg rounded-t-xl">
           <div className="max-w-2xl mx-auto w-full">
-            <div className="relative bg-white border border-gray-300 rounded-xl flex items-center px-4 py-2 gap-2 hover:border-gray-400 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition">
+            <div className="relative bg-white border border-gray-300 rounded-xl flex items-center px-4 py-2 gap-2 hover:border-gray-400 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition shadow-sm">
               {/* Upload Button */}
-              <label className="inline-flex items-center cursor-pointer">
-                <Paperclip className="h-5 w-5 text-gray-500 hover:text-blue-600" />
+              <label className="inline-flex items-center cursor-pointer group">
+                <span className="p-1 rounded-full group-hover:bg-blue-50 transition">
+                  <Paperclip className="h-5 w-5 text-gray-500 group-hover:text-blue-600" />
+                </span>
                 <input
                   type="file"
                   accept=".pdf,.doc,.docx"
@@ -249,15 +249,15 @@ const Chat = () => {
                 onClick={handleSendMessage}
                 disabled={!message.trim() && !attachedFile}
                 size="icon"
-                className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-2 shadow-sm transition-all disabled:opacity-50 disabled:bg-gray-300"
-                style={{ height: 36, width: 36 }}
+                className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-2 shadow-lg transition-all disabled:opacity-50 disabled:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                style={{ height: 40, width: 40 }}
               >
-                <Send className="h-4 w-4" />
+                <Send className="h-5 w-5" />
               </Button>
             </div>
             {/* Show attached file name if present */}
             {attachedFile && (
-              <div className="flex items-center mt-2 ml-2 text-xs text-gray-600 bg-gray-100 rounded-lg px-3 py-1.5 w-fit border border-gray-200">
+              <div className="flex items-center mt-2 ml-2 text-xs text-gray-600 bg-gray-100 rounded-lg px-3 py-1.5 w-fit border border-gray-200 shadow-sm">
                 <span className="mr-2 truncate max-w-xs">{attachedFile.name}</span>
                 <button
                   onClick={removeAttachment}
@@ -267,9 +267,34 @@ const Chat = () => {
                 </button>
               </div>
             )}
+            {/* Typing indicator placeholder */}
+            {/* You can replace this with a real typing indicator if needed */}
+            {/* <div className="flex items-center mt-2 ml-2 text-xs text-blue-400 animate-pulse">Assistant is typing...</div> */}
           </div>
         </div>
       </div>
+      {/* Custom scrollbar styles */}
+      <style>{`
+        .light-scrollbar::-webkit-scrollbar {
+          width: 8px;
+          background: transparent;
+        }
+        .light-scrollbar::-webkit-scrollbar-thumb {
+          background: #e5e7eb;
+          border-radius: 8px;
+        }
+        .light-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: #e5e7eb #f8fafc;
+        }
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: none; }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.5s cubic-bezier(.4,0,.2,1);
+        }
+      `}</style>
     </div>
   );
 };

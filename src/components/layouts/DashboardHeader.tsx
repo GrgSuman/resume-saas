@@ -59,7 +59,7 @@ export default function DashboardHeader() {
       ),
       text: (
         <div className="flex flex-col">
-          <span className="text-2xl font-bold text-gray-900 tracking-tight">CVFAST</span>
+          <span className="text-2xl font-bold text-gray-900 tracking-tight">CloneCV</span>
           <span className="text-xs text-gray-500 font-medium tracking-wide">RESUME BUILDER</span>
         </div>
       )
@@ -257,7 +257,7 @@ export default function DashboardHeader() {
           <rect x="4" y="18" width="6" height="1" fill="#1f2937" />
         </svg>
       ),
-      text: <span className="text-2xl font-bold text-gray-900">CVFAST</span>
+      text: <span className="text-2xl font-bold text-gray-900">CloneCV</span>
     },
     16: {
       // Diamond design

@@ -16,21 +16,21 @@ const Modal = ({
   children: React.ReactNode;
 }) => {
   if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 mb-4 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold">{title}</h3>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
-          >
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 font-sans" aria-modal="true" role="dialog">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] flex flex-col overflow-hidden border border-gray-100 animate-fade-in font-sans">
+        <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200 bg-white font-sans">
+          <h3 className="text-lg font-semibold tracking-tight text-gray-900 font-sans">{title}</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-blue-600 p-2 rounded-full transition focus:outline-none focus:ring-2 focus:ring-blue-200 font-sans" aria-label="Close modal">
             <X className="h-5 w-5" />
           </button>
         </div>
-        {children}
+        <div className="bg-slate-50 px-6 py-6 overflow-y-auto flex-1 font-sans">{children}</div>
       </div>
+      <style>{`
+        @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+        .animate-fade-in { animation: fade-in 0.4s cubic-bezier(.4,0,.2,1); }
+      `}</style>
     </div>
   );
 };
@@ -150,57 +150,23 @@ const Modal = ({
         onClose={handleClose}
         title={editingIndex !== null ? "Edit Custom Section" : "Add New Custom Section"}
       >
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Section Title *
-            </label>
-            <input
-              type="text"
-              value={formData.title}
-              onChange={(e) =>
-                setFormData({ ...formData, title: e.target.value })
-              }
-              placeholder="e.g., Awards, Publications, Languages"
-              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
+        <form className="space-y-6 font-sans" onSubmit={e => { e.preventDefault(); handleSave(); }}>
+          <div className="space-y-4 font-sans">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 font-sans">Section Title *</label>
+              <input type="text" value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} placeholder="e.g., Awards, Publications, Languages" className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 bg-white shadow-sm transition font-sans" required />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 font-sans">Section Content *</label>
+              <textarea value={formData.content} onChange={e => setFormData({ ...formData, content: e.target.value })} placeholder="Enter the content for this custom section..." rows={6} className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 bg-white shadow-sm transition resize-vertical font-sans" required />
+              <p className="text-xs text-gray-500 mt-1 font-sans">You can use plain text or basic formatting. Each line will be displayed as a separate paragraph.</p>
+            </div>
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Section Content *
-            </label>
-            <textarea
-              value={formData.content}
-              onChange={(e) =>
-                setFormData({ ...formData, content: e.target.value })
-              }
-              placeholder="Enter the content for this custom section..."
-              rows={6}
-              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-vertical"
-              required
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              You can use plain text or basic formatting. Each line will be displayed as a separate paragraph.
-            </p>
+          <div className="pt-6 border-t border-gray-200 flex flex-col md:flex-row justify-end gap-3 bg-slate-50 -mx-6 px-6 pb-2 sticky bottom-0 z-10 font-sans">
+            <button type="button" onClick={handleClose} className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-100 transition font-medium font-sans">Cancel</button>
+            <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition font-semibold w-full md:w-auto font-sans">{editingIndex !== null ? "Update" : "Add"} Section</button>
           </div>
-
-          <div className="flex justify-end gap-3 pt-4 border-t">
-            <button
-              onClick={handleClose}
-              className="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSave}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              {editingIndex !== null ? "Update" : "Add"} Section
-            </button>
-          </div>
-        </div>
+        </form>
       </Modal>
     </>
   );
