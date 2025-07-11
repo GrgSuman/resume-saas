@@ -2,28 +2,56 @@ import React, { useState, useRef, useEffect } from "react";
 import { Button } from "../../../components/ui/button";
 import { Paperclip, Send, X, Edit3, Sparkles } from "lucide-react";
 import { useResume } from "../../../hooks/useResume";
+import axiosInstance from "../../../api/axios";
+import { useParams } from "react-router";
+
+type Message = {
+  id: number;
+  type: "user" | "model";
+  text: string;
+  timestamp: Date;
+};
 
 const Chat = () => {
   const [message, setMessage] = useState("");
   const [attachedFile, setAttachedFile] = useState<File | null>(null);
-  const [messages, setMessages] = useState<
-    Array<{
-      id: number;
-      type: "user" | "assistant";
-      content: string;
-      timestamp: Date;
-    }>
-  >([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [chatLoading, setChatLoading] = useState(false);
+  const [conversationLoading, setConversationLoading] = useState(true);
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const {id} = useParams();
+
   const { state, dispatch } = useResume();
-  const resumeTitle = state?.resumeTitle || "Untitled Resume";
+  const resumeTitle = state?.resumeTitle || "";
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleInput, setTitleInput] = useState(resumeTitle);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  useEffect(()=>{
+    const fetchMessages = async () => {
+      try {
+        setConversationLoading(true);
+        const response = await axiosInstance.get(`/resumegpt/${id}`);
+        setMessages(response.data.conversation.map((msg:{id:number,role:string,text:string,timestamp:Date})=>({
+          id:msg.id,
+          type:msg.role,
+          text:msg.text,
+          timestamp:new Date(msg.timestamp)
+        })));
+      } catch (error) {
+        console.error("Error fetching conversation:", error);
+      } finally {
+        setConversationLoading(false);
+      }
+    };
+    fetchMessages();
+  },[id])
 
   useEffect(() => {
     setTitleInput(resumeTitle);
@@ -39,36 +67,61 @@ const Chat = () => {
 
   const handleSendMessage = async () => {
     if (!message.trim() && !attachedFile) return;
-    if (attachedFile) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: prev.length + 1,
-          type: "user" as const,
-          content: `Uploaded resume: ${attachedFile.name}`,
-          timestamp: new Date(),
-        },
-      ]);
-      setAttachedFile(null);
-    }
+    // if (attachedFile) {
+    //   setMessages((prev) => [
+    //     ...prev,
+    //     {
+    //       id: prev.length + 1,
+    //       type: "user" as const,
+    //       content: `Uploaded resume: ${attachedFile.name}`,
+    //       timestamp: new Date(),
+    //     },
+    //   ]);
+    //   setAttachedFile(null);
+    // }
+
+    let updatedMessages = [...messages];
+
     if (message.trim()) {
+      setChatLoading(true);
       const newMessage = {
         id: messages.length + 1,
         type: "user" as const,
-        content: message,
+        text: message,
         timestamp: new Date(),
       };
-      setMessages([...messages, newMessage]);
+      updatedMessages = [...updatedMessages, newMessage];
+      setMessages(updatedMessages);
       setMessage("");
-      const aiResponseMsg =
-        "Hello! I'm your resume assistant. I can help you improve your resume, suggest better wording, or answer any questions about resume writing.\n\nYou can also upload your resume for feedback.";
+    }
+
+    const resumeData = state?.resumeData;
+    const resumeSettings = state?.resumeSettings;
+
+    try {
+      const response = await axiosInstance.post(`/resumegpt/`, {
+        resumeData,
+        resumeSettings,
+        userPrompt: message,
+        resumeId: id,
+      });
+
+      console.log(response.data.response)
+
+      dispatch({type: 'UPDATE_RESUME_DATA', payload: response.data.response.resumeUpdates})
+      dispatch({type: 'UPDATE_RESUME_SETTINGS', payload: response.data.response.settingsUpdates})
+
       const aiResponse = {
-        id: messages.length + 2,
-        type: "assistant" as const,
-        content: aiResponseMsg,
+        id: updatedMessages.length + 1,
+        type: "model" as const,
+        text: response.data?.response?.message,
         timestamp: new Date(),
       };
-      setMessages((prev) => [...prev, aiResponse]);
+      updatedMessages = [...updatedMessages, aiResponse];
+      setMessages(updatedMessages);
+      setChatLoading(false);
+    } catch (error) {
+      console.error("Error sending message:", error);
     }
   };
 
@@ -122,7 +175,9 @@ const Chat = () => {
               />
             ) : (
               <>
-                <span className="text-sm text-gray-700 font-medium max-w-[180px] truncate">{resumeTitle}</span>
+                <span className="text-sm text-gray-700 font-medium max-w-[180px] truncate">
+                  {resumeTitle}
+                </span>
                 <button
                   className="text-gray-400 hover:text-blue-600 p-1 rounded hover:bg-blue-50 transition focus:outline-none focus:ring-2 focus:ring-blue-200"
                   title="Edit title"
@@ -137,21 +192,31 @@ const Chat = () => {
       </div>
 
       <div className="flex flex-col flex-1 min-h-0">
-        {isEmpty ? (
-          <div className="flex flex-col items-center px-4 flex-none mt-16 animate-fade-in">
+        {conversationLoading ? (
+          <div className="flex flex-col items-center justify-center px-4 flex-1 animate-fade-in">
+            <div className="mb-4">
+              <div className="w-8 h-8 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+            </div>
+            <div className="text-sm text-gray-600">Loading conversation...</div>
+          </div>
+        ) : isEmpty ? (
+          <div className="flex flex-col items-center px-4 flex-none mt-5 animate-fade-in">
             <div className="mb-4">
               <Sparkles className="h-12 w-12 text-blue-200" />
             </div>
             <div className="text-lg font-semibold text-gray-900 mb-2">
-              How can I help you get noticed?
+              Transform Your Resume with AI
             </div>
             <div className="text-sm text-gray-600 text-center my-4 max-w-md">
-              Ask for resume tips, section ideas, or upload your file for instant feedback. Try one of these to get started:
+              Ask for resume tips, section ideas, or upload your file for
+              instant feedback. Try one of these to get started:
             </div>
             <div className="flex flex-wrap gap-3 justify-center max-w-lg  p-4">
               <button
                 className="rounded-full px-4 py-2 text-sm text-gray-700 bg-white hover:text-blue-700 border border-gray-200 shadow transition focus:outline-none focus:ring-2 focus:ring-blue-100"
-                onClick={() => setMessage("Rewrite my work experience for impact")}
+                onClick={() =>
+                  setMessage("Rewrite my work experience for impact")
+                }
               >
                 Rewrite work experience
               </button>
@@ -169,7 +234,9 @@ const Chat = () => {
               </button>
               <button
                 className="rounded-full px-4 py-2 text-sm text-gray-700 bg-white hover:text-blue-700 border border-gray-200 shadow transition focus:outline-none focus:ring-2 focus:ring-blue-100"
-                onClick={() => setMessage("Suggest skills for a software engineer")}
+                onClick={() =>
+                  setMessage("Suggest skills for a software engineer")
+                }
               >
                 Suggest skills
               </button>
@@ -203,7 +270,7 @@ const Chat = () => {
                       : "bg-white text-gray-800 border border-gray-100"
                   }`}
                 >
-                  {msg.content}
+                  {msg.text}
                 </div>
                 <span className="text-xs text-gray-400 mt-1">
                   {msg.timestamp.toLocaleTimeString([], {
@@ -213,6 +280,29 @@ const Chat = () => {
                 </span>
               </div>
             ))}
+            
+            {/* Loading message from AI */}
+            {chatLoading && (
+              <div className="flex flex-col mb-4 transform-gpu transition-all duration-300 animate-fade-in items-start">
+                <div className="max-w-[80%] whitespace-pre-wrap px-5 py-3 rounded-2xl shadow-md text-sm leading-relaxed transition-all duration-300 bg-white text-gray-800 border border-gray-100">
+                  <div className="flex items-center gap-2">
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    </div>
+                    {/* <span className="text-gray-600">Thinking...</span> */}
+                  </div>
+                </div>
+                <span className="text-xs text-gray-400 mt-1">
+                  {new Date().toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+              </div>
+            )}
+            
             <div ref={messagesEndRef} />
           </div>
         )}
@@ -241,7 +331,6 @@ const Chat = () => {
                 placeholder="Type your message..."
                 rows={1}
                 className="flex-1 w-full resize-none border-0 outline-none bg-transparent px-2 py-2 text-sm min-h-[44px] max-h-32 pr-10 placeholder-gray-400"
-                disabled={false}
               />
               {/* Send Button */}
               <Button
@@ -258,7 +347,9 @@ const Chat = () => {
             {/* Show attached file name if present */}
             {attachedFile && (
               <div className="flex items-center mt-2 ml-2 text-xs text-gray-600 bg-gray-100 rounded-lg px-3 py-1.5 w-fit border border-gray-200 shadow-sm">
-                <span className="mr-2 truncate max-w-xs">{attachedFile.name}</span>
+                <span className="mr-2 truncate max-w-xs">
+                  {attachedFile.name}
+                </span>
                 <button
                   onClick={removeAttachment}
                   className="text-gray-500 hover:text-red-500"
@@ -267,9 +358,7 @@ const Chat = () => {
                 </button>
               </div>
             )}
-            {/* Typing indicator placeholder */}
-            {/* You can replace this with a real typing indicator if needed */}
-            {/* <div className="flex items-center mt-2 ml-2 text-xs text-blue-400 animate-pulse">Assistant is typing...</div> */}
+
           </div>
         </div>
       </div>

@@ -35,7 +35,7 @@ const ResumeDetail = () => {
             </div>
 
             {/* Right Side - Chat Only */}
-            <div className="w-1/4 bg-white">
+            <div className="w-[30%] bg-white">
               <Chat />
             </div>
           </div>
@@ -65,8 +65,7 @@ const ResumeDetail = () => {
               <div className="fixed inset-0 z-50 flex items-end bg-black/30">
                 <div className="w-full bg-white rounded-t-2xl shadow-2xl min-h-[80vh] max-h-[80vh] flex flex-col">
                   {/* Drawer Header */}
-                  <div className="flex items-center justify-between p-4 border-b">
-                    <h3 className="font-semibold text-lg">AI Assistant</h3>
+                  <div className="flex items-center justify-end p-4">
                     <button
                       onClick={() => setMobileDrawerOpen(false)}
                       className="text-gray-500 hover:text-gray-900 p-2"

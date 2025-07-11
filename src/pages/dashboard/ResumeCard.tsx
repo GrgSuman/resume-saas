@@ -40,6 +40,18 @@ export default function ResumeCard({id, title, updatedAt}: {id: string, title: s
 
   const queryClient = useQueryClient();
 
+
+  // Duplicate Resume 
+  const duplicateResumeMutation = useMutation({
+    mutationFn: () => axiosInstance.post(`/resume/duplicate`,{
+      resumeId: id
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["resumes"] });
+      setIsDeleteModalOpen(false);
+    },
+  });
+
   // Delete Resume Mutation
   const deleteResumeMutation = useMutation({
     mutationFn: () => axiosInstance.delete(`/resume/${id}`),
@@ -83,7 +95,7 @@ export default function ResumeCard({id, title, updatedAt}: {id: string, title: s
 
   const handleDuplicate = () => {
     setIsDropdownOpen(false);
-    alert(`Duplicate ${title}`);
+    duplicateResumeMutation.mutate();
   };
   
   return (
