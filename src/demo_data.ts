@@ -1,4 +1,4 @@
-import type { ResumeData } from "./types/resumeTypes";
+import type { ResumeData } from "./context/resume/types";
 
 export const demoData: ResumeData = {
   personalInfo: {

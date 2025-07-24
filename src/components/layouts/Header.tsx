@@ -11,7 +11,7 @@ export default function Header() {
     <nav className="fixed top-0 w-full z-50 bg-white/95 backdrop-blur border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         <a href="/" className="font-semibold text-2xl hover:text-gray-700 transition-colors">
-          CVFAST
+          CloneCV
         </a>
 
         <div className="hidden md:flex items-center gap-8">

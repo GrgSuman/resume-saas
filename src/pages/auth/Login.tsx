@@ -1,10 +1,10 @@
-import img from "../../assets/illustration.jpg"
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import { useAuth } from "../../hooks/useAuth";
 import { Navigate, useLocation } from "react-router";
+import { API_URL } from '../../lib/constants';
 
 const Login = () => {
-  const { authStates, setUser, setAuthStates, user } = useAuth();
+  const { authStates, setUser, setAuthStates } = useAuth();
   const location = useLocation();
 
   // Get the redirect path from location state, or default to dashboard
@@ -21,8 +21,10 @@ const Login = () => {
 
   if(authStates.isAuthenticated) return <Navigate to={from} replace />;
 
+
   const handleSuccess = async (credentialResponse: CredentialResponse) => {
-    const res = await fetch('http://localhost:8000/api/auth/register', {
+    const baseURL = API_URL;  
+    const res = await fetch(`${baseURL}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token: credentialResponse.credential }),
@@ -45,26 +47,6 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center px-6 bg-gradient-to-b from-white via-purple-50 to-purple-200">
       <div className="max-w-md w-full">
-        <h1 className="text-red-500 mt-16">{JSON.stringify(user)}</h1>
-        <button onClick={() => {
-          fetch('http://localhost:8000/api/auth/logout', {
-            credentials: 'include',
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-          }).then(res => res.json()).then(data => console.log(data));
-        }}>Validate</button>
-
-<h1>{JSON.stringify(authStates)}</h1>
-
-        {/* Illustration */}
-        <div className="flex justify-center mb-8">
-          <img
-            src={img}
-            alt="Sign in illustration"
-            className="h-40 w-auto object-contain"
-            draggable={false}
-          />
-        </div>
         {/* Login Card */}
         <div className="bg-white border border-gray-200 rounded-2xl p-10 shadow-xl">
           <div className="text-center mb-8">

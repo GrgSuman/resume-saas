@@ -7,7 +7,7 @@ import ReferenceSection from "./sections/ReferenceSection";
 import InterestSection from "./sections/InterestSection";
 import CustomSection from "./sections/CustomSection";
 import { useResume } from "../../../hooks/useResume";
-import PersonalInfoSectionTwo from "./sections/PersonalInfoSectionTwo";
+import PersonalInfoSection from "./sections/PersonalInfoSection";
 
 const TemplateThree = ({ ref }: { ref: React.RefObject<HTMLDivElement | null> }) => {
   const { state } = useResume();
@@ -34,11 +34,11 @@ const TemplateThree = ({ ref }: { ref: React.RefObject<HTMLDivElement | null> })
     
     switch (section.key) {
       case "personalInfo":
-        return <PersonalInfoSectionTwo {...baseProps} personalInfo={personalInfo} />;
+        return <PersonalInfoSection {...baseProps} personalInfo={personalInfo || {}} />;
       case "experience":
-        return <ExperienceSection {...baseProps} experience={experience} />;
+        return <ExperienceSection {...baseProps} experience={experience || []} />;
       case "education":
-        return <EducationSection {...baseProps} education={education} />;
+        return <EducationSection {...baseProps} education={education || []} />;
       case "projects":
         return <ProjectsSection {...baseProps} projects={projects || []} />;
       case "skills":
@@ -57,15 +57,15 @@ const TemplateThree = ({ ref }: { ref: React.RefObject<HTMLDivElement | null> })
   };
 
   // Split sections into left and right columns after personal info
-  const personalInfoSection = sortedSections.find(s => s.key === "personalInfo");
-  const otherSections = sortedSections.filter(s => s.key !== "personalInfo");
+  const personalInfoSection = sortedSections?.find(s => s.key === "personalInfo");
+  const otherSections = sortedSections?.filter(s => s.key !== "personalInfo");
   
   // Define which sections go in left vs right column
-  const leftColumnSections = otherSections.filter(s => 
+  const leftColumnSections = otherSections?.filter(s => 
     ['experience', 'projects', 'customSections'].includes(s.key)
   );
   
-  const rightColumnSections = otherSections.filter(s => 
+  const rightColumnSections = otherSections?.filter(s => 
     ['education', 'skills', 'certifications', 'references', 'interests'].includes(s.key)
   );
 
@@ -77,10 +77,10 @@ const TemplateThree = ({ ref }: { ref: React.RefObject<HTMLDivElement | null> })
       <div
         className="max-w-[210mm] min-w-[210mm] min-h-[297mm] max-h-[297mm] mx-auto bg-white text-black leading-tight overflow-hidden"
         style={{ 
-          fontSize: `${state.resumeSettings.fontSize}px`, 
+          fontSize: `${state.resumeSettings?.fontSize}px`, 
           boxSizing: "border-box",
           padding: "32px 40px",
-          fontFamily: state.resumeSettings.fontFamily
+          fontFamily: state.resumeSettings?.fontFamily
         }}
       >
         {/* Header Section - Personal Info */}
@@ -92,7 +92,7 @@ const TemplateThree = ({ ref }: { ref: React.RefObject<HTMLDivElement | null> })
         <div className="flex gap-8">
           {/* Left Column - Main Content */}
           <div className="flex-1 space-y-6">
-            {leftColumnSections.map((section, index) => (
+            {leftColumnSections?.map((section, index) => (
               <div key={section.key} className="break-inside-avoid">
                 {renderSection(section, index + 1)}
               </div>
@@ -101,9 +101,9 @@ const TemplateThree = ({ ref }: { ref: React.RefObject<HTMLDivElement | null> })
 
           {/* Right Column - Supporting Information */}
           <div className="w-72 space-y-6">
-            {rightColumnSections.map((section, index) => (
+            {rightColumnSections?.map((section, index) => (
               <div key={section.key} className="break-inside-avoid">
-                {renderSection(section, index + leftColumnSections.length + 1)}
+                {renderSection(section, index + (leftColumnSections?.length || 0) + 1)}
               </div>
             ))}
           </div>

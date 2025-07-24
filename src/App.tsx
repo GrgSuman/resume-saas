@@ -10,6 +10,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthProvider } from "./context/auth/AuthContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
+import UserProfile from "./pages/profile/UserProfile";
 
 function App() {
   const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ function App() {
               <Route path="/dashboard" element={<PrivateRoute />}>
                 <Route path="/dashboard" index element={<Dashboard />} />
                 <Route path="/dashboard/resume/:id" element={<ResumeDetail />} />
+                <Route path="/dashboard/profile" element={<UserProfile />} />
               </Route>
             </Routes>
           {/* </ResumeProvider> */}
