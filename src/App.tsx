@@ -17,7 +17,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
        <Toaster />
-      <GoogleOAuthProvider clientId="620421156218-1vl05kpbr9ljs8uqok8pssamo40qaa0o.apps.googleusercontent.com">
+      <GoogleOAuthProvider clientId="620421156218-5b2p94rdcismn2eqr8afggor7tqd2sum.apps.googleusercontent.com">
         <AuthProvider>
           {/* <ResumeProvider> */}
             <Routes>
