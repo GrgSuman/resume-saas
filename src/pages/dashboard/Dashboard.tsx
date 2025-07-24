@@ -73,11 +73,6 @@ export default function Dashboard() {
           {/* Empty State */}
           {resumeData?.data?.resume.length === 0 && (
             <div className="flex flex-col items-center justify-center py-20">
-              {/* <div className="mb-6">
-                <div className="w-20 h-20 rounded-full flex items-center justify-center bg-gradient-to-br from-purple-100 via-pink-100 to-red-100 shadow-md">
-                  <Plus className="h-10 w-10 text-purple-400" />
-                </div>
-              </div> */}
               <h3 className="text-2xl font-bold text-gray-900 mb-2">
                 No resumes yet
               </h3>

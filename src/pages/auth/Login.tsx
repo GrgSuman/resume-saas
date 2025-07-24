@@ -1,6 +1,7 @@
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import { useAuth } from "../../hooks/useAuth";
 import { Navigate, useLocation } from "react-router";
+import { API_URL } from '../../lib/constants';
 
 const Login = () => {
   const { authStates, setUser, setAuthStates } = useAuth();
@@ -22,7 +23,8 @@ const Login = () => {
 
 
   const handleSuccess = async (credentialResponse: CredentialResponse) => {
-    const res = await fetch('http://localhost:8000/api/auth/register', {
+    const baseURL = API_URL;  
+    const res = await fetch(`${baseURL}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token: credentialResponse.credential }),

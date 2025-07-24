@@ -17,7 +17,7 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
 
   useEffect(() => {
     const downloadPDF = async (htmlContent: string) => {
-      const res = await fetch("http://localhost:8000/generate-pdf", {
+      const res = await fetch(`https://server.clonecv.com/generate-pdf`, {
         method: "POST",
         body: JSON.stringify({ htmlContent }),
         headers: {
@@ -100,16 +100,15 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
           {/* Font */}
           <div className="flex items-center gap-2">
             <Select
-              value={state.resumeSettings?.fontFamily || "sans-serif"}
+              value={state.resumeSettings?.fontFamily || "Roboto"}
               onValueChange={(value) => dispatch({ type: "UPDATE_RESUME_SETTINGS", payload: { fontFamily: value } })}
             >
               <SelectTrigger className="h-9 w-[100px] border-gray-300 bg-white hover:bg-gray-50 rounded-lg text-sm font-medium text-gray-800">
                 <SelectValue placeholder="Select font" />
               </SelectTrigger>
               <SelectContent className="rounded-lg shadow-lg border border-gray-200 bg-white">
-                <SelectItem value="sans-serif" className="hover:bg-gray-50">Sans</SelectItem>
-                <SelectItem value="serif" className="hover:bg-gray-50">Serif</SelectItem>
-                <SelectItem value="monospace" className="hover:bg-gray-50">Mono</SelectItem>
+                <SelectItem value="Roboto" className="hover:bg-gray-50">Sans</SelectItem>
+                <SelectItem value="PT Serif" className="hover:bg-gray-50">Serif</SelectItem>
               </SelectContent>
             </Select>
           </div>
