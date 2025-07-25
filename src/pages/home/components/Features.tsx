@@ -1,161 +1,107 @@
-export default function Features() {
+export default function BrutalistFeatures() {
   return (
-    <section className="py-20 px-6">
-      <div className="max-w-6xl mx-auto">
+    <section id="features" className="py-20 bg-white">
+      <div className="max-w-6xl mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 id="features" className="text-3xl font-bold mb-4">Everything you need to land your dream job</h2>
-          <p className="text-xl text-gray-700 max-w-2xl mx-auto">
-            Powerful AI features that make resume building effortless and effective
+          <h2 className="text-4xl font-black uppercase tracking-tighter mb-4">EVERYTHING YOU NEED</h2>
+          <p className="text-lg text-gray-600 font-mono">
+            // Powerful AI features that make resume building effortless and effective
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {/* AI Tailoring */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-              <span className="text-blue-600 text-xl">🤖</span>
-            </div>
-            <h3 className="text-lg font-semibold mb-3">AI-Powered Tailoring</h3>
-            <p className="text-gray-700 text-sm mb-4">
-              Our AI analyzes job descriptions and automatically customizes your resume to match the role requirements.
+          {/* Chat to Build */}
+          <div className="border-4 border-black p-8 bg-white h-full">
+            <div className="text-4xl mb-6">💬</div>
+            <h3 className="text-xl font-black uppercase mb-4">CHAT TO BUILD</h3>
+            <p className="text-gray-700 mb-6">
+              Build your resume through conversation. Just tell the AI what you want — it writes, updates, and optimizes content instantly.
             </p>
-            <ul className="space-y-2 text-sm text-gray-600">
-              <li className="flex items-center gap-2">
-                <div className="w-1 h-1 bg-blue-600 rounded-full"></div>
-                Keyword optimization
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-1 h-1 bg-blue-600 rounded-full"></div>
-                Skill highlighting
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-1 h-1 bg-blue-600 rounded-full"></div>
-                Experience alignment
+            <div className="h-1 w-full bg-black mb-6"></div>
+            <ul className="space-y-4 text-base">
+              <li className="flex items-start gap-3">
+                <div className="w-2 h-2 bg-black mt-2"></div>
+                <span>Natural language interface</span>
               </li>
             </ul>
           </div>
 
-          {/* Multiple Templates */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-              <span className="text-green-600 text-xl">📄</span>
-            </div>
-            <h3 className="text-lg font-semibold mb-3">Professional Templates</h3>
-            <p className="text-gray-700 text-sm mb-4">
-              Choose from 20+ ATS-friendly templates designed for different industries and experience levels.
+          {/* No Boring Forms */}
+          <div className="border-4 border-black p-8 bg-white h-full">
+            <div className="text-4xl mb-6">✂️</div>
+            <h3 className="text-xl font-black uppercase mb-4">NO BORING FORMS</h3>
+            <p className="text-gray-700 mb-6">
+              Skip the traditional step-by-step forms. Edit freely or use AI suggestions. Simple, intuitive, and non-restrictive.
             </p>
-            <ul className="space-y-2 text-sm text-gray-600">
-              <li className="flex items-center gap-2">
-                <div className="w-1 h-1 bg-green-600 rounded-full"></div>
-                ATS-optimized layouts
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-1 h-1 bg-green-600 rounded-full"></div>
-                Industry-specific designs
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-1 h-1 bg-green-600 rounded-full"></div>
-                Mobile-responsive
+            <div className="h-1 w-full bg-black mb-6"></div>
+            <ul className="space-y-4 text-base">
+              <li className="flex items-start gap-3">
+                <div className="w-2 h-2 bg-black mt-2"></div>
+                <span>Free-form editing</span>
               </li>
             </ul>
           </div>
 
-          {/* Real-time Chat */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-              <span className="text-purple-600 text-xl">💬</span>
-            </div>
-            <h3 className="text-lg font-semibold mb-3">AI Chat Assistant</h3>
-            <p className="text-gray-700 text-sm mb-4">
-              Chat with AI to get instant feedback, suggestions, and improvements for your resume.
+          {/* Clone & Customize */}
+          <div className="border-4 border-black p-8 bg-white h-full">
+            <div className="text-4xl mb-6">🧾</div>
+            <h3 className="text-xl font-black uppercase mb-4">CLONE & CUSTOMIZE</h3>
+            <p className="text-gray-700 mb-6">
+              Duplicate existing resumes in one click. Tweak just the parts you need — no risk of breaking your original.
             </p>
-            <ul className="space-y-2 text-sm text-gray-600">
-              <li className="flex items-center gap-2">
-                <div className="w-1 h-1 bg-purple-600 rounded-full"></div>
-                Real-time suggestions
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-1 h-1 bg-purple-600 rounded-full"></div>
-                Writing improvements
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-1 h-1 bg-purple-600 rounded-full"></div>
-                Career advice
+            <div className="h-1 w-full bg-black mb-6"></div>
+            <ul className="space-y-4 text-base">
+              <li className="flex items-start gap-3">
+                <div className="w-2 h-2 bg-black mt-2"></div>
+                <span>One-click duplication</span>
               </li>
             </ul>
           </div>
 
-          {/* Version Control */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-              <span className="text-orange-600 text-xl">📚</span>
-            </div>
-            <h3 className="text-lg font-semibold mb-3">Version Control</h3>
-            <p className="text-gray-700 text-sm mb-4">
-              Keep track of all your resume versions and easily switch between different iterations.
+          {/* Smart AI Suggestions */}
+          <div className="border-4 border-black p-8 bg-[#00E0C6] bg-opacity-10 h-full">
+            <div className="text-4xl mb-6">🤖</div>
+            <h3 className="text-xl font-black uppercase mb-4">SMART AI SUGGESTIONS</h3>
+            <p className="text-gray-700 mb-6">
+              Get real-time feedback on your resume. AI highlights what to improve, tailors content to jobs, and boosts your profile.
             </p>
-            <ul className="space-y-2 text-sm text-gray-600">
-              <li className="flex items-center gap-2">
-                <div className="w-1 h-1 bg-orange-600 rounded-full"></div>
-                Unlimited versions
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-1 h-1 bg-orange-600 rounded-full"></div>
-                Easy comparison
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-1 h-1 bg-orange-600 rounded-full"></div>
-                One-click restore
+            <div className="h-1 w-full bg-black mb-6"></div>
+            <ul className="space-y-4 text-base">
+              <li className="flex items-start gap-3">
+                <div className="w-2 h-2 bg-black mt-2"></div>
+                <span>ATS optimization</span>
               </li>
             </ul>
           </div>
 
-          {/* Export Options */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-4">
-              <span className="text-red-600 text-xl">📤</span>
-            </div>
-            <h3 className="text-lg font-semibold mb-3">Multiple Export Formats</h3>
-            <p className="text-gray-700 text-sm mb-4">
-              Export your resume in PDF, Word, or plain text formats for any application system.
+          {/* Modern Templates */}
+          <div className="border-4 border-black p-8 bg-white h-full">
+            <div className="text-4xl mb-6">🎨</div>
+            <h3 className="text-xl font-black uppercase mb-4">MODERN TEMPLATES</h3>
+            <p className="text-gray-700 mb-6">
+              Choose from clean, professional designs. Stand out while staying recruiter- and ATS-friendly.
             </p>
-            <ul className="space-y-2 text-sm text-gray-600">
-              <li className="flex items-center gap-2">
-                <div className="w-1 h-1 bg-red-600 rounded-full"></div>
-                High-quality PDF
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-1 h-1 bg-red-600 rounded-full"></div>
-                Editable Word docs
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-1 h-1 bg-red-600 rounded-full"></div>
-                ATS-compatible text
+            <div className="h-1 w-full bg-black mb-6"></div>
+            <ul className="space-y-4 text-base">
+              <li className="flex items-start gap-3">
+                <div className="w-2 h-2 bg-black mt-2"></div>
+                <span>ATS-ready layouts</span>
               </li>
             </ul>
           </div>
 
-          {/* Analytics */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
-              <span className="text-indigo-600 text-xl">📊</span>
-            </div>
-            <h3 className="text-lg font-semibold mb-3">Resume Analytics</h3>
-            <p className="text-gray-700 text-sm mb-4">
-              Get insights into your resume's performance and suggestions for improvement.
+          {/* Instant Export */}
+          <div className="border-4 border-black p-8 bg-white h-full">
+            <div className="text-4xl mb-6">📤</div>
+            <h3 className="text-xl font-black uppercase mb-4">INSTANT EXPORT</h3>
+            <p className="text-gray-700 mb-6">
+              Download in PDF. Ready for applications, LinkedIn, or print — no extra formatting needed.
             </p>
-            <ul className="space-y-2 text-sm text-gray-600">
-              <li className="flex items-center gap-2">
-                <div className="w-1 h-1 bg-indigo-600 rounded-full"></div>
-                ATS score tracking
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-1 h-1 bg-indigo-600 rounded-full"></div>
-                Keyword analysis
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-1 h-1 bg-indigo-600 rounded-full"></div>
-                Improvement tips
+            <div className="h-1 w-full bg-black mb-6"></div>
+            <ul className="space-y-4 text-base">
+              <li className="flex items-start gap-3">
+                <div className="w-2 h-2 bg-black mt-2"></div>
+                <span>One-click downloads</span>
               </li>
             </ul>
           </div>
@@ -163,4 +109,4 @@ export default function Features() {
       </div>
     </section>
   )
-} 
+}

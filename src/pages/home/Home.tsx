@@ -1,21 +1,15 @@
 import {
   Hero,
-  // Demo,
   Features,
-  HowItWorks,
-  Pricing,
-  CTA,
+  Pricing
 } from './components'
 
 export default function Home() {
   return (
     <div className="bg-white">
       <Hero />
-      {/* <Demo /> */}
       <Features />
       <Pricing />
-      <HowItWorks />
-      <CTA />
     </div>
   )
 }
