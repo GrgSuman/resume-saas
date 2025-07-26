@@ -14,23 +14,22 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "../../api/axios";
 
 const colors = [
-  'bg-blue-100/70',
-  'bg-purple-100/70', 
-  'bg-pink-100/70',
-  'bg-indigo-100/70',
-  'bg-cyan-100/70',
-  'bg-emerald-100/70',
-  'bg-teal-100/70',
-  'bg-violet-100/70',
-  'bg-rose-100/70',
-  'bg-sky-100/70'
+  'bg-[#00E0C6]/20',
+  'bg-yellow-400/20', 
+  'bg-blue-400/20',
+  'bg-red-400/20',
+  'bg-purple-400/20',
+  'bg-green-400/20',
+  'bg-pink-400/20',
+  'bg-indigo-400/20',
+  'bg-orange-400/20',
+  'bg-teal-400/20'
 ]
 
 const emojis = [
   '💼', '📄', '🎯', '🚀', '⭐', '💡', '🎨', '🔧', '📊', '🌟',
   '🎪', '🎭', '🎪', '🎨', '🎯', '🎪', '🎭', '🎪', '🎨', '🎯'
 ]
-
 
 export default function ResumeCard({id, title, updatedAt}: {id: string, title: string, updatedAt: string}) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -39,7 +38,6 @@ export default function ResumeCard({id, title, updatedAt}: {id: string, title: s
   const navigate = useNavigate();
 
   const queryClient = useQueryClient();
-
 
   // Duplicate Resume 
   const duplicateResumeMutation = useMutation({
@@ -100,7 +98,10 @@ export default function ResumeCard({id, title, updatedAt}: {id: string, title: s
   
   return (
     <>
-      <div onClick={() => navigate(`/dashboard/resume/${id}`)} className={`group relative cursor-pointer rounded-xl border border-gray-200 ${selectedColor} p-6 transition-all duration-300 hover:shadow-sm flex flex-col h-[220px] cursor-pointer`}>
+      <div 
+        onClick={() => navigate(`/dashboard/resume/${id}`)} 
+        className={`group relative cursor-pointer rounded-lg border-2 border-black ${selectedColor} p-6 transition-all duration-200 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col h-[220px]`}
+      >
         <div className="flex items-start justify-between mb-4">
           <span className="text-4xl">{selectedEmoji}</span>
           
@@ -115,34 +116,37 @@ export default function ResumeCard({id, title, updatedAt}: {id: string, title: s
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 p-0  hover:bg-white/80 hover:text-gray-800 rounded-full cursor-pointer transition-all duration-200"
+                className="h-8 w-8 p-0 border-2 border-black hover:bg-black hover:text-white rounded-full transition-all duration-200"
                 aria-label="More"
                 onClick={(e) => e.stopPropagation()}
               >
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-44 p-1" onClick={(e) => e.stopPropagation()}>
+            <DropdownMenuContent 
+              className="w-44 p-1 border-2 border-black bg-white" 
+              onClick={(e) => e.stopPropagation()}
+            >
               <DropdownMenuItem
                 onClick={openEditModal}
-                className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100 rounded-md"
+                className="flex items-center gap-2 px-2 py-2 text-sm font-bold hover:bg-black hover:text-white rounded-none"
               >
                 <Pencil className="h-4 w-4" />
-                Edit title
+                EDIT TITLE
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={handleDuplicate}
-                className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100 rounded-md"
+                className="flex items-center gap-2 px-2 py-2 text-sm font-bold hover:bg-black hover:text-white rounded-none"
               >
                 <Copy className="h-4 w-4" />
-                Duplicate
+                DUPLICATE
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={openDeleteModal}
-                className="flex items-center gap-2 px-2 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md"
+                className="flex items-center gap-2 px-2 py-2 text-sm font-bold text-red-600 hover:bg-black hover:text-white rounded-none"
               >
-                <Trash2 className="h-4 w-4 text-red-600" />
-                Delete
+                <Trash2 className="h-4 w-4" />
+                DELETE
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -150,15 +154,15 @@ export default function ResumeCard({id, title, updatedAt}: {id: string, title: s
 
         {/* Title */}
         <div className="mb-4">
-          <h3 className="font-medium text-2xl text-gray-900 line-clamp-2 leading-tight">
+          <h3 className="font-black text-xl text-gray-900 line-clamp-2 leading-tight uppercase">
             {title}
           </h3>
         </div>
 
         {/* Date Info */}
         <div className="mt-auto">
-          <p className="text-sm text-gray-600 font-medium">
-            Updated {new Date(updatedAt).toLocaleDateString()}
+          <p className="text-sm text-gray-700 font-bold">
+            UPDATED {new Date(updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()}
           </p>
         </div>
       </div>

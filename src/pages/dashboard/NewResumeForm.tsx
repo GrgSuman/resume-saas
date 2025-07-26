@@ -5,8 +5,6 @@ import { Label } from '../../components/ui/label'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '../../components/ui/dialog'
@@ -32,9 +30,7 @@ const NewResumeForm: React.FC<NewResumeFormProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if(resumeName.trim() === '') {
-      toast.error('Resume name is required', {
-        position: 'top-right',
-      })
+      toast.error('Please enter a resume name')
       return
     }
     if (resumeName.trim()) {
@@ -45,9 +41,7 @@ const NewResumeForm: React.FC<NewResumeFormProps> = ({
 
   useEffect(() => {
     if (isError) {
-      toast.error("Resume name is required", {
-        position: 'top-right',
-      })
+      toast.error("Please enter a valid resume name")
     }
   }, [isError])
 
@@ -58,17 +52,22 @@ const NewResumeForm: React.FC<NewResumeFormProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px]  p-6 bg-white rounded-lg">
         <DialogHeader>
-          <DialogTitle>Create New Resume</DialogTitle>
-          <DialogDescription>
-            Give your resume a name to get started. You can always change it later.
-          </DialogDescription>
+          <DialogTitle className="text-xl font-bold text-gray-900">
+            Create New Resume
+          </DialogTitle>
+          <div className="h-px w-full bg-black my-2"></div>
+          <p className="text-gray-700 text-sm font-mono">
+            // Give your resume a name to get started
+          </p>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="resume-name">Resume Name</Label>
+              <Label className="text-sm font-medium text-gray-700" htmlFor="resume-name">
+                Resume Name
+              </Label>
               <Input
                 id="resume-name"
                 value={resumeName}
@@ -76,25 +75,28 @@ const NewResumeForm: React.FC<NewResumeFormProps> = ({
                 placeholder="e.g., Software Engineer Resume"
                 disabled={isLoading}
                 autoFocus
+                className="border border-gray-300 focus:border-gray-900 focus-visible:ring-gray-900"
               />
             </div>
           </div>
-          <DialogFooter>
+          <div className="flex flex-row justify-end gap-3">
             <Button
               type="button"
               variant="outline"
               onClick={handleCancel}
               disabled={isLoading}
+              className="border border-gray-300 hover:bg-gray-50 text-gray-700"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-            //   disabled={!resumeName.trim() || isLoading}
+              disabled={!resumeName.trim() || isLoading}
+              className="bg-gray-900 text-white hover:bg-gray-700"
             >
               {isLoading ? 'Creating...' : 'Create Resume'}
             </Button>
-          </DialogFooter>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

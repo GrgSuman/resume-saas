@@ -1,11 +1,9 @@
 import React from 'react'
 import { Button } from '../../components/ui/button'
-import { Trash2, AlertTriangle } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '../../components/ui/dialog'
@@ -36,39 +34,37 @@ const DeleteResumeModal: React.FC<DeleteResumeModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] p-6 bg-white rounded-lg">
         <DialogHeader>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-              <AlertTriangle className="h-5 w-5 text-red-600" />
-            </div>
-            <DialogTitle>Delete Resume</DialogTitle>
-          </div>
-          <DialogDescription>
+          <DialogTitle className="text-xl font-bold text-gray-900">
+            Delete Resume
+          </DialogTitle>
+          <div className="h-px w-full bg-black my-2"></div>
+          <p className="text-gray-700 text-sm font-mono">
             Are you sure you want to delete "<span className="font-medium">{resumeTitle}</span>"? This action cannot be undone.
-          </DialogDescription>
+          </p>
         </DialogHeader>
         
-        <DialogFooter>
+        <div className="flex flex-row justify-end gap-3 mt-6">
           <Button
             type="button"
             variant="outline"
             onClick={handleCancel}
             disabled={isLoading}
+            className="border border-gray-300 hover:bg-gray-50 text-gray-700"
           >
             Cancel
           </Button>
           <Button
             type="button"
-            variant="destructive"
             onClick={handleConfirm}
             disabled={isLoading}
-            className="bg-red-600 hover:bg-red-700"
+            className="bg-red-600 text-white hover:bg-red-700"
           >
             <Trash2 className="h-4 w-4 mr-2" />
             {isLoading ? 'Deleting...' : 'Delete Resume'}
           </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   )
