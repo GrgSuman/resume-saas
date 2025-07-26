@@ -5,5 +5,5 @@ export const PrivateRoute = () => {
   const { authStates } = useAuth();
   const location = useLocation();
 
- return authStates.isAuthenticated ? <Outlet /> : <Navigate to="/login" state={{ from: location }} replace />;
+ return authStates.isAuthenticated ? <Outlet /> : <Navigate to="/signin" state={{ from: location }} replace />;
 };

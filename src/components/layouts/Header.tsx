@@ -1,13 +1,10 @@
 import { useState } from "react"
 import { Menu, X } from "lucide-react"
+import { useNavigate } from "react-router"
 
 export default function BrutalistHeader() {
   const [menuOpen, setMenuOpen] = useState(false)
-
-  const handleNavigation = (path: string) => {
-    console.log(`Navigate to: ${path}`)
-  }
-
+  const navigate = useNavigate()
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-white border-b-4 border-black">
       <div className="container mx-auto px-4">
@@ -30,7 +27,7 @@ export default function BrutalistHeader() {
               FEATURES
             </a>
             <a
-              href="#how"
+              href="#features"
               className="text-black font-bold text-sm uppercase tracking-wide px-4 py-2 border-2 border-transparent hover:border-black hover:bg-black hover:text-white transition-all duration-200"
             >
               HOW IT WORKS
@@ -46,14 +43,14 @@ export default function BrutalistHeader() {
           {/* Desktop Buttons */}
           <div className="hidden md:flex items-center space-x-2">
             <a
-              href="/login"
+              href="/signin"
               className="text-black font-bold text-sm uppercase tracking-wide px-4 py-2 border-2 border-black hover:bg-black hover:text-white transition-all duration-200"
             >
               SIGN IN
             </a>
             <button
               className="px-4 py-2 font-bold text-sm uppercase tracking-wide bg-[#00E0C6] text-black border-2 border-black hover:bg-black hover:text-[#00E0C6] transition-all duration-200 cursor-pointer"
-              onClick={() => handleNavigation("/dashboard")}
+              onClick={() => navigate("/signin")}
             >
               TRY FREE
             </button>
@@ -79,7 +76,7 @@ export default function BrutalistHeader() {
               FEATURES
             </a>
             <a
-              href="#how"
+              href="#features"
               className="block px-4 py-2 text-black font-bold text-base uppercase tracking-wide border-2 border-transparent hover:border-black hover:bg-black hover:text-white transition-all duration-200"
               onClick={() => setMenuOpen(false)}
             >
@@ -95,7 +92,7 @@ export default function BrutalistHeader() {
 
             <div className="flex flex-col space-y-2 pt-2 px-4">
               <a
-                href="/login"
+                href="/signin"
                 className="text-center px-4 py-2 text-black font-bold text-base uppercase tracking-wide border-2 border-black hover:bg-black hover:text-white transition-all duration-200"
                 onClick={() => setMenuOpen(false)}
               >
@@ -104,7 +101,7 @@ export default function BrutalistHeader() {
               <button
                 className="px-4 py-2 font-bold text-base uppercase tracking-wide bg-[#00E0C6] text-black border-2 border-black hover:bg-black hover:text-[#00E0C6] transition-all duration-200 cursor-pointer"
                 onClick={() => {
-                  handleNavigation("/dashboard")
+                  navigate("/signin")
                   setMenuOpen(false)
                 }}
               >
