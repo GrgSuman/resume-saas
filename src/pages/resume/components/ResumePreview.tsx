@@ -11,10 +11,7 @@ const ResumePreview = ({ resumeRef }: { resumeRef: React.RefObject<HTMLDivElemen
 
   return (
     <div className="flex flex-col h-full">
-      {/* Responsive Resume Preview */}
-      <div
-        className="flex-1 flex bg-gray-50 overflow-auto px-0 sm:px-2 py-4 h-full min-h-0"
-      >
+      <div className="flex-1 flex bg-gray-50 overflow-auto px-0 sm:px-2 py-4 h-full min-h-0">
         <div
           ref={resumeRef}
           className="mx-auto"
