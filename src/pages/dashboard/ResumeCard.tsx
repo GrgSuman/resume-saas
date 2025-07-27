@@ -12,6 +12,8 @@ import DeleteResumeModal from "./DeleteResumeModal";
 import EditTitleModal from "./EditTitleModal";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "../../api/axios";
+import axios from "axios";
+import { toast } from "sonner";
 
 const colors = [
   'bg-[#00E0C6]/20',
@@ -48,6 +50,13 @@ export default function ResumeCard({id, title, updatedAt}: {id: string, title: s
       queryClient.invalidateQueries({ queryKey: ["resumes"] });
       setIsDeleteModalOpen(false);
     },
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || "Something went wrong",{
+          position: "top-right",
+        });
+      } 
+      }
   });
 
   // Delete Resume Mutation

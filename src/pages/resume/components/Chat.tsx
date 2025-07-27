@@ -4,6 +4,8 @@ import { Paperclip, Send, X, Edit3, Sparkles, User, Bot } from "lucide-react";
 import { useResume } from "../../../hooks/useResume";
 import axiosInstance from "../../../api/axios";
 import { useParams } from "react-router";
+import axios from "axios";
+import { toast } from "sonner";
 
 type Message = {
   id: number;
@@ -19,6 +21,7 @@ const Chat = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [chatLoading, setChatLoading] = useState(false);
   const [conversationLoading, setConversationLoading] = useState(true);
+  const [limitReached, setLimitReached] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { id } = useParams();
@@ -38,6 +41,8 @@ const Chat = () => {
       try {
         setConversationLoading(true);
         const response = await axiosInstance.get(`/resumegpt/${id}`);
+        console.log(response.data?.limitReached)
+        setLimitReached(response.data?.limitReached || false);
         setMessages(
           response.data.conversation.map(
             (msg: { id: number; role: string; text: string; timestamp: Date }) => ({
@@ -49,7 +54,11 @@ const Chat = () => {
           )
         );
       } catch (error) {
-        console.error("Error fetching conversation:", error);
+        if (axios.isAxiosError(error)) {
+          toast.error(error.response?.data?.message || 'Failed to fetch conversation',{
+            position: "top-right",
+          });
+        }
       } finally {
         setConversationLoading(false);
       }
@@ -99,14 +108,8 @@ const Chat = () => {
         resumeId: id,
       });
 
-      dispatch({
-        type: "UPDATE_RESUME_DATA",
-        payload: response.data.response.resumeUpdates,
-      });
-      dispatch({
-        type: "UPDATE_RESUME_SETTINGS",
-        payload: response.data.response.settingsUpdates,
-      });
+      dispatch({type: "UPDATE_RESUME_DATA",payload: response.data.response.resumeUpdates});
+      dispatch({type: "UPDATE_RESUME_SETTINGS",payload: response.data.response.settingsUpdates});
 
       const aiResponse = {
         id: updatedMessages.length + 1,
@@ -117,7 +120,11 @@ const Chat = () => {
       updatedMessages = [...updatedMessages, aiResponse];
       setMessages(updatedMessages);
     } catch (error) {
-      console.error("Error sending message:", error);
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || 'Failed to send message',{
+          position: "top-right",
+        });
+      }
     } finally {
       setChatLoading(false);
     }
@@ -230,7 +237,7 @@ const Chat = () => {
           </div>
         ) : (
           <div className="flex-1 overflow-y-auto light-scrollbar px-6 py-4">
-            <div className="max-w-3xl mx-auto space-y-4" light-scrollbar  style={{
+            <div className="max-w-3xl mx-auto space-y-4" style={{
               WebkitOverflowScrolling: "touch",
               overflowAnchor: "none",
             }}>
@@ -291,7 +298,6 @@ const Chat = () => {
                             style={{ animationDelay: "0.2s" }}
                           ></div>
                         </div>
-                        <span>Thinking...</span>
                       </div>
                     </div>
                   </div>
@@ -307,34 +313,54 @@ const Chat = () => {
       {/* Input Area - Always at bottom */}
       <div className="px-4 pb-4 pt-2 bg-white border-t border-gray-200 flex-shrink-0">
         <div className="max-w-3xl mx-auto">
-          <div className="relative bg-white border border-gray-300 rounded-lg flex items-center px-4 py-2 gap-2 hover:border-gray-400 focus-within:border-[#00E0C6] focus-within:ring-1 focus-within:ring-[#00E0C6] transition-shadow shadow-sm">
-            <label className="cursor-pointer text-gray-500 hover:text-[#00E0C6] transition-colors">
-              <Paperclip className="h-5 w-5" />
-              <input
-                type="file"
-                accept=".pdf,.doc,.docx"
-                className="hidden"
-                onChange={handleUpload}
+          {limitReached ? (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
+              <div className="text-yellow-800 font-semibold mb-2">
+                You have reached the free message limit
+              </div>
+              <div className="text-yellow-700 text-sm mb-3">
+                Upgrade to PRO to continue chatting with unlimited messages
+              </div>
+              <div className="text-yellow-600 text-xs mb-3">
+                You can still edit your resume manually by turning on edit mode
+              </div>
+              <Button
+                onClick={() => window.open('/dashboard/credits', '_blank')}
+                className="bg-[#00E0C6] text-black font-bold hover:bg-[#00c7ad] transition-colors"
+              >
+                Upgrade to PRO
+              </Button>
+            </div>
+          ) : (
+            <div className="relative bg-white border border-gray-300 rounded-lg flex items-center px-4 py-2 gap-2 hover:border-gray-400 focus-within:border-[#00E0C6] focus-within:ring-1 focus-within:ring-[#00E0C6] transition-shadow shadow-sm">
+              <label className="cursor-pointer text-gray-500 hover:text-[#00E0C6] transition-colors">
+                <Paperclip className="h-5 w-5" />
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  className="hidden"
+                  onChange={handleUpload}
+                />
+              </label>
+              <textarea
+                ref={textareaRef}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Type your message..."
+                rows={1}
+                className="flex-1 w-full resize-none border-0 outline-none bg-transparent px-2 py-2 text-sm min-h-[44px] max-h-32 placeholder-gray-400"
               />
-            </label>
-            <textarea
-              ref={textareaRef}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Type your message..."
-              rows={1}
-              className="flex-1 w-full resize-none border-0 outline-none bg-transparent px-2 py-2 text-sm min-h-[44px] max-h-32 placeholder-gray-400"
-            />
-            <Button
-              onClick={handleSendMessage}
-              disabled={!message.trim() && !attachedFile}
-              size="icon"
-              className="bg-[#00E0C6] text-gray-900 hover:bg-[#00c7ad] rounded-full p-2 shadow transition-colors disabled:opacity-50"
-            >
-              <Send className="h-5 w-5" />
-            </Button>
-          </div>
+              <Button
+                onClick={handleSendMessage}
+                disabled={!message.trim() && !attachedFile}
+                size="icon"
+                className="bg-[#00E0C6] text-gray-900 hover:bg-[#00c7ad] rounded-full p-2 shadow transition-colors disabled:opacity-50"
+              >
+                <Send className="h-5 w-5" />
+              </Button>
+            </div>
+          )}
 
           {attachedFile && (
             <div className="flex items-center mt-2 text-xs text-gray-600 bg-gray-100 rounded-md px-3 py-1.5 w-fit border border-gray-200 shadow-sm">

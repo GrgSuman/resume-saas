@@ -10,6 +10,9 @@ import {
 import { ArrowLeft, Download, Eye, Edit3, Menu, X, LayoutGrid } from "lucide-react";
 import { useResume } from "../../hooks/useResume";
 import { useNavigate } from "react-router";
+import axios from "axios";
+import axiosInstance from "../../api/axios";
+import { toast } from "sonner";
 
 interface EditorHeaderProps {
   resumeRef: React.RefObject<HTMLDivElement | null>;
@@ -24,21 +27,29 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
 
   useEffect(() => {
     const downloadPDF = async (htmlContent: string) => {
-      const res = await fetch(`https://server.clonecv.com/generate-pdf`, {
-        method: "POST",
-        body: JSON.stringify({ htmlContent }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "resume.pdf";
-      a.click();
-      setShouldDownload(false);
-      dispatch({ type: "SET_DOWNLOADING", payload: false });
+      try {
+        dispatch({ type: "SET_DOWNLOADING", payload: true });
+        const response = await axiosInstance.post('/generate-pdf',{ htmlContent });
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'resume.pdf';
+        a.click();
+        // Cleanup
+        window.URL.revokeObjectURL(url);
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          toast.error(error.response?.data?.message || 'Failed to download PDF',{
+            position: "top-right",
+          });
+        } else {
+          console.error('Unexpected error:', error);
+        }
+      } finally {
+        setShouldDownload(false);
+        dispatch({ type: "SET_DOWNLOADING", payload: false });
+      }
     };
 
     if (resumeRef.current && !state?.resumeEditingMode && shouldDownload) {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
 import { Label } from '../../components/ui/label'
@@ -23,7 +23,6 @@ const NewResumeForm: React.FC<NewResumeFormProps> = ({
   onOpenChange,
   onSubmit,
   isLoading = false,
-  isError
 }) => {
   const [resumeName, setResumeName] = useState('')
 
@@ -38,12 +37,6 @@ const NewResumeForm: React.FC<NewResumeFormProps> = ({
       setResumeName('')
     }
   }
-
-  useEffect(() => {
-    if (isError) {
-      toast.error("Please enter a valid resume name")
-    }
-  }, [isError])
 
   const handleCancel = () => {
     setResumeName('')
