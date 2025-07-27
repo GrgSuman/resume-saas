@@ -66,7 +66,6 @@ const resumeReducer = (state: InitialStateType, action: ResumeAction) => {
             return { ...state, isInitialized: true, resumeTitle: action.payload };
 
         case 'UPDATE_RESUME_DATA':
-            console.log("update")
             return { ...state, isInitialized: true, resumeData: { ...state.resumeData, ...action.payload } };
 
         case 'UPDATE_RESUME_SETTINGS':
@@ -87,7 +86,6 @@ const resumeReducer = (state: InitialStateType, action: ResumeAction) => {
 };
 
 const updateResume = async (id: string, resumeData?: ResumeData, resumeSettings?: ResumeSettings, title?: string | null) => {
-    console.log(resumeData, resumeSettings, title)
     try {
         const payload: {resumeData?: ResumeData, resumeSettings?: ResumeSettings, title?: string | null} = {};
         if (resumeData !== undefined) payload.resumeData = resumeData;

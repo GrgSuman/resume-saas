@@ -6,9 +6,10 @@ type User = {
     id: string;
     name: string;
     email: string;
-    image: string;
+    picture: string;
     token: string;
     role: string;
+    isPaidUser: boolean;
 }
 
 type AuthStates = {
@@ -20,7 +21,7 @@ type AuthStates = {
 type AuthContextType = {
     user: User | null,
     authStates: AuthStates,
-    setUser: (user: User) => void,
+    setUser: (user: User | null) => void,
     setAuthStates: (authStates: AuthStates) => void,
 };
 

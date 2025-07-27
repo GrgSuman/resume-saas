@@ -7,15 +7,16 @@ import NewResumeForm from "./NewResumeForm";
 import axiosInstance from "../../api/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import axios from "axios";
+import { toast } from "sonner";
 
 export default function Dashboard() {
   const { user } = useAuth();
-  console.log(user);
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const {
-    data: resumeData,
+  data: resumeData,
     isLoading,
     // isError,
   } = useQuery({
@@ -30,6 +31,13 @@ export default function Dashboard() {
       queryClient.invalidateQueries({ queryKey: ["resumes"] });
       setIsModalOpen(false);
     },
+    onError: (error) => {
+    if (axios.isAxiosError(error)) {
+      toast.error(error.response?.data?.message || "Something went wrong",{
+        position: "top-right",
+      });
+    } 
+    }
   });
 
   const createNewResume = async (resumeName: string) => {
@@ -49,7 +57,7 @@ export default function Dashboard() {
           <div className="mb-8 border-b-2 border-black pb-6">
             <div className="mb-6">
               <h1 className="text-4xl font-semibold uppercase mb-2">
-                Welcome back, {user?.email?.split("@")[0]}
+                Welcome back, {user?.name}
               </h1>
               <p className="text-base text-gray-600 font-mono">
                 // Ready to create your next resume?
@@ -119,7 +127,6 @@ export default function Dashboard() {
         onOpenChange={setIsModalOpen}
         onSubmit={createNewResume}
         isLoading={mutation.isPending}
-        isError={mutation.isError}
       />
     </div>
   );
