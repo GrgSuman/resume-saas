@@ -3,11 +3,10 @@ import EditorHeader from "./EditorHeader";
 import ResumePreview from "./components/ResumePreview";
 import Chat from "./components/Chat";
 import SectionsModal from "./components/SectionsModal";
-import { MessageSquare, X } from "lucide-react";
 import { ResumeProvider } from "../../context/resume/ResumeContext";
 
 const ResumeDetail = () => {
-  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'resume' | 'chat'>('resume');
   const [sectionsModalOpen, setSectionsModalOpen] = useState(false);
   const resumeRef = useRef<HTMLDivElement | null>(null);
 
@@ -17,70 +16,48 @@ const ResumeDetail = () => {
         {/* Header */}
         <EditorHeader 
           resumeRef={resumeRef} 
-          onSectionsClick={() => setSectionsModalOpen(true)} 
-        />
+          onSectionsClick={() => setSectionsModalOpen(true)}/>
 
-        {/* Main Content */}
-        <div className="flex-1 flex overflow-hidden h-full min-h-0">
-          {/* Desktop Layout */}
-          <div className="hidden md:flex flex-1 overflow-hidden">
-            {/* Left Side - Resume Preview */}
-            <div className="flex-1 h-full min-h-0">
-              {/* Resume Preview */}
-              <div className="flex-1 overflow-auto h-full light-scrollbar">
-                <div className="flex-1 justify-center flex bg-gray-50 overflow-auto px-0 sm:px-2 py-4">
-                  <ResumePreview resumeRef={resumeRef} />
-                </div>
-              </div>
-            </div>
+        {/* Mobile Tabs */}
+        <div className="lg:hidden border-b border-gray-200 bg-white">
+          <div className="flex">
+            <button
+              onClick={() => setActiveTab('resume')}
+              className={`flex-1 py-3 px-4 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'resume'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Resume Preview
+            </button>
+            <button
+              onClick={() => setActiveTab('chat')}
+              className={`flex-1 py-3 px-4 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'chat'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Chat
+            </button>
+          </div>
+        </div>
 
-            {/* Right Side - Chat Only */}
-            <div className="w-[30%] bg-white">
-              <Chat />
-            </div>
+        <div className="flex-1 flex overflow-hidden">
+          {/* Main Content */}
+          <div className={`transform-gpu bg-gray-100 p-5 grow overflow-auto ${activeTab === 'resume' ? 'block' : 'hidden lg:block'}`}>
+            <ResumePreview resumeRef={resumeRef} />
+          </div>
+          
+          {/* Desktop Chat - always visible on xl screens */}
+          <div className="h-full overflow-y-auto w-[30%] hidden xl:block border-l border-gray-200">
+            <Chat />
           </div>
 
-          {/* Mobile Layout */}
-          <div className="flex flex-col md:hidden w-full h-full">
-            {/* Resume Preview */}
-            <div className="flex-1 overflow-auto">
-              <div className="flex-1 flex bg-gray-50 overflow-auto px-0 sm:px-2 py-4">
-                <ResumePreview resumeRef={resumeRef} />
-              </div>
-            </div>
-            
-            {/* Floating Chat Button */}
-            <div className="fixed bottom-4 right-4 z-50">
-              <button
-                onClick={() => setMobileDrawerOpen(true)}
-                className="bg-teal-500 hover:bg-teal-600 text-white shadow-lg rounded-full p-4 transition-colors"
-                title="Open Assistant"
-              >
-                <MessageSquare className="h-6 w-6" />
-              </button>
-            </div>
-            
-            {/* Mobile Chat Drawer */}
-            {mobileDrawerOpen && (
-              <div className="fixed inset-0 z-50 flex items-end bg-black/30">
-                <div className="w-full bg-white rounded-t-2xl shadow-2xl min-h-[80vh] max-h-[80vh] flex flex-col">
-                  {/* Drawer Header */}
-                  <div className="flex items-center justify-end p-4">
-                    <button
-                      onClick={() => setMobileDrawerOpen(false)}
-                      className="text-gray-500 hover:text-gray-900 p-2"
-                    >
-                      <X className="h-5 w-5" />
-                    </button>
-                  </div>
-                  
-                  {/* Chat Content */}
-                  <div className="flex-1 overflow-hidden">
-                    <Chat />
-                  </div>
-                </div>
-              </div>
-            )}
+          {/* Mobile Chat - only visible when chat tab is active */}
+          <div className={`lg:hidden w-full ${activeTab === 'chat' ? 'block' : 'hidden'}`}>
+            <Chat />
           </div>
         </div>
         

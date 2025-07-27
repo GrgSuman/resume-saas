@@ -9,11 +9,14 @@ import InterestSection from "./sections/InterestSection";
 import CustomSection from "./sections/CustomSection";
 import { useResume } from "../../../hooks/useResume";
 
-const ResumeTemplate = ({ref}:{ref:React.RefObject<HTMLDivElement | null>}) => {
+const ResumeTemplate = ({
+  ref,
+}: {
+  ref: React.RefObject<HTMLDivElement | null>;
+}) => {
+  const { state } = useResume();
 
-  const {state} = useResume()
-
-  if(!state.resumeData) return null;
+  if (!state.resumeData) return null;
 
   const {
     personalInfo,
@@ -31,43 +34,75 @@ const ResumeTemplate = ({ref}:{ref:React.RefObject<HTMLDivElement | null>}) => {
   if (!state.resumeSettings) return null;
 
   return (
-    <div
-      ref={ref}
-      className="max-w-[210mm] min-w-[210mm]  min-h-[297mm] max-h-[297mm]"
-    >
+    <div ref={ref}>
       <div
-        className="max-w-[210mm] min-w-[210mm]  min-h-[297mm] max-h-[297mm] mx-auto bg-white text-black leading-tight font-serif p-6 py-8 overflow-hidden"
-        style={{ fontSize: `${state.resumeSettings.fontSize}px`, boxSizing: "border-box", fontFamily: state.resumeSettings.fontFamily }}
+        className="123 max-w-[210mm] min-w-[210mm]  min-h-[297mm] max-h-[297mm] mx-auto bg-white text-black leading-tight font-serif p-6 py-8 overflow-hidden"
+        style={{
+          fontSize: `${state.resumeSettings.fontSize}px`,
+          boxSizing: "border-box",
+          fontFamily: state.resumeSettings.fontFamily,
+        }}
       >
-      {state.resumeSettings.sections
-        ?.slice()
-        .sort((a, b) => a.order - b.order)
-        .map((x,index)=>{
-          if(x.visible){
-            switch(x.key){
-              case "personalInfo":
-                return <PersonalInfoSection key={index} personalInfo={personalInfo || {}} />
-              case "experience":
-                return <ExperienceSection key={index} experience={experience || []} />
-              case "education":
-                return <EducationSection key={index} education={education || []} />
-              case "projects":
-                return <ProjectsSection key={index} projects={projects || []} />
-              case "skills":
-                return <SkillsSection key={index} skills={skills || []} />
-              case "certifications":
-                return <CertificationSection key={index} certifications={certifications || []}/>
-              case "references":
-                return <ReferenceSection key={index} references={references || []} />
-              case "interests":
-                return <InterestSection key={index} interests={interests || []} />
-              case "customSections":
-                return <CustomSection key={index} customSections={customSections || []}/>
-              default:
-                return null
+        {state.resumeSettings.sections
+          ?.slice()
+          .sort((a, b) => a.order - b.order)
+          .map((x, index) => {
+            if (x.visible) {
+              switch (x.key) {
+                case "personalInfo":
+                  return (
+                    <PersonalInfoSection
+                      key={index}
+                      personalInfo={personalInfo || {}}
+                    />
+                  );
+                case "experience":
+                  return (
+                    <ExperienceSection
+                      key={index}
+                      experience={experience || []}
+                    />
+                  );
+                case "education":
+                  return (
+                    <EducationSection key={index} education={education || []} />
+                  );
+                case "projects":
+                  return (
+                    <ProjectsSection key={index} projects={projects || []} />
+                  );
+                case "skills":
+                  return <SkillsSection key={index} skills={skills || []} />;
+                case "certifications":
+                  return (
+                    <CertificationSection
+                      key={index}
+                      certifications={certifications || []}
+                    />
+                  );
+                case "references":
+                  return (
+                    <ReferenceSection
+                      key={index}
+                      references={references || []}
+                    />
+                  );
+                case "interests":
+                  return (
+                    <InterestSection key={index} interests={interests || []} />
+                  );
+                case "customSections":
+                  return (
+                    <CustomSection
+                      key={index}
+                      customSections={customSections || []}
+                    />
+                  );
+                default:
+                  return null;
+              }
             }
-          }
-        })}
+          })}
       </div>
     </div>
   );
