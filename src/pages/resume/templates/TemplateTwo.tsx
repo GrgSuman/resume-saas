@@ -26,10 +26,7 @@ const ResumeTemplate = ({ref}:{ref:React.RefObject<HTMLDivElement | null>}) => {
   } = state.resumeData;
 
   return (
-    <div
-      ref={ref}
-      className="max-w-[210mm] min-w-[210mm]  min-h-[297mm] max-h-[297mm]"
-    >
+    <div ref={ref}>
       <div
         className="max-w-[210mm] min-w-[210mm]  min-h-[297mm] max-h-[297mm] mx-auto bg-white text-black leading-tight p-6 py-8 overflow-hidden"
         style={{ fontSize: `${state.resumeSettings?.fontSize}px`, boxSizing: "border-box", fontFamily: state.resumeSettings?.fontFamily }}

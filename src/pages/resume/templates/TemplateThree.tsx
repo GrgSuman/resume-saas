@@ -70,10 +70,7 @@ const TemplateThree = ({ ref }: { ref: React.RefObject<HTMLDivElement | null> })
   );
 
   return (
-    <div
-      ref={ref}
-      className="max-w-[210mm] min-w-[210mm] min-h-[297mm] max-h-[297mm]"
-    >
+    <div ref={ref}>
       <div
         className="max-w-[210mm] min-w-[210mm] min-h-[297mm] max-h-[297mm] mx-auto bg-white text-black leading-tight overflow-hidden"
         style={{ 

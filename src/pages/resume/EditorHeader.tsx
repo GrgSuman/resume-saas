@@ -65,7 +65,7 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b-2 border-black bg-white">
+    <header className="sticky top-0 z-50 w-full shadow-sm bg-white">
       {/* Mobile Top Bar */}
       <div className="flex h-14 items-center justify-between px-4 lg:hidden">
         <Button
@@ -79,7 +79,7 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
         </Button>
 
         {/* Center - Edit/Preview Toggle */}
-        <div className="flex items-center p-1 rounded-sm bg-white border-2 border-black/20 h-9">
+        <div className="flex items-center p-[1px] rounded-sm bg-white border-2 border-black/20 h-9">
           <button
             onClick={toggleEditMode}
             className={`flex items-center rounded-sm gap-1 px-3 h-full text-xs font-semibold uppercase transition-all ${
@@ -240,7 +240,7 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
         {/* Right - Action Buttons */}
         <div className="flex items-center gap-2">
           {/* Edit/Preview Toggle */}
-          <div className="flex items-center p-1 rounded-sm bg-white border-2 border-black/20 h-9">
+          <div className="flex items-center p-[1px] rounded-sm bg-white border-2 border-black/20 h-9">
             <button
               onClick={toggleEditMode}
               className={`flex items-center rounded-sm gap-1 px-3 h-full text-xs font-semibold uppercase transition-all ${
