@@ -46,7 +46,7 @@ const ResumeDetail = () => {
 
         <div className="flex-1 flex overflow-hidden">
           {/* Main Content */}
-          <div className={`transform-gpu bg-gray-100 p-5 grow overflow-auto ${activeTab === 'resume' ? 'block' : 'hidden lg:block'}`}>
+          <div className={`transform-gpu bg-gray-100 p-5 grow overflow-auto ${activeTab === 'resume' ? 'block' : 'hidden xl:block'}`}>
             <ResumePreview resumeRef={resumeRef} />
           </div>
           
@@ -56,7 +56,7 @@ const ResumeDetail = () => {
           </div>
 
           {/* Mobile Chat - only visible when chat tab is active */}
-          <div className={`lg:hidden w-full ${activeTab === 'chat' ? 'block' : 'hidden'}`}>
+          <div className={`xl:hidden w-full ${activeTab === 'chat' ? 'block' : 'hidden'}`}>
             <Chat />
           </div>
         </div>
