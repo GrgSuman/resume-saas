@@ -19,7 +19,7 @@ const ResumeDetail = () => {
           onSectionsClick={() => setSectionsModalOpen(true)}/>
 
         {/* Mobile Tabs */}
-        <div className="lg:hidden border-b border-gray-200 bg-white">
+        <div className="xl:hidden border-b border-gray-200 bg-white">
           <div className="flex">
             <button
               onClick={() => setActiveTab('resume')}
