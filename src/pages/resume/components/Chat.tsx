@@ -41,7 +41,6 @@ const Chat = () => {
       try {
         setConversationLoading(true);
         const response = await axiosInstance.get(`/resumegpt/${id}`);
-        console.log(response.data?.limitReached)
         setLimitReached(response.data?.limitReached || false);
         setMessages(
           response.data.conversation.map(

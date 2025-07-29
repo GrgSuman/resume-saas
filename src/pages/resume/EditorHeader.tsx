@@ -29,7 +29,9 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
     const downloadPDF = async (htmlContent: string) => {
       try {
         dispatch({ type: "SET_DOWNLOADING", payload: true });
-        const response = await axiosInstance.post('/generate-pdf',{ htmlContent });
+        const response = await axiosInstance.post('/generate-pdf',{ htmlContent },{ 
+          responseType: 'blob' // This is crucial for PDF downloads
+        });
         const blob = new Blob([response.data], { type: 'application/pdf' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -40,11 +42,24 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
         window.URL.revokeObjectURL(url);
       } catch (error) {
         if (axios.isAxiosError(error)) {
-          toast.error(error.response?.data?.message || 'Failed to download PDF',{
+
+          try {
+            // Convert blob back to text, then parse as JSON
+            const text = await error?.response?.data?.text();
+            const errorData = JSON.parse(text);
+            toast.error(errorData.message || 'Failed to download PDF',{
+              position: "top-right",
+            });
+            
+          } catch (parseError) {
+            toast.error(parseError as string || 'Failed to download PDF',{
+              position: "top-right",
+            });
+          }
+        } else {
+          toast.error( 'Failed to download PDF',{
             position: "top-right",
           });
-        } else {
-          console.error('Unexpected error:', error);
         }
       } finally {
         setShouldDownload(false);
