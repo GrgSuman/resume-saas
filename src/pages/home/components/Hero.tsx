@@ -33,7 +33,7 @@ export default function BrutalistHero() {
           <div className="bg-black p-4 border-4 border-black">
             <div className="bg-white p-2">
               <img
-                src="/SS.png"
+                src="/hero.png"
                 alt="Resume Builder"
                 className="w-full h-auto border-2 border-gray-200"
               />

@@ -1,7 +1,8 @@
 import React, { createContext, useEffect, useReducer, type Dispatch } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import axiosInstance from "../../api/axios";
 import type { InitialStateType, ResumeData, ResumeSettings } from "./types";
+import { AxiosError } from "axios";
 
 
 const initialState: InitialStateType = {
@@ -101,7 +102,7 @@ const updateResume = async (id: string, resumeData?: ResumeData, resumeSettings?
 export const ResumeProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
     const [state, dispatch] = useReducer(resumeReducer, initialState);
     const {id} = useParams()
-
+    const navigate = useNavigate()  // for redirecting to dashboard if resume is not found
     useEffect(() => {
         const fetchResume = async () => {
             try {
@@ -109,13 +110,17 @@ export const ResumeProvider: React.FC<{children: React.ReactNode}> = ({ children
                 dispatch({type: 'INITIALIZE_RESUME', payload: {resumeData: response.data.resume.resumeData, resumeSettings: response.data.resume.resumeSettings, resumeTitle: response.data.resume.title}});
                 dispatch({type: 'SET_LOADING', payload: false});
             } catch (error) {
-                console.error('Error fetching resume:', error);
+                if(error instanceof AxiosError){
+                    if(error.response?.status === 404){
+                        return navigate('/dashboard')
+                    }
+                }
             }
         }
         if(id){
             fetchResume();
         }
-    }, [id])
+    }, [id, navigate])
 
     useEffect(()=>{
         if(id && state.resumeData && state.resumeSettings && state.isInitialized){

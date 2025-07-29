@@ -17,11 +17,15 @@ export default function BrutalistPricing() {
             <ul className="space-y-3 text-left mb-8">
               <li className="flex items-start gap-3 text-gray-700">
                 <div className="w-2 h-2 bg-black mt-2"></div>
-                <span>5 tailored resumes per month</span>
+                <span>Create up to 3 resumes</span>
               </li>
               <li className="flex items-start gap-3 text-gray-700">
                 <div className="w-2 h-2 bg-black mt-2"></div>
-                <span>PDF download</span>
+                <span>5 PDF downloads per month</span>
+              </li>
+              <li className="flex items-start gap-3 text-gray-700">
+                <div className="w-2 h-2 bg-black mt-2"></div>
+                <span>10 chats per resume per month</span>
               </li>
               <li className="flex items-start gap-3 text-gray-700">
                 <div className="w-2 h-2 bg-black mt-2"></div>
@@ -54,24 +58,24 @@ export default function BrutalistPricing() {
               </li>
               <li className="flex items-start gap-3 text-gray-700">
                 <div className="w-2 h-2 bg-black mt-2"></div>
-                <span>Cover letter generation</span>
+                <span>Unlimited chats</span>
               </li>
               <li className="flex items-start gap-3 text-gray-700">
                 <div className="w-2 h-2 bg-black mt-2"></div>
-                <span>LinkedIn optimization</span>
+                <span>ATS Checker</span>
+              </li>
+              <li className="flex items-start gap-3 text-gray-700">
+                <div className="w-2 h-2 bg-black mt-2"></div>
+                <span>PDF download</span>
               </li>
             </ul>
             <Button 
               className="w-full bg-black text-white font-black uppercase tracking-wider hover:bg-gray-800 border-4 border-black py-4 hover:text-[#00E0C6]"
             >
-              START 7-DAY TRIAL
+              GET PREMIUM
             </Button>
           </div>
         </div>
-
-        <p className="text-sm text-gray-600 mt-8 font-mono">
-          // Cancel anytime. No hidden fees.
-        </p>
       </div>
     </section>
   )
