@@ -1,7 +1,7 @@
 import {
   Hero,
   Features,
-  Pricing
+  // Pricing
 } from './components'
 
 export default function Home() {
@@ -9,7 +9,7 @@ export default function Home() {
     <div className="bg-white">
       <Hero />
       <Features />
-      <Pricing />
+      {/* <Pricing /> */}
     </div>
   )
 }

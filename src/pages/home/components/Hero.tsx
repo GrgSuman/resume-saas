@@ -19,7 +19,7 @@ export default function BrutalistHero() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <button onClick={() => navigate("/signin")} className="group px-8 py-4 bg-black text-white font-bold text-lg uppercase tracking-wider border-2 border-black hover:bg-[#00E0C6] hover:text-black transition-all duration-200 flex items-center gap-2">
-              BUILD NOW
+              BUILD NOW FOR FREE
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" strokeWidth={3} />
             </button>
 
