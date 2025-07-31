@@ -6,6 +6,7 @@ import axiosInstance from "../../../api/axios";
 import { useParams } from "react-router";
 import axios from "axios";
 import { toast } from "sonner";
+import { useAuth } from "../../../hooks/useAuth";
 
 type Message = {
   id: number;
@@ -28,7 +29,7 @@ const Chat = () => {
   const resumeTitle = state?.resumeTitle || "";
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleInput, setTitleInput] = useState(resumeTitle);
-
+  const { deductCredits } = useAuth();
   // Auto-scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -118,6 +119,10 @@ const Chat = () => {
       setMessages(updatedMessages);
     } catch (error) {
       if (axios.isAxiosError(error)) {
+        if(error.response?.data?.message === 'Insufficient credits'){
+          console.log('Insufficient credits');
+          deductCredits();
+        }
         toast.error(error.response?.data?.message || 'Failed to send message',{
           position: "top-right",
         });

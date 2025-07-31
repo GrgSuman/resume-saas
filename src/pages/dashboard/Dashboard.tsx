@@ -11,7 +11,7 @@ import axios from "axios";
 import { toast } from "sonner";
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, deductCredits } = useAuth();
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -29,6 +29,7 @@ export default function Dashboard() {
       axiosInstance.post("/resume", { title: resumeName }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["resumes"] });
+      deductCredits('CREATE_RESUME');
       setIsModalOpen(false);
     },
     onError: (error) => {
@@ -59,8 +60,8 @@ export default function Dashboard() {
               <h1 className="text-5xl font-black uppercase mb-3 tracking-tight">
                 Welcome back, {user?.name}
               </h1>
-              <p className="text-base text-gray-600 font-mono">
-                // Ready to create your next resume?
+              <p className="text-base text-gray-600 font-bold">
+                Ready to create your next resume?
               </p>
             </div>
             <Button

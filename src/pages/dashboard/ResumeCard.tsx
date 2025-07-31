@@ -14,6 +14,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "../../api/axios";
 import axios from "axios";
 import { toast } from "sonner";
+import { useAuth } from "../../hooks/useAuth";
 
 const colors = [
   'bg-[#00E0C6]/20',
@@ -38,7 +39,7 @@ export default function ResumeCard({id, title, updatedAt}: {id: string, title: s
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
-
+  const { deductCredits } = useAuth();
   const queryClient = useQueryClient();
 
   // Duplicate Resume 
@@ -48,6 +49,7 @@ export default function ResumeCard({id, title, updatedAt}: {id: string, title: s
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["resumes"] });
+      deductCredits('CLONE_RESUME');
       setIsDeleteModalOpen(false);
     },
     onError: (error) => {

@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import { manageLocalStorage } from "../../lib/localstorage";
-import { API_URL } from "../../lib/constants";
+import { API_URL, CREDIT_COSTS } from "../../lib/constants";
 
 type User = {
     id: string;
@@ -9,7 +9,7 @@ type User = {
     picture: string;
     token: string;
     role: string;
-    isPaidUser: boolean;
+    credits: number;
 }
 
 type AuthStates = {
@@ -23,6 +23,7 @@ type AuthContextType = {
     authStates: AuthStates,
     setUser: (user: User | null) => void,
     setAuthStates: (authStates: AuthStates) => void,
+    deductCredits: (creditType?: string) => void
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -44,6 +45,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             isLoading: false,
             error: null
         });
+    }
+
+    const deductCredits = (creditType?: string) => {
+        if (user) {
+            setUser(prev => {
+                if (!prev) return null;
+                return { ...prev, credits: creditType ?  prev.credits - CREDIT_COSTS[creditType as keyof typeof CREDIT_COSTS] : 0 };
+            });
+        }
     }
 
     useEffect(() => {
@@ -125,7 +135,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             user,
             authStates,
             setUser,
-            setAuthStates
+            setAuthStates,
+            deductCredits
         }}>
             {children}
         </AuthContext.Provider>

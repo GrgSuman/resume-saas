@@ -1,21 +1,7 @@
 import { useState } from "react";
 import { Button } from "../ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import {
-  Menu,
-  X,
-  User,
-  LogOut,
-  Settings,
-  Lightbulb,
-  CreditCard,
-  ChevronDown,
-} from "lucide-react";
+import {DropdownMenu,DropdownMenuContent,DropdownMenuItem,DropdownMenuTrigger} from "../ui/dropdown-menu";
+import {Menu,X,User,LogOut,Lightbulb,CreditCard,ChevronDown} from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import { manageLocalStorage } from "../../lib/localstorage";
 import { useAuth } from "../../hooks/useAuth";
@@ -37,8 +23,7 @@ export default function DashboardHeader() {
   };
 
   const handleSuggestFeature = () => {
-    // Add your suggest feature logic here
-    console.log("Suggest feature clicked");
+    window.open("https://docs.google.com/forms/d/e/1FAIpQLSd6ouB_E5PfZ2EXsr2_Okm4PtrpgwrxtUnmPejX29_ADQBsuQ/viewform?usp=preview", "_blank");
   };
 
   return (
@@ -62,7 +47,7 @@ export default function DashboardHeader() {
             className="hidden md:flex gap-2 border-black text-black font-bold hover:bg-black hover:text-white transition-all duration-200 bg-transparent h-9"
           >
             <Lightbulb className="h-4 w-4" />
-            SUGGEST FEATURE
+            SUGGEST FEATURE / REPORT BUG
           </Button>
 
           <DropdownMenu>
@@ -88,7 +73,7 @@ export default function DashboardHeader() {
                 <ChevronDown className="h-3 w-3 text-black" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-64 border-2 border-black bg-white" align="end">
+            <DropdownMenuContent className="w-80 border-2 border-black bg-white" align="end">
               <div className="px-3 py-2 border-b border-gray-200">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center overflow-hidden">
@@ -108,11 +93,11 @@ export default function DashboardHeader() {
                     </div>
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <p className="text-xs font-bold uppercase text-black">{user?.name}</p>
-                      <span className="px-2 py-0.5 bg-[#00E0C6] text-black text-xs font-bold uppercase">
-                        {user?.isPaidUser ? "PRO" : "FREE"}
-                      </span>
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-sm font-bold uppercase text-black">{user?.name}</p>
+                      <div className="px-2 py-0.5 bg-[#00E0C6] text-black text-sm font-bold uppercase">
+                        {user?.credits} Credits
+                      </div>
                     </div>
                     <p className="text-xs text-gray-600">{user?.email}</p>
                   </div>
@@ -137,14 +122,14 @@ export default function DashboardHeader() {
                 </Link>
               </DropdownMenuItem>
 
-              <DropdownMenuItem asChild>
+              {/* <DropdownMenuItem asChild>
                 <Link to="/dashboard/settings"
                   className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-black hover:text-white font-bold transition-colors cursor-pointer"
                 >
                   <Settings className="h-4 w-4" />
                   SETTINGS
                 </Link>
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
 
               <DropdownMenuItem
                 onClick={handleLogout}
@@ -194,7 +179,7 @@ export default function DashboardHeader() {
               </div>
             </div>
             <div className="px-2 py-1 bg-[#00E0C6]  text-xs font-bold uppercase">
-              {user?.isPaidUser ? "PRO" : "FREE"}
+              {user?.credits} Credits
             </div>
           </div>
 
@@ -221,7 +206,7 @@ export default function DashboardHeader() {
             </div>
           </Link>
 
-          <Link
+          {/* <Link
             to="/dashboard/settings"
             className="block px-4 py-2 text-black font-bold text-base uppercase tracking-wide border-2 border-transparent hover:border-black hover:bg-black hover:text-white transition-all duration-200"
             onClick={() => setMenuOpen(false)}
@@ -230,7 +215,7 @@ export default function DashboardHeader() {
               <Settings className="h-4 w-4" />
               SETTINGS
             </div>
-          </Link>
+          </Link> */}
 
           <button
             onClick={handleSuggestFeature}
