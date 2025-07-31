@@ -16,7 +16,7 @@ import {
   CreditCard,
   ChevronDown,
 } from "lucide-react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { manageLocalStorage } from "../../lib/localstorage";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -45,13 +45,13 @@ export default function DashboardHeader() {
     <nav className="sticky top-0 z-50 bg-white border-b-2 border-black">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center">
-          <a
-            href="/dashboard"
+          <Link
+            to="/dashboard"
             className="font-black text-xl text-black uppercase tracking-tighter px-1 py-1 border-2 border-transparent"
           >
             CLONE
             <span className="bg-[#00E0C6] text-black px-2 inline-block transform -skew-x-12 ml-1">CV</span>
-          </a>
+          </Link>
         </div>
 
         <div className="flex justify-end gap-3 items-center">
@@ -120,33 +120,30 @@ export default function DashboardHeader() {
               </div>
 
               <DropdownMenuItem asChild>
-                <a
-                  href="/dashboard/profile"
+                <Link to="/dashboard/profile"
                   className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-black hover:text-white font-bold transition-colors cursor-pointer"
                 >
                   <User className="h-4 w-4" />
                   PROFILE
-                </a>
+                </Link>
               </DropdownMenuItem>
 
               <DropdownMenuItem asChild>
-                <a
-                  href="/dashboard/credits"
+                <Link to="/dashboard/credits"
                   className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-black hover:text-white font-bold transition-colors cursor-pointer"
                 >
                   <CreditCard className="h-4 w-4" />
-                  UPGRADE & BILLING
-                </a>
+                  BUY CREDITS
+                </Link>
               </DropdownMenuItem>
 
               <DropdownMenuItem asChild>
-                <a
-                  href="/dashboard/settings"
+                <Link to="/dashboard/settings"
                   className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-black hover:text-white font-bold transition-colors cursor-pointer"
                 >
                   <Settings className="h-4 w-4" />
                   SETTINGS
-                </a>
+                </Link>
               </DropdownMenuItem>
 
               <DropdownMenuItem
@@ -202,8 +199,8 @@ export default function DashboardHeader() {
           </div>
 
           {/* Mobile Menu Items */}
-          <a
-            href="/dashboard/profile"
+          <Link
+            to="/dashboard/profile"
             className="block px-4 py-2 text-black font-bold text-base uppercase tracking-wide border-2 border-transparent hover:border-black hover:bg-black hover:text-white transition-all duration-200"
             onClick={() => setMenuOpen(false)}
           >
@@ -211,10 +208,10 @@ export default function DashboardHeader() {
               <User className="h-4 w-4" />
               PROFILE
             </div>
-          </a>
+          </Link>
 
-          <a
-            href="/dashboard/credits"
+          <Link
+            to="/dashboard/credits"
             className="block px-4 py-2 text-black font-bold text-base uppercase tracking-wide border-2 border-transparent hover:border-black hover:bg-black hover:text-white transition-all duration-200"
             onClick={() => setMenuOpen(false)}
           >
@@ -222,10 +219,10 @@ export default function DashboardHeader() {
               <CreditCard className="h-4 w-4" />
               BUY CREDITS
             </div>
-          </a>
+          </Link>
 
-          <a
-            href="/dashboard/settings"
+          <Link
+            to="/dashboard/settings"
             className="block px-4 py-2 text-black font-bold text-base uppercase tracking-wide border-2 border-transparent hover:border-black hover:bg-black hover:text-white transition-all duration-200"
             onClick={() => setMenuOpen(false)}
           >
@@ -233,7 +230,7 @@ export default function DashboardHeader() {
               <Settings className="h-4 w-4" />
               SETTINGS
             </div>
-          </a>
+          </Link>
 
           <button
             onClick={handleSuggestFeature}

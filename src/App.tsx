@@ -11,6 +11,8 @@ import { AuthProvider } from "./context/auth/AuthContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 import UserProfile from "./pages/profile/UserProfile";
+import Credits from "./pages/credits/Credits";
+import SuccessPage from "./pages/credits/SuccessPage";
 
 function App() {
   const queryClient = new QueryClient();
@@ -30,10 +32,16 @@ function App() {
               {/* Dashboard and Protected Routes */}
               <Route path="/dashboard" element={<PrivateRoute />}>
                 <Route path="/dashboard" index element={<Dashboard />} />
+                <Route path="/dashboard/credits" element={<Credits />} />
                 <Route path="/dashboard/resume/:id" element={<ResumeDetail />} />
                 <Route path="/dashboard/profile" element={<UserProfile />} />
               </Route>
+
+            <Route path="/dashboard/credits/success" element={<SuccessPage />} />
+
             </Routes>
+
+
           {/* </ResumeProvider> */}
         </AuthProvider>
       </GoogleOAuthProvider>

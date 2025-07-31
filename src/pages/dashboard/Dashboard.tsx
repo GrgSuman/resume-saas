@@ -56,7 +56,7 @@ export default function Dashboard() {
           {/* Welcome and Create Section */}
           <div className="mb-8 border-b-2 border-black pb-6">
             <div className="mb-6">
-              <h1 className="text-4xl font-semibold uppercase mb-2">
+              <h1 className="text-5xl font-black uppercase mb-3 tracking-tight">
                 Welcome back, {user?.name}
               </h1>
               <p className="text-base text-gray-600 font-mono">
