@@ -90,10 +90,6 @@ const Credits = () => {
       const { error } = await stripe.redirectToCheckout({ sessionId });
 
       if (error) throw error;
-
-      toast.success("Redirecting to checkout...", {
-        position: "top-right",
-      });
       
     } catch (err) {
       console.error("Checkout error:", err);

@@ -21,7 +21,6 @@ const Chat = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [chatLoading, setChatLoading] = useState(false);
   const [conversationLoading, setConversationLoading] = useState(true);
-  const [limitReached, setLimitReached] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { id } = useParams();
@@ -41,7 +40,6 @@ const Chat = () => {
       try {
         setConversationLoading(true);
         const response = await axiosInstance.get(`/resumegpt/${id}`);
-        setLimitReached(response.data?.limitReached || false);
         setMessages(
           response.data.conversation.map(
             (msg: { id: number; role: string; text: string; timestamp: Date }) => ({
@@ -312,25 +310,7 @@ const Chat = () => {
       {/* Input Area - Always at bottom */}
       <div className="px-4 pb-4 pt-2 bg-white border-t border-gray-200 flex-shrink-0">
         <div className="max-w-3xl mx-auto">
-          {limitReached ? (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
-              <div className="text-yellow-800 font-semibold mb-2">
-                You have reached the free message limit
-              </div>
-              <div className="text-yellow-700 text-sm mb-3">
-                Upgrade to PRO to continue chatting with unlimited messages
-              </div>
-              <div className="text-yellow-600 text-xs mb-3">
-                You can still edit your resume manually by turning on edit mode
-              </div>
-              <Button
-                onClick={() => window.open('/dashboard/credits', '_blank')}
-                className="bg-[#00E0C6] text-black font-bold hover:bg-[#00c7ad] transition-colors"
-              >
-                Upgrade to PRO
-              </Button>
-            </div>
-          ) : (
+          
             <div className="relative bg-white border border-gray-300 rounded-lg flex items-center px-4 py-2 gap-2 hover:border-gray-400 focus-within:border-[#00E0C6] focus-within:ring-1 focus-within:ring-[#00E0C6] transition-shadow shadow-sm">
               <label className="cursor-pointer text-gray-500 hover:text-[#00E0C6] transition-colors">
                 <Paperclip className="h-5 w-5" />
@@ -359,7 +339,6 @@ const Chat = () => {
                 <Send className="h-5 w-5" />
               </Button>
             </div>
-          )}
 
           {attachedFile && (
             <div className="flex items-center mt-2 text-xs text-gray-600 bg-gray-100 rounded-md px-3 py-1.5 w-fit border border-gray-200 shadow-sm">
