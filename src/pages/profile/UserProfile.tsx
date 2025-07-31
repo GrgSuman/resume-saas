@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
@@ -11,15 +11,10 @@ import {
   GraduationCap, 
   Briefcase, 
   Award, 
-  MapPin, 
-  Mail, 
-  Phone, 
   Globe, 
   Plus, 
   Trash2,
-  Edit3,
   Save,
-  X
 } from 'lucide-react';
 
 interface UserData {
@@ -80,7 +75,6 @@ interface UserData {
 
 const UserProfile = () => {
   const [activeTab, setActiveTab] = useState('personal');
-  const [editingField, setEditingField] = useState<string | null>(null);
   const [userData, setUserData] = useState<UserData>({
     personalInfo: {
       firstName: 'John',
