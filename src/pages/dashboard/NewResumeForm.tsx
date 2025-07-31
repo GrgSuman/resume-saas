@@ -9,6 +9,8 @@ import {
   DialogTitle,
 } from '../../components/ui/dialog'
 import { toast } from "sonner"
+import { motion } from 'framer-motion'
+import { Loader2 } from 'lucide-react'
 
 interface NewResumeFormProps {
   open: boolean
@@ -45,52 +47,68 @@ const NewResumeForm: React.FC<NewResumeFormProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]  p-6 bg-white rounded-lg">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-gray-900">
-            Create New Resume
-          </DialogTitle>
-          <div className="h-px w-full bg-black my-2"></div>
-          <p className="text-gray-700 text-sm font-mono">
-            // Give your resume a name to get started
-          </p>
-        </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label className="text-sm font-medium text-gray-700" htmlFor="resume-name">
-                Resume Name
-              </Label>
-              <Input
-                id="resume-name"
-                value={resumeName}
-                onChange={(e) => setResumeName(e.target.value)}
-                placeholder="e.g., Software Engineer Resume"
-                disabled={isLoading}
-                autoFocus
-                className="border border-gray-300 focus:border-gray-900 focus-visible:ring-gray-900"
-              />
+      <DialogContent className="sm:max-w-md p-6 bg-white rounded-lg shadow-lg border border-gray-200">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-gray-900">
+              Create New Resume
+            </DialogTitle>
+            <div className="h-px w-full bg-gray-200 my-4"></div>
+            <p className="text-gray-700 text-sm">
+              Give your resume a descriptive name to get started
+            </p>
+          </DialogHeader>
+          
+          <form onSubmit={handleSubmit} className="mt-4">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700" htmlFor="resume-name">
+                  Resume Name
+                </Label>
+                <Input
+                  id="resume-name"
+                  value={resumeName}
+                  onChange={(e) => setResumeName(e.target.value)}
+                  placeholder="e.g., Software Engineer Resume"
+                  disabled={isLoading}
+                  autoFocus
+                  className="border-gray-300 focus:border-gray-700 focus:ring-gray-900 shadow-sm"
+                />
+                <p className="text-xs text-gray-500">
+                  You can change this later
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="flex flex-row justify-end gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleCancel}
-              disabled={isLoading}
-              className="border border-gray-300 hover:bg-gray-50 text-gray-700"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={!resumeName.trim() || isLoading}
-              className="bg-gray-900 text-white hover:bg-gray-700"
-            >
-              {isLoading ? 'Creating...' : 'Create Resume'}
-            </Button>
-          </div>
-        </form>
+            
+            <div className="flex justify-end gap-3 mt-6">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleCancel}
+                disabled={isLoading}
+                className="border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={!resumeName.trim() || isLoading}
+                className="bg-gray-900 text-white hover:bg-gray-800 disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {isLoading ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Creating...
+                  </span>
+                ) : 'Create Resume'}
+              </Button>
+            </div>
+          </form>
+        </motion.div>
       </DialogContent>
     </Dialog>
   )

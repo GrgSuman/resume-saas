@@ -40,7 +40,7 @@ const DeleteResumeModal: React.FC<DeleteResumeModalProps> = ({
             Delete Resume
           </DialogTitle>
           <div className="h-px w-full bg-black my-2"></div>
-          <p className="text-gray-700 text-sm font-mono">
+          <p className="text-gray-700 text-sm ">
             Are you sure you want to delete "<span className="font-medium">{resumeTitle}</span>"? This action cannot be undone.
           </p>
         </DialogHeader>

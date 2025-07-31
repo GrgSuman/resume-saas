@@ -1,18 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "../../components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../components/ui/select";
+import {Select,SelectContent,SelectItem,SelectTrigger,SelectValue} from "../../components/ui/select";
 import { ArrowLeft, Download, Eye, Edit3, Menu, X, LayoutGrid } from "lucide-react";
 import { useResume } from "../../hooks/useResume";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import axiosInstance from "../../api/axios";
 import { toast } from "sonner";
+import { useAuth } from "../../hooks/useAuth";
 
 interface EditorHeaderProps {
   resumeRef: React.RefObject<HTMLDivElement | null>;
@@ -24,6 +19,7 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
   const navigate = useNavigate();
   const [shouldDownload, setShouldDownload] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { deductCredits } = useAuth();
 
   useEffect(() => {
     const downloadPDF = async (htmlContent: string) => {
@@ -38,6 +34,7 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
         a.href = url;
         a.download = 'resume.pdf';
         a.click();
+        deductCredits('DOWNLOAD_PDF');
         // Cleanup
         window.URL.revokeObjectURL(url);
       } catch (error) {
@@ -72,7 +69,7 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
       const html = resumeRef.current.innerHTML;
       downloadPDF(html);
     }
-  }, [state?.resumeEditingMode, shouldDownload, resumeRef, dispatch]);
+  }, [state?.resumeEditingMode, shouldDownload, resumeRef, dispatch, deductCredits]);
 
   const handleDownloadPDF = () => {
     dispatch({ type: "SET_EDITING_MODE", payload: false });

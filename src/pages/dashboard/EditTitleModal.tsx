@@ -74,14 +74,14 @@ const EditTitleModal: React.FC<EditTitleModalProps> = ({
             Edit Resume Title
           </DialogTitle>
           <div className="h-px w-full bg-black my-2"></div>
-          <p className="text-gray-700 text-sm font-mono">
-            // Update the title of your resume. This will help you identify it easily.
+          <p className="text-gray-600 text-sm font-medium">
+            Update the title of your resume. This will help you identify it easily.
           </p>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-4 py-2">
             <div className="grid gap-2">
-              <Label className="text-sm font-medium text-gray-700" htmlFor="resume-title">Resume Title</Label>
+              <Label className="text-sm font-medium text-gray-700" htmlFor="resume-title">New Resume Title</Label>
               <Input
                 id="resume-title"
                 value={newTitle}
