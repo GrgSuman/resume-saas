@@ -3,6 +3,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import DashboardHeader from "../../components/layouts/DashboardHeader";
 import { toast } from "sonner";
 import axiosInstance from "../../api/axios";
+import { AxiosError } from "axios";
 
 const creditPacks = [
   {
@@ -90,10 +91,11 @@ const Credits = () => {
       if (error) throw error;
       
     } catch (err) {
-      console.error("Checkout error:", err);
-      toast.error("Something went wrong. Please try again.", {
-        position: "top-right",
-      });
+      if(err instanceof AxiosError){
+        toast.error("Something went wrong. Please try again.", {
+          position: "top-right",
+        });
+      }
     }
   };
 
