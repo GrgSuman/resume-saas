@@ -19,7 +19,7 @@ export default function BrutalistHeader() {
           </a>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-1">
+          <div className="hidden md:flex items-center justify-center space-x-1">
             <a
               href="#features"
               className="text-black font-bold text-sm uppercase tracking-wide px-4 py-2 border-2 border-transparent hover:border-black hover:bg-black hover:text-white transition-all duration-200"
@@ -31,12 +31,6 @@ export default function BrutalistHeader() {
               className="text-black font-bold text-sm uppercase tracking-wide px-4 py-2 border-2 border-transparent hover:border-black hover:bg-black hover:text-white transition-all duration-200"
             >
               HOW IT WORKS
-            </a>
-            <a
-              href="#pricing"
-              className="text-black font-bold text-sm uppercase tracking-wide px-4 py-2 border-2 border-transparent hover:border-black hover:bg-black hover:text-white transition-all duration-200"
-            >
-              PRICING
             </a>
           </div>
 
@@ -81,13 +75,6 @@ export default function BrutalistHeader() {
               onClick={() => setMenuOpen(false)}
             >
               HOW IT WORKS
-            </a>
-            <a
-              href="#pricing"
-              className="block px-4 py-2 text-black font-bold text-base uppercase tracking-wide border-2 border-transparent hover:border-black hover:bg-black hover:text-white transition-all duration-200"
-              onClick={() => setMenuOpen(false)}
-            >
-              PRICING
             </a>
 
             <div className="flex flex-col space-y-2 pt-2 px-4">

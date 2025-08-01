@@ -67,9 +67,7 @@ const Credits = () => {
 
   const handleBuyCredits = async (pack: string) => {
     // Initialize Stripe
-    const stripePromise = await loadStripe(
-      "pk_test_51RpilqRtBE3WEzfFOjYZ79SlZZigBXhAADtol7Ku17mKizzGabTKPJiTjlRqDwB3xmk60GQsxid6yLZWkYX0nihs00bfDJGcX4"
-    );
+    const stripePromise = await loadStripe("pk_live_51RpilURpmJmQnVSV42vcOistNO4lRKbn2KMLHbfBHpz0pJHvnzhiGvtt9JXZzTGmfDqlzY9iY6mptyOCLEEGLJhj00XEZYEW9c")
 
     try {
       const response = await axiosInstance.post("/create-checkout-session",
@@ -219,7 +217,7 @@ const Credits = () => {
         {/* CTA at bottom */}
         <div className="mt-16 text-center">
           <h3 className="text-xl font-bold mb-4">Need more help deciding?</h3>
-          <button className="px-6 py-3 bg-black text-white font-bold border-2 border-black rounded-lg hover:bg-white hover:text-black transition-colors shadow-[3px_3px_0_0_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1">
+          <button onClick={()=>window.open("https://docs.google.com/forms/d/e/1FAIpQLSeA2tZS8ukqiGWVCFIGN-pOPZJ-krue3EM44vwZ47MiToU3wA/viewform?usp=preview", "_blank")} className="px-6 py-3 bg-black text-white font-bold border-2 border-black rounded-lg hover:bg-white hover:text-black transition-colors shadow-[3px_3px_0_0_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1">
             Contact Support
           </button>
         </div>

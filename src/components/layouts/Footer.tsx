@@ -14,6 +14,9 @@ export default function BrutalistFooter() {
             <span className="font-black uppercase border-2 border-black px-4 py-2 bg-[#00E0C6]">
               TRUSTED BY 100+ USERS
             </span>
+            <span role="button" onClick={() => window.open("https://docs.google.com/forms/d/e/1FAIpQLSeA2tZS8ukqiGWVCFIGN-pOPZJ-krue3EM44vwZ47MiToU3wA/viewform?usp=preview", "_blank")} className="font-black uppercase border-2 border-black px-4 py-2 cursor-pointer bg-white">
+              CONTACT US
+            </span>
           </div>
         </div>
       </div>
