@@ -150,7 +150,7 @@ export default function ResumeCard({id, title, updatedAt}: {id: string, title: s
                 className="flex items-center gap-2 px-2 py-2 text-sm font-bold hover:bg-black hover:text-white rounded-none"
               >
                 <Copy className="h-4 w-4" />
-                DUPLICATE
+                CLONE RESUME
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={openDeleteModal}

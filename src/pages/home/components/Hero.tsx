@@ -13,7 +13,8 @@ export default function BrutalistHero() {
             </h1>
 
             <div className="max-w-xl mx-auto">
-              <p className="text-lg text-gray-600 mt-5 font-mono">// No clunky forms. Just chat, duplicate, tweak — your resume evolves with you.</p>
+              <p className="text-lg text-gray-600 mt-5 font-mono">No clunky forms. Just chat, duplicate, tweak — your resume evolves with you.</p>
+             
             </div>
           </div>
 
