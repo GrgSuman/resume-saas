@@ -16,28 +16,28 @@ export default function BrutalistHeader({ showNotification, setShowNotification 
       {showNotification && (
         <div className="fixed top-0 left-0 w-full z-[100] bg-[#00E0C6] border-b-2 border-black">
           <div className="container mx-auto px-4 py-2">
-                         <div className="flex items-center justify-between">
-               <div className="flex-1"></div>
-               <div className="flex items-center gap-2">
-                 <span className="text-black font-bold text-sm uppercase tracking-wide">
+            <div className="flex items-center justify-between">
+              <div className="flex-1 hidden sm:block"></div>
+                             <div className="flex items-center gap-2">
+                 <span className="text-black font-bold text-xs sm:text-sm uppercase tracking-wide">
                    🎉 LIMITED TIME: Get 15 FREE credits when you sign up!
                  </span>
                  <button
                    onClick={() => navigate("/signin")}
-                   className="bg-black text-white px-3 py-1 text-xs font-bold uppercase border-2 border-black hover:bg-white hover:text-black transition-all duration-200"
+                   className="bg-black text-white px-2 sm:px-3 py-1 text-xs font-bold uppercase border-2 border-black hover:bg-white hover:text-black transition-all duration-200 whitespace-nowrap"
                  >
                    CLAIM NOW
                  </button>
                </div>
-               <div className="flex-1 flex justify-end">
-                 <button
-                   onClick={() => setShowNotification(false)}
-                   className="text-black hover:text-gray-700 transition-colors duration-200"
-                 >
-                   <X size={16} strokeWidth={3} />
-                 </button>
-               </div>
-             </div>
+              <div className="flex-1 flex justify-end">
+                <button
+                  onClick={() => setShowNotification(false)}
+                  className="text-black hover:text-gray-700 transition-colors duration-200 p-1"
+                >
+                  <X size={16} strokeWidth={3} />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

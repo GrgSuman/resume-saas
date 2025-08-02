@@ -9,7 +9,7 @@ const Layout = () => {
   return (
     <div>
       <Header showNotification={showNotification} setShowNotification={setShowNotification} />
-      <main className={showNotification ? "pt-16" : "pt-0"}>
+      <main className={showNotification ? "pt-8" : "pt-0"}>
         <Outlet />
       </main>
       <Footer />
