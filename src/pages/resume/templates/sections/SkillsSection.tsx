@@ -156,11 +156,11 @@ const Modal = ({
               {skillCategory.category && (
                 <>
                   <strong>{skillCategory.category}:</strong>{" "}
-                  {skillCategory.items.slice(0, 6).join(", ")}
+                  {skillCategory.items.slice().join(", ")}
                 </>
               )}
               {!skillCategory.category && (
-                <>{skillCategory.items.slice(0, 6).join(", ")}</>
+                <>{skillCategory.items.slice().join(", ")}</>
               )}
             </div>
             {state.resumeEditingMode && (
