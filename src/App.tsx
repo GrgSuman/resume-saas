@@ -1,7 +1,6 @@
 import { Route, Routes } from "react-router";
 import Dashboard from "./pages/dashboard/Dashboard";
 import ResumeDetail from "./pages/resume/ResumeDetail";
-import Home from "./pages/home/Home";
 import "./App.css";
 import Login from "./pages/auth/Login";
 import Layout from "./components/layouts/BaseLayout";
@@ -13,7 +12,7 @@ import { Toaster } from "sonner";
 import UserDetails from "./pages/profile/UserDetails";
 import Credits from "./pages/credits/Credits";
 import SuccessPage from "./pages/credits/SuccessPage";
-import BlogHome from "./pages/blogs/BlogHome";
+import Home from "./pages/home/Home";
 
 function App() {
   const queryClient = new QueryClient();
@@ -22,13 +21,11 @@ function App() {
        <Toaster />
       <GoogleOAuthProvider clientId="620421156218-5b2p94rdcismn2eqr8afggor7tqd2sum.apps.googleusercontent.com">
         <AuthProvider>
-          {/* <ResumeProvider> */}
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<Layout />}>
-                <Route path="/" element={<Home />} />
                 <Route path="/signin" element={<Login />} />
-                <Route path="/blogs" element={<BlogHome />} />
+                <Route path="/" element={<Home />} />
               </Route>
 
               {/* Dashboard and Protected Routes */}

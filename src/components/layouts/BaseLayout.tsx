@@ -1,15 +1,13 @@
 import { Outlet } from "react-router";
 import Header from "./Header";
 import Footer from "./Footer";
-import { useState } from "react";
 
 const Layout = () => {
-  const [showNotification, setShowNotification] = useState(true);
   
   return (
     <div>
-      <Header showNotification={showNotification} setShowNotification={setShowNotification} />
-      <main className={showNotification ? "pt-8" : "pt-0"}>
+      <Header/>
+      <main>
         <Outlet />
       </main>
       <Footer />
