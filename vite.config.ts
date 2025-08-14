@@ -14,6 +14,6 @@ export default defineConfig({
   server:{
     host:true,
     port:3000,
-    allowedHosts:['clonecv.com','localhost','127.0.0.1','0.0.0.0','192.168.1.100','https://clonecv.com','www.clonecv.com']
+    allowedHosts:['app.clonecv.com','localhost','127.0.0.1','0.0.0.0','192.168.1.100','https://app.clonecv.com','www.clonecv.com']
   }
 })

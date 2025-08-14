@@ -92,7 +92,7 @@ const Login = () => {
 
             {/* Google Login Button - Wrapped for styling */}
             <div className="flex justify-center mb-8">
-              <div className="transform transition-all duration-200 hover:scale-105 scale-125">
+              <div className="transform transition-all duration-200 ">
                 <GoogleLogin
                   onSuccess={handleSuccess}
                   onError={() => console.log('Login Failed')}
