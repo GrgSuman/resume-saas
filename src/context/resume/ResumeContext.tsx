@@ -67,9 +67,11 @@ const resumeReducer = (state: InitialStateType, action: ResumeAction) => {
             return { ...state, isInitialized: true, resumeTitle: action.payload };
 
         case 'UPDATE_RESUME_DATA':
+            console.log("update resume data", action.payload)
             return { ...state, isInitialized: true, resumeData: { ...state.resumeData, ...action.payload } };
 
         case 'UPDATE_RESUME_SETTINGS':
+            console.log("update resume settings", action.payload)
             return { ...state, isInitialized: true, resumeSettings: { ...state.resumeSettings, ...action.payload } };
 
         case 'SET_DOWNLOADING':
