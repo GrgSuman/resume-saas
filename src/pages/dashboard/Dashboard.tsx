@@ -16,7 +16,7 @@ export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const {
-  data: resumeData,
+    data: resumeData,
     isLoading,
     // isError,
   } = useQuery({
@@ -29,16 +29,16 @@ export default function Dashboard() {
       axiosInstance.post("/resume", { title: resumeName }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["resumes"] });
-      deductCredits('CREATE_RESUME');
+      deductCredits("CREATE_RESUME");
       setIsModalOpen(false);
     },
     onError: (error) => {
-    if (axios.isAxiosError(error)) {
-      toast.error(error.response?.data?.message || "Something went wrong",{
-        position: "top-right",
-      });
-    } 
-    }
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || "Something went wrong", {
+          position: "top-right",
+        });
+      }
+    },
   });
 
   const createNewResume = async (resumeName: string) => {
@@ -50,72 +50,81 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="bg-white">
+    <div className="bg-slate-50 min-h-screen">
       <DashboardHeader />
-      <div className="py-12 min-h-screen">
+      <div className="py-16">
         <div className="max-w-7xl mx-auto px-6">
           {/* Welcome and Create Section */}
-          <div className="mb-8 border-b-2 border-black pb-6">
-            <div className="mb-6">
-              <h1 className="text-5xl font-black uppercase mb-3 tracking-tight">
-                Welcome back, {user?.name}
+          <div className="mb-12">
+            <div className="mb-8">
+              <h1 className="text-5xl font-semibold text-slate-900 mb-3">
+                Hello {user?.name?.split(" ")[0]}! 👋
               </h1>
-              <p className="text-base text-gray-600 font-bold">
+              <p className="text-xl text-slate-600 font-medium">
                 Ready to create your next resume?
               </p>
             </div>
             <Button
               onClick={openModal}
-              className="px-6 py-3 bg-black text-white font-bold uppercase tracking-wide border-2 border-black hover:bg-[#00E0C6] hover:text-black transition-all duration-200"
+              className="px-10 py-4 cursor-pointer bg-[#7060fc] text-white font-semibold rounded-md hover:bg-[#6050e5] transition-all duration-200 shadow-sm hover:shadow-md text-md"
             >
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className="mr-1 h-6 w-6" />
               Create New Resume
             </Button>
           </div>
 
           {/* Loading State */}
           {isLoading && (
-            <div className="border-4 border-black p-8 text-center">
-              <h3 className="text-2xl font-black uppercase mb-4">LOADING...</h3>
-              <div className="h-1 w-full bg-black mb-6"></div>
-              <div className="animate-pulse space-y-4">
-                <div className="h-4 bg-gray-300 rounded w-3/4 mx-auto"></div>
-                <div className="h-4 bg-gray-300 rounded w-1/2 mx-auto"></div>
-              </div>
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-12 text-center">
+              <div className="w-12 h-12 border-3 border-slate-200 border-t-[#7060fc] rounded-full animate-spin mx-auto mb-4"></div>
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                Loading...
+              </h3>
+              <p className="text-slate-500">
+                Please wait while we fetch your resumes
+              </p>
             </div>
           )}
 
           {/* Resumes Grid */}
-          {!isLoading && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {resumeData?.data?.resume.map(
-                (data: { id: string; title: string; updatedAt: string }) => (
-                  <ResumeCard
-                    key={data.id}
-                    id={data.id}
-                    title={data.title}
-                    updatedAt={data.updatedAt}
-                  />
-                )
-              )}
+          {!isLoading && resumeData?.data?.resume?.length > 0 && (
+            <div>
+              <h2 className="text-2xl font-semibold text-slate-900 mb-4">
+                Your Resumes ({resumeData?.data?.resume?.length})
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {resumeData?.data?.resume.map(
+                  (data: { id: string; title: string; updatedAt: string }) => (
+                    <ResumeCard
+                      key={data.id}
+                      id={data.id}
+                      title={data.title}
+                      updatedAt={data.updatedAt}
+                    />
+                  )
+                )}
+              </div>
             </div>
           )}
-          {!isLoading && resumeData?.data?.resume.length === 0 && (
-            <div className="text-center max-w-2xl mx-auto ">
-              <div className="text-6xl mb-4">📄</div>
-              <h3 className="text-2xl font-black uppercase mb-3 tracking-tighter">
+
+          {/* Empty State */}
+          {!isLoading && resumeData?.data?.resume?.length === 0 && (
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-12 text-center max-w-2xl mx-auto">
+              <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-3xl">📄</span>
+              </div>
+              <h3 className="text-2xl font-semibold text-slate-900 mb-3">
                 No resumes yet
               </h3>
-              <div className="h-1 w-16 bg-black mx-auto mb-6"></div>
-              <p className="text-gray-700 mb-6 text-base">
+              <p className="text-slate-600 mb-8 text-base">
                 Start by creating your first resume. It only takes a few minutes
                 to get started.
               </p>
               <Button
                 onClick={openModal}
-                className="px-6 py-3 bg-black text-white font-bold uppercase tracking-wide border-2 border-black hover:bg-[#00E0C6] hover:text-black transition-all duration-200"
+                className="px-10 py-4 bg-[#7060fc] text-white font-semibold rounded-lg hover:bg-[#6050e5] transition-all duration-200 shadow-sm hover:shadow-md text-lg"
               >
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="mr-3 h-6 w-6" />
                 Create First Resume
               </Button>
             </div>

@@ -17,16 +17,16 @@ import { toast } from "sonner";
 import { useAuth } from "../../hooks/useAuth";
 
 const colors = [
-  'bg-[#00E0C6]/20',
-  'bg-yellow-400/20', 
-  'bg-blue-400/20',
-  'bg-red-400/20',
-  'bg-purple-400/20',
-  'bg-green-400/20',
-  'bg-pink-400/20',
-  'bg-indigo-400/20',
-  'bg-orange-400/20',
-  'bg-teal-400/20'
+  'from-blue-500/20 to-indigo-500/20',
+  'from-purple-500/20 to-pink-500/20', 
+  'from-green-500/20 to-emerald-500/20',
+  'from-orange-500/20 to-red-500/20',
+  'from-teal-500/20 to-cyan-500/20',
+  'from-violet-500/20 to-purple-500/20',
+  'from-rose-500/20 to-pink-500/20',
+  'from-sky-500/20 to-blue-500/20',
+  'from-amber-500/20 to-orange-500/20',
+  'from-lime-500/20 to-green-500/20'
 ]
 
 const emojis = [
@@ -111,7 +111,7 @@ export default function ResumeCard({id, title, updatedAt}: {id: string, title: s
     <>
       <div 
         onClick={() => navigate(`/dashboard/resume/${id}`)} 
-        className={`group relative cursor-pointer rounded-lg border-2 border-black ${selectedColor} p-6 transition-all duration-200 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col h-[220px]`}
+        className={`group relative cursor-pointer rounded-2xl bg-white/80 backdrop-blur-sm border border-white/20  transition-all duration-300 hover:scale-105 p-6 flex flex-col h-[220px] bg-gradient-to-br ${selectedColor}`}
       >
         <div className="flex items-start justify-between mb-4">
           <span className="text-4xl">{selectedEmoji}</span>
@@ -127,7 +127,7 @@ export default function ResumeCard({id, title, updatedAt}: {id: string, title: s
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 p-0 border-2 border-black hover:bg-black hover:text-white rounded-full transition-all duration-200"
+                className="h-8 w-8 p-0 bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/40 text-slate-700 hover:text-slate-900 rounded-lg transition-all duration-200"
                 aria-label="More"
                 onClick={(e) => e.stopPropagation()}
               >
@@ -135,29 +135,29 @@ export default function ResumeCard({id, title, updatedAt}: {id: string, title: s
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent 
-              className="w-44 p-1 border-2 border-black bg-white" 
+              className="w-44 p-1 border border-slate-200 bg-white/90 backdrop-blur-sm shadow-lg rounded-xl" 
               onClick={(e) => e.stopPropagation()}
             >
               <DropdownMenuItem
                 onClick={openEditModal}
-                className="flex items-center gap-2 px-2 py-2 text-sm font-bold hover:bg-black hover:text-white rounded-none"
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium hover:bg-slate-50 rounded-lg cursor-pointer"
               >
                 <Pencil className="h-4 w-4" />
-                EDIT TITLE
+                Edit Title
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={handleDuplicate}
-                className="flex items-center gap-2 px-2 py-2 text-sm font-bold hover:bg-black hover:text-white rounded-none"
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium hover:bg-slate-50 rounded-lg cursor-pointer"
               >
                 <Copy className="h-4 w-4" />
-                CLONE RESUME
+                Clone Resume
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={openDeleteModal}
-                className="flex items-center gap-2 px-2 py-2 text-sm font-bold text-red-600 hover:bg-black hover:text-white rounded-none"
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg cursor-pointer"
               >
                 <Trash2 className="h-4 w-4" />
-                DELETE
+                Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -165,15 +165,15 @@ export default function ResumeCard({id, title, updatedAt}: {id: string, title: s
 
         {/* Title */}
         <div className="mb-4">
-          <h3 className="font-black text-xl text-gray-900 line-clamp-2 leading-tight uppercase">
+          <h3 className="font-semibold text-xl text-slate-900 line-clamp-2 leading-tight">
             {title}
           </h3>
         </div>
 
         {/* Date Info */}
         <div className="mt-auto">
-          <p className="text-sm text-gray-700 font-bold">
-            UPDATED {new Date(updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()}
+          <p className="text-sm text-slate-600 font-medium">
+            Updated {new Date(updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
           </p>
         </div>
       </div>

@@ -1,9 +1,9 @@
-import { useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import DashboardHeader from "../../components/layouts/DashboardHeader";
 import { toast } from "sonner";
 import axiosInstance from "../../api/axios";
 import { AxiosError } from "axios";
+import { Check, X } from "lucide-react";
 
 const creditPacks = [
   {
@@ -12,19 +12,25 @@ const creditPacks = [
     credits: 20,
     price: 4.99,
     priceDisplay: "$4.99",
-    desc: "Perfect for quick edits & small updates.",
-    color: "bg-yellow-300",
+    desc: "Perfect for occasional users",
     popular: false,
+    savings: null,
+    perCredit: 0.25,
+    features: ["20 Credits", "Never Expires", "All Templates", "AI Optimization", "ATS Checker", "PDF & Word Export"],
+    notIncluded: ["Priority Support"],
   },
   {
     id: "pro",
-    name: "Pro Pack",
+    name: "Professional Pack",
     credits: 50,
     price: 9.99,
     priceDisplay: "$9.99",
-    desc: "For active job seekers who need more AI help.",
-    color: "bg-pink-300",
+    desc: "Best value for active job seekers",
     popular: true,
+    savings: "Save $2.50",
+    perCredit: 0.2,
+    features: ["50 Credits", "Never Expires", "All Templates", "AI Optimization", "ATS Checker", "PDF & Word Export", "Priority Support"],
+    notIncluded: [],
   },
   {
     id: "power",
@@ -32,39 +38,35 @@ const creditPacks = [
     credits: 120,
     price: 19.99,
     priceDisplay: "$19.99",
-    desc: "Best value — for heavy resume builders.",
-    color: "bg-green-300",
+    desc: "Maximum value for professionals",
     popular: false,
+    savings: "Save $10.01",
+    perCredit: 0.17,
+    features: [
+      "120 Credits",
+      "Never Expires",
+      "All Templates",
+      "AI Optimization",
+      "ATS Checker",
+      "PDF & Word Export",
+      "Priority Support",
+      "Dedicated Support",
+    ],
+    notIncluded: [],
   },
 ];
 
-const featureBreakdown = [
-  { action: "Create new resume", cost: 3 },
-  { action: "Clone existing resume", cost: 2 },
-  { action: "AI conversation (per 5 messages)", cost: 1 },
-  { action: "Download PDF", cost: 2 },
-  { action: "Export to Docx", cost: 3 },
-  { action: "AI optimization and ATS Checker", cost: 3 },
-];
-
-const faqs = [
-  {
-    question: "Do credits expire?",
-    answer: "No, your credits never expire. Use them whenever you need them.",
-  },
-  {
-    question: "Can I get a refund?",
-    answer: "Credits are non-refundable once purchased, but they never expire.",
-  },
-  {
-    question: "What payment methods do you accept?",
-    answer:
-      "We accept all major credit cards through our secure Stripe checkout.",
-  },
+const costBreakdown = [
+  { action: "Create new resume", cost: 3, description: "Full AI-powered resume creation" },
+  { action: "Clone existing resume", cost: 2, description: "Duplicate and customize existing resume" },
+  { action: "AI conversation (5 messages)", cost: 1, description: "Get AI feedback and suggestions" },
+  { action: "Download PDF", cost: 2, description: "Export professional PDF format" },
+  { action: "Export to Word", cost: 3, description: "Download editable .docx file" },
+  { action: "AI optimization", cost: 3, description: "Enhance content with AI suggestions" },
+  { action: "ATS checker", cost: 3, description: "Ensure ATS compatibility" },
 ];
 
 const Credits = () => {
-  const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
   const handleBuyCredits = async (pack: string) => {
     // Initialize Stripe
@@ -99,130 +101,147 @@ const Credits = () => {
     }
   };
 
-  const toggleFaq = (index: number) => {
-    setActiveFaq(activeFaq === index ? null : index);
-  };
-
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-slate-50 min-h-screen">
       <DashboardHeader />
 
-      <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        {/* Pricing Packs */}
-        <div className="mb-16">
-          <h2 className="text-2xl font-bold uppercase mb-6 text-center">
-            Choose Your Pack
-          </h2>
-          <div className="grid gap-8 md:grid-cols-3">
-            {creditPacks.map((pack) => (
-              <div
-                key={pack.id}
-                className={`relative p-6 border-4 border-black rounded-lg ${pack.color} shadow-[6px_6px_0_0_rgba(0,0,0,1)] hover:shadow-[3px_3px_0_0_rgba(0,0,0,1)] transition-all`}
-              >
-                {pack.popular && (
-                  <div className="absolute -top-3 -right-3 bg-black text-white px-3 py-1 text-xs font-bold uppercase rounded-full">
-                    Most Popular
-                  </div>
-                )}
-                <div className="mb-4">
-                  <h3 className="text-2xl font-extrabold uppercase">
-                    {pack.name}
-                  </h3>
-                  <p className="text-gray-700 text-sm">{pack.desc}</p>
+      {/* Header */}
+      <div className="bg-white border-b border-slate-200">
+        <div className="px-4 py-12 mx-auto max-w-7xl">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-slate-900 mb-4">Choose Your Credit Package</h1>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              Transparent pricing with no hidden fees. All credits never expire and can be used anytime.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Pricing Section */}
+      <div className="px-4 py-16 mx-auto max-w-6xl">
+        <div className="grid gap-8 lg:grid-cols-3">
+          {creditPacks.map((pack) => (
+            <div
+              key={pack.id}
+              className={`relative bg-white rounded-2xl shadow-lg border-2 transition-all duration-300 ${
+                pack.popular ? "border-[#7060fc] shadow-[#7060fc]/10 scale-105" : "border-slate-200 hover:border-slate-300"
+              }`}
+            >
+              {pack.popular && (
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-[#7060fc] text-white px-6 py-2 text-sm font-semibold rounded-full">
+                  Most Popular
                 </div>
-                <div className="mb-6">
-                  <div className="text-4xl font-bold mb-1">
-                    {pack.priceDisplay}
-                  </div>
-                  <div className="text-lg font-mono font-semibold">
-                    {pack.credits} Credits
-                  </div>
+              )}
+
+              <div className="p-8">
+                <div className="text-center mb-6">
+                  <h3 className="text-2xl font-bold text-slate-900 mb-2">{pack.name}</h3>
+                  <p className="text-slate-600">{pack.desc}</p>
                 </div>
+
+                <div className="text-center mb-6">
+                  <div className="text-5xl font-bold text-slate-900 mb-2">{pack.priceDisplay}</div>
+                  <div className="text-lg font-semibold text-[#7060fc] mb-1">{pack.credits} Credits</div>
+                  <div className="text-sm text-slate-500">${pack.perCredit.toFixed(2)} per credit</div>
+                  {pack.savings && <div className="text-sm text-green-600 font-semibold mt-1">{pack.savings}</div>}
+                </div>
+
+                <div className="mb-8">
+                  <h4 className="font-semibold text-slate-900 mb-4">What's included:</h4>
+                  <ul className="space-y-3">
+                    {pack.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-center gap-3">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                        <span className="text-slate-700">{feature}</span>
+                      </li>
+                    ))}
+                    {pack.notIncluded && pack.notIncluded.map((feature, idx) => (
+                      <li key={idx} className="flex items-center gap-3 opacity-50">
+                        <X className="w-5 h-5 text-slate-400 flex-shrink-0" />
+                        <span className="text-slate-500">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
                 <button
                   onClick={() => handleBuyCredits(pack.id)}
-                  className={`w-full py-3 border-2 border-black font-bold transition-all ${"bg-black text-white hover:bg-white hover:text-black"} rounded-lg shadow-[3px_3px_0_0_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1`}
+                  className={`w-full py-4 px-6 font-semibold rounded-xl transition-all duration-200 ${
+                    pack.popular
+                      ? "bg-[#7060fc] text-white hover:bg-[#6050e5] shadow-lg"
+                      : "bg-slate-100 text-slate-900 hover:bg-slate-200 border border-slate-300"
+                  }`}
                 >
                   Get Started
                 </button>
               </div>
-            ))}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Detailed Comparison */}
+      <div className="px-4 py-16 mx-auto max-w-6xl bg-white">
+          <h2 className="text-3xl font-bold text-slate-900 text-center mb-12">Credit Usage Breakdown</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b-2 border-slate-200">
+                  <th className="text-left py-4 px-6 font-semibold text-slate-900">Action</th>
+                  <th className="text-center py-4 px-6 font-semibold text-slate-900">Credits</th>
+                  <th className="text-left py-4 px-6 font-semibold text-slate-900">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                {costBreakdown.map((item, idx) => (
+                  <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50">
+                    <td className="py-4 px-6 font-medium text-slate-900">{item.action}</td>
+                    <td className="py-4 px-6 text-center">
+                      <span className="bg-[#7060fc]/10 text-[#7060fc] px-3 py-1 rounded-full font-semibold">
+                        {item.cost}
+                      </span>
+                    </td>
+                    <td className="py-4 px-6 text-slate-600">{item.description}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
 
-        {/* Features Breakdown */}
-        <div className="mb-16">
-          <div className="border-4 border-black bg-gray-50 rounded-lg p-6 shadow-[6px_6px_0_0_rgba(0,0,0,1)]">
-            <h2 className="text-2xl font-bold uppercase mb-6 text-center">
-              How Credits Work
-            </h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="font-bold text-lg mb-3">Feature Costs</h3>
-                <ul className="space-y-3">
-                  {featureBreakdown.map((item, idx) => (
-                    <li
-                      key={idx}
-                      className="flex justify-between py-2 border-b border-gray-200"
-                    >
-                      <span>{item.action}</span>
-                      <span className="font-bold">{item.cost} credits</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="bg-yellow-50 border-2 border-black p-4 rounded-lg">
-                <h3 className="font-bold text-lg mb-3">Credit Tips</h3>
-                <ul className="space-y-3 list-disc pl-5">
-                  <li>Credits never expire - use them anytime</li>
-                  <li>Bulk purchases save you money</li>
-                  <li>Check your balance anytime in your dashboard</li>
-                  <li>Unused credits carry over indefinitely</li>
-                </ul>
-              </div>
-            </div>
-            <p className="mt-6 text-center text-sm text-gray-600">
-              All prices in USD. Taxes may apply based on your location.
+      {/* FAQ */}
+      <div className="px-4 py-16 mx-auto max-w-4xl bg-slate-50">
+        <h2 className="text-3xl font-bold text-slate-900 text-center mb-12">Frequently Asked Questions</h2>
+        <div className="space-y-6">
+          <div className="bg-white p-6 rounded-xl shadow-sm">
+            <h3 className="font-semibold text-slate-900 mb-2">Do credits expire?</h3>
+            <p className="text-slate-600">No, your credits never expire. Use them whenever you need them.</p>
+          </div>
+          <div className="bg-white p-6 rounded-xl shadow-sm">
+            <h3 className="font-semibold text-slate-900 mb-2">What payment methods do you accept?</h3>
+            <p className="text-slate-600">We accept all major credit cards through our secure Stripe checkout.</p>
+          </div>
+          <div className="bg-white p-6 rounded-xl shadow-sm">
+            <h3 className="font-semibold text-slate-900 mb-2">Can I get a refund?</h3>
+            <p className="text-slate-600">
+              Credits are non-refundable once purchased, but they never expire so you can use them anytime.
             </p>
           </div>
         </div>
+      </div>
 
-        {/* FAQ Section */}
-        <div>
-          <h2 className="text-2xl font-bold uppercase mb-6 text-center">
-            Frequently Asked Questions
-          </h2>
-          <div className="space-y-3 max-w-3xl mx-auto">
-            {faqs.map((faq, index) => (
-              <div
-                key={index}
-                className="border-2 border-black rounded-lg overflow-hidden"
-              >
-                <button
-                  onClick={() => toggleFaq(index)}
-                  className="w-full p-4 bg-orange-100 text-left font-bold flex justify-between items-center hover:bg-orange-200 transition-colors"
-                >
-                  <span>{faq.question}</span>
-                  <span className="text-xl">
-                    {activeFaq === index ? "−" : "+"}
-                  </span>
-                </button>
-                {activeFaq === index && (
-                  <div className="p-4 bg-white">
-                    <p>{faq.answer}</p>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* CTA at bottom */}
-        <div className="mt-16 text-center">
-          <h3 className="text-xl font-bold mb-4">Need more help deciding?</h3>
-          <button onClick={()=>window.open("https://docs.google.com/forms/d/e/1FAIpQLSeA2tZS8ukqiGWVCFIGN-pOPZJ-krue3EM44vwZ47MiToU3wA/viewform?usp=preview", "_blank")} className="px-6 py-3 bg-black text-white font-bold border-2 border-black rounded-lg hover:bg-white hover:text-black transition-colors shadow-[3px_3px_0_0_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1">
-            Contact Support
-          </button>
-        </div>
+      {/* Final CTA */}
+      <div className="px-4 py-16 mx-auto max-w-4xl text-center bg-[#7060fc]">
+        <h2 className="text-4xl font-bold text-white mb-4">Ready to Build Your Perfect Resume?</h2>
+        <p className="text-xl text-white/90 mb-8">
+          Join thousands of professionals who've advanced their careers with our platform.
+        </p>
+        <button
+          onClick={() => handleBuyCredits("pro")}
+          className="px-12 py-4 bg-white text-[#7060fc] font-bold text-lg rounded-xl hover:bg-slate-100 transition-all duration-200 shadow-lg"
+        >
+          Get Started Today
+        </button>
       </div>
     </div>
   );

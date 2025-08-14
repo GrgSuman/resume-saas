@@ -1,16 +1,11 @@
-import { useNavigate } from 'react-router';
-import { useEffect } from 'react';
-
-export default function Home() {
-  const navigate = useNavigate();
-  useEffect(() => {
-    navigate("/signin");
-  }, [navigate]);
+const Home = () => {
   return (
-    <div className="bg-white">
-      <div className="flex justify-center items-center h-screen">
-        <div className="w-20 h-20 rounded-full border-4 border-gray-200 border-t-blue-600 animate-spin"></div>
-      </div>
+    <div>
+        <div className="flex justify-center items-center h-screen">
+            <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
+        </div>
     </div>
   )
 }
+
+export default Home
