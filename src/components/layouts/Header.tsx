@@ -1,106 +1,46 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
-import { useNavigate } from "react-router";
 
-interface HeaderProps {
-  showNotification: boolean;
-  setShowNotification: (show: boolean) => void;
-}
 
-export default function BrutalistHeader({ showNotification, setShowNotification }: HeaderProps) {
+export default function BrutalistHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const navigate = useNavigate();
+  const siteURL = "https://clonecv.com"
   return (
     <>
-      {/* Top Notification Banner */}
-      {showNotification && (
-        <div className="fixed top-0 left-0 w-full z-[100] bg-[#00E0C6] border-b-2 border-black">
-          <div className="container mx-auto px-4 py-2">
-            <div className="flex items-center justify-between">
-              <div className="flex-1 hidden sm:block"></div>
-                             <div className="flex items-center gap-2">
-                 <span className="text-black font-bold text-xs sm:text-sm uppercase tracking-wide">
-                   🎉 LIMITED TIME: Get 15 FREE credits when you sign up!
-                 </span>
-                 <button
-                   onClick={() => navigate("/signin")}
-                   className="bg-black text-white px-2 sm:px-3 py-1 text-xs font-bold uppercase border-2 border-black hover:bg-white hover:text-black transition-all duration-200 whitespace-nowrap"
-                 >
-                   CLAIM NOW
-                 </button>
-               </div>
-              <div className="flex-1 flex justify-end">
-                <button
-                  onClick={() => setShowNotification(false)}
-                  className="text-black hover:text-gray-700 transition-colors duration-200 p-1"
-                >
-                  <X size={16} strokeWidth={3} />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       <header
-        className={`fixed ${
-          showNotification ? "top-10" : "top-0"
-        } left-0 w-full z-50 bg-white border-b-4 border-black`}
+        className={`fixed top-0 left-0 w-full z-50 bg-white/70 backdrop-blur border-b border-slate-200`}
       >
         <div className="container mx-auto px-4">
           <nav className="relative flex items-center justify-between h-16">
             {/* Logo */}
             <a
-              href="/"
-              className="font-black text-xl text-black uppercase tracking-tighter px-1 py-1 border-2 border-transparent"
+              href={siteURL}
+              className="flex items-center gap-2 font-semibold text-xl text-slate-900 tracking-tight px-1 py-1"
             >
-              CLONE
-              <span className="bg-[#00E0C6] text-black px-2 inline-block transform -skew-x-12 ml-1">
-                CV
+              <img src="/icon.png" alt="CloneCV logo" className="h-7 w-7" />
+              <span className="text-xl pt-[5px]">
+                Clone<span className="text-[#7060fc]">CV</span>
               </span>
             </a>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center justify-center space-x-1">
-              <a
-                href="/#features"
-                className="text-black font-bold text-sm uppercase tracking-wide px-4 py-2 border-2 border-transparent hover:border-black hover:bg-black hover:text-white transition-all duration-200"
-              >
-                FEATURES
-              </a>
-              <a
-                href="/#features"
-                className="text-black font-bold text-sm uppercase tracking-wide px-4 py-2 border-2 border-transparent hover:border-black hover:bg-black hover:text-white transition-all duration-200"
-              >
-                HOW IT WORKS
-              </a>
-              <a
-                href="/blogs"
-                className="text-black font-bold text-sm uppercase tracking-wide px-4 py-2 border-2 border-transparent hover:border-black hover:bg-black hover:text-white transition-all duration-200"
-              >
-                BLOGS
-              </a>
-            </div>
-
-            {/* Desktop Buttons */}
-            <div className="hidden md:flex items-center space-x-2">
+            {/* Desktop Navigation and Buttons (right side) */}
+            <div className="hidden md:flex items-center space-x-3">
               <a
                 href="/signin"
-                className="text-black font-bold text-sm uppercase tracking-wide px-4 py-2 border-2 border-black hover:bg-black hover:text-white transition-all duration-200"
+                className="text-slate-800 font-medium text-base px-4 py-2 rounded-lg border border-black hover:bg-slate-50 transition-colors"
               >
-                SIGN IN
+                Sign in
               </a>
-              <button
-                className="px-4 py-2 font-bold text-sm uppercase tracking-wide bg-[#00E0C6] text-black border-2 border-black hover:bg-black hover:text-[#00E0C6] transition-all duration-200 cursor-pointer"
-                onClick={() => navigate("/signin")}
+              <a href="/signin"
+                className="px-4 py-2 font-medium text-base rounded-lg bg-[#7060fc] text-white hover:bg-[#6050e5] transition-colors cursor-pointer"
               >
-                TRY FREE
-              </button>
+                Try free
+              </a>
             </div>
 
             {/* Mobile Menu Button */}
             <button
-              className="md:hidden p-2 border-2 border-black bg-white text-black hover:bg-black hover:text-white transition-all duration-200"
+              className="md:hidden p-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
               onClick={() => setMenuOpen(!menuOpen)}
             >
               {menuOpen ? (
@@ -112,52 +52,25 @@ export default function BrutalistHeader({ showNotification, setShowNotification 
           </nav>
 
           {/* Mobile Menu */}
-          <div
+            <div
             className={`md:hidden ${
               menuOpen ? "block" : "hidden"
             } transition-all duration-300 ease-in-out`}
           >
-            <div className="py-2 space-y-1 bg-white border-t-2 border-black">
-              <a
-                href="/#features"
-                className="block px-4 py-2 text-black font-bold text-base uppercase tracking-wide border-2 border-transparent hover:border-black hover:bg-black hover:text-white transition-all duration-200"
-                onClick={() => setMenuOpen(false)}
-              >
-                FEATURES
-              </a>
-              <a
-                href="/#features"
-                className="block px-4 py-2 text-black font-bold text-base uppercase tracking-wide border-2 border-transparent hover:border-black hover:bg-black hover:text-white transition-all duration-200"
-                onClick={() => setMenuOpen(false)}
-              >
-                HOW IT WORKS
-              </a>
-
-              <a
-                href="/blogs"
-                className="block px-4 py-2 text-black font-bold text-base uppercase tracking-wide border-2 border-transparent hover:border-black hover:bg-black hover:text-white transition-all duration-200"
-                onClick={() => setMenuOpen(false)}
-              >
-                BLOGS
-              </a>
-
+            <div className="py-2 space-y-1 bg-white/80 backdrop-blur border-t border-slate-200">
               <div className="flex flex-col space-y-2 pt-2 px-4">
                 <a
                   href="/signin"
-                  className="text-center px-4 py-2 text-black font-bold text-base uppercase tracking-wide border-2 border-black hover:bg-black hover:text-white transition-all duration-200"
+                    className="text-center px-4 py-2 text-slate-800 font-medium text-lg rounded-lg border border-black hover:bg-slate-50 transition-colors"
                   onClick={() => setMenuOpen(false)}
                 >
-                  SIGN IN
+                  Sign in
                 </a>
-                <button
-                  className="px-4 py-2 font-bold text-base uppercase tracking-wide bg-[#00E0C6] text-black border-2 border-black hover:bg-black hover:text-[#00E0C6] transition-all duration-200 cursor-pointer"
-                  onClick={() => {
-                    navigate("/signin");
-                    setMenuOpen(false);
-                  }}
+                <a href="/signin"
+                    className="text-center px-4 py-2 font-medium text-lg rounded-lg bg-[#7060fc] text-white hover:bg-[#6050e5] transition-colors cursor-pointer"
                 >
-                  TRY FREE
-                </button>
+                  Try free
+                </a>
               </div>
             </div>
           </div>
