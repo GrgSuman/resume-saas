@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "../../../components/ui/button";
-import { Paperclip, Send, X, Edit3, Sparkles, User, Bot } from "lucide-react";
+import { Send, X, Edit3, Sparkles, Bot } from "lucide-react";
 import { useResume } from "../../../hooks/useResume";
 import axiosInstance from "../../../api/axios";
 import { useParams } from "react-router";
@@ -139,11 +139,7 @@ const Chat = () => {
     }
   };
 
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setAttachedFile(file);
-  };
+
 
   const removeAttachment = () => setAttachedFile(null);
 
@@ -249,24 +245,17 @@ const Chat = () => {
                   className={`flex transform-gpu ${msg.type === "user" ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-[80%] rounded-lg px-4 py-3 ${
-                      msg.type === "user"
-                        ? "bg-[#00E0C6] text-gray-900"
-                        : "bg-white text-gray-800 border border-gray-200"
-                    } shadow-sm`}
-                  >
-                    <div className="flex items-start gap-2">
-                      <div className={`flex-shrink-0 mt-0.5 ${
-                        msg.type === "user" ? "text-gray-700" : "text-gray-500"
-                      }`}>
-                        {msg.type === "user" ? (
-                          <User className="h-4 w-4" />
-                        ) : (
-                          <Bot className="h-4 w-4" />
-                        )}
-                      </div>
+                    className={`rounded-lg px-4 py-3 ${
+                      msg.type === "user"? "bg-gray-200 max-w-[80%]": "bg-white"}`}>
+                                         <div className="flex items-start gap-2">
+                       {/* if it is not user then use bot icon */}
+                       {msg.type !== "user" && (
+                         <div className="flex-shrink-0 mt-0.5">
+                           <Bot className="h-4 w-4 text-gray-500" />
+                         </div>
+                       )}
                       <div className="flex-1">
-                        <div className="whitespace-pre-wrap text-sm">
+                        <div className="whitespace-pre-wrap text-justify text-sm">
                           {msg.text}
                         </div>
                         <div className="text-xs text-gray-500 mt-1">
@@ -316,34 +305,25 @@ const Chat = () => {
       <div className="px-4 pb-4 pt-2 bg-white border-t border-gray-200 flex-shrink-0">
         <div className="max-w-3xl mx-auto">
           
-            <div className="relative bg-white border border-gray-300 rounded-lg flex items-center px-4 py-2 gap-2 hover:border-gray-400 focus-within:border-[#00E0C6] focus-within:ring-1 focus-within:ring-[#00E0C6] transition-shadow shadow-sm">
-              <label className="cursor-pointer text-gray-500 hover:text-[#00E0C6] transition-colors">
-                <Paperclip className="h-5 w-5" />
-                <input
-                  type="file"
-                  accept=".pdf,.doc,.docx"
-                  className="hidden"
-                  onChange={handleUpload}
-                />
-              </label>
-              <textarea
-                ref={textareaRef}
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Type your message..."
-                rows={1}
-                className="flex-1 w-full resize-none border-0 outline-none bg-transparent px-2 py-2 text-sm min-h-[44px] max-h-32 placeholder-gray-400"
-              />
-              <Button
-                onClick={handleSendMessage}
-                disabled={!message.trim() && !attachedFile}
-                size="icon"
-                className="bg-[#00E0C6] text-gray-900 hover:bg-[#00c7ad] rounded-full p-2 shadow transition-colors disabled:opacity-50"
-              >
-                <Send className="h-5 w-5" />
-              </Button>
-            </div>
+                         <div className="relative bg-white border border-gray-300 rounded-lg flex items-center px-4 py-2 gap-2 hover:border-gray-400 focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600 transition-shadow shadow-sm">
+               <textarea
+                 ref={textareaRef}
+                 value={message}
+                 onChange={(e) => setMessage(e.target.value)}
+                 onKeyDown={handleKeyDown}
+                 placeholder="Type your message..."
+                 rows={1}
+                 className="flex-1 w-full resize-none border-0 outline-none bg-transparent px-2 py-2 text-sm min-h-[44px] max-h-32 placeholder-gray-400"
+               />
+               <Button
+                 onClick={handleSendMessage}
+                 disabled={!message.trim() && !attachedFile}
+                 size="icon"
+                 className="bg-blue-600 text-white hover:bg-blue-700 rounded-full p-2 shadow transition-colors disabled:opacity-50"
+               >
+                 <Send className="h-5 w-5" />
+               </Button>
+             </div>
 
           {attachedFile && (
             <div className="flex items-center mt-2 text-xs text-gray-600 bg-gray-100 rounded-md px-3 py-1.5 w-fit border border-gray-200 shadow-sm">

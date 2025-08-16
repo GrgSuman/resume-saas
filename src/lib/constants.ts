@@ -5,7 +5,7 @@ export const API_URL = 'https://server.clonecv.com/api';
 export const TEMPLATES = {
   CREATIVE: "Creative",
   PROFESSIONAL: "Professional", 
-  TWO_COLUMN: "Two Column"
+  MODERN: "Modern"
 } as const;
 
 export const CREDIT_COSTS = {

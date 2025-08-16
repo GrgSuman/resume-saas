@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "../../components/ui/button";
-import {Select,SelectContent,SelectItem,SelectTrigger,SelectValue} from "../../components/ui/select";
-import { ArrowLeft, Download, Eye, Edit3, Menu, X, LayoutGrid } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../components/ui/select";
+import { Slider } from "../../components/ui/slider";
+import { ArrowLeft, Download, Eye, SquarePen, Menu, X, LayoutGrid, Settings } from "lucide-react";
 import { useResume } from "../../hooks/useResume";
 import { useNavigate } from "react-router";
 import axios from "axios";
@@ -19,44 +26,40 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
   const navigate = useNavigate();
   const [shouldDownload, setShouldDownload] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const { deductCredits } = useAuth();
 
   useEffect(() => {
     const downloadPDF = async (htmlContent: string) => {
       try {
         dispatch({ type: "SET_DOWNLOADING", payload: true });
-        const response = await axiosInstance.post('/generate-pdf',{ htmlContent },{ 
-          responseType: 'blob' // This is crucial for PDF downloads
-        });
-        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const response = await axiosInstance.post(
+          "/generate-pdf",
+          { htmlContent },
+          {
+            responseType: "blob",
+          }
+        );
+        const blob = new Blob([response.data], { type: "application/pdf" });
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = url;
-        a.download = 'resume.pdf';
+        a.download = "resume.pdf";
         a.click();
-        deductCredits('DOWNLOAD_PDF');
-        // Cleanup
+        deductCredits("DOWNLOAD_PDF");
         window.URL.revokeObjectURL(url);
       } catch (error) {
         if (axios.isAxiosError(error)) {
-
           try {
-            // Convert blob back to text, then parse as JSON
             const text = await error?.response?.data?.text();
             const errorData = JSON.parse(text);
-            toast.error(errorData.message || 'Failed to download PDF',{
-              position: "top-right",
-            });
-            
+            toast.error(errorData.message || "Failed to download PDF");
           } catch (parseError) {
-            toast.error(parseError as string || 'Failed to download PDF',{
-              position: "top-right",
-            });
+            console.log(parseError);
+            toast.error("Failed to download PDF");
           }
         } else {
-          toast.error( 'Failed to download PDF',{
-            position: "top-right",
-          });
+          toast.error("Failed to download PDF");
         }
       } finally {
         setShouldDownload(false);
@@ -69,308 +72,426 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
       const html = resumeRef.current.innerHTML;
       downloadPDF(html);
     }
-  }, [state?.resumeEditingMode, shouldDownload, resumeRef, dispatch, deductCredits]);
+  }, [
+    state?.resumeEditingMode,
+    shouldDownload,
+    resumeRef,
+    dispatch,
+    deductCredits,
+  ]);
 
   const handleDownloadPDF = () => {
     dispatch({ type: "SET_EDITING_MODE", payload: false });
     setShouldDownload(true);
-    setIsMobileMenuOpen(false); // Close menu when downloading
+    setIsMobileMenuOpen(false);
   };
 
   const toggleEditMode = () => {
     dispatch({ type: "SET_EDITING_MODE", payload: !state?.resumeEditingMode });
-    setIsMobileMenuOpen(false); // Close menu when toggling edit mode
+    setIsMobileMenuOpen(false);
   };
 
   const handleSectionsClick = () => {
     onSectionsClick();
-    setIsMobileMenuOpen(false); // Close menu when clicking sections
+    setIsMobileMenuOpen(false);
+  };
+
+  const handleSettingChange = (key: string, value: number | string) => {
+    dispatch({
+      type: "UPDATE_RESUME_SETTINGS",
+      payload: { [key]: value },
+    });
+  };
+
+  const toggleAdvancedSettings = () => {
+    setShowAdvancedSettings(!showAdvancedSettings);
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full shadow-sm bg-white">
-      {/* Mobile Top Bar */}
-      <div className="flex h-14 items-center justify-between px-4 lg:hidden">
+    <header className="sticky top-0 z-50 w-full border-b bg-gray-900 border-gray-700 shadow-sm">
+      {/* Desktop Header */}
+      <div className="hidden h-16 items-center justify-between px-6 lg:flex">
+        {/* Left - Document Controls */}
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate("/dashboard")}
+            className="gap-2 text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-gray-300"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
+
+          <div className="h-6 w-px bg-gray-700" />
+
+          {/* Main Controls */}
+          <div className="flex items-center gap-3">
+            {/* Template Selector */}
+            <div className="relative">
+              <Select
+                value={state.resumeSettings?.template || "Professional"}
+                onValueChange={(value) =>
+                  handleSettingChange("template", value)
+                }
+              >
+                <SelectTrigger
+                  size="sm"
+                  className="border-gray-700 bg-gray-800 text-sm font-medium text-gray-200 hover:bg-gray-700"
+                >
+                  <div className="absolute -top-2 left-3 px-1 text-xs text-gray-400 bg-gray-900 group-hover:bg-gray-800 transition-colors">
+                    Template
+                  </div>
+                  <SelectValue placeholder="Professional" />
+                </SelectTrigger>
+                <SelectContent className="border-gray-700 bg-gray-800 text-gray-200">
+                  <SelectItem
+                    value="Creative"
+                    className="text-sm hover:bg-gray-700"
+                  >
+                    Creative
+                  </SelectItem>
+                  <SelectItem
+                    value="Modern"
+                    className="text-sm hover:bg-gray-700"
+                  >
+                    Modern
+                  </SelectItem>
+                  <SelectItem
+                    value="Professional"
+                    className="text-sm hover:bg-gray-700"
+                  >
+                    Professional
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Font Selector */}
+            <div className="relative">
+              <Select
+                value={state.resumeSettings?.fontFamily || "Roboto"}
+                onValueChange={(value) =>
+                  handleSettingChange("fontFamily", value)
+                }
+              >
+                <SelectTrigger
+                  size="sm"
+                  className="h-9 w-36 border-gray-700 bg-gray-800 text-sm font-medium text-gray-200 hover:bg-gray-700 group"
+                >
+                  <div className="absolute -top-2 left-3 px-1 text-xs text-gray-400 bg-gray-900 group-hover:bg-gray-800 transition-colors">
+                    Font
+                  </div>
+                  <SelectValue placeholder="Roboto" />
+                </SelectTrigger>
+                <SelectContent className="border-gray-700 bg-gray-800 text-gray-200">
+                  <SelectItem
+                    value="Roboto"
+                    className="text-sm hover:bg-gray-700"
+                  >
+                    Sans (Roboto)
+                  </SelectItem>
+                  <SelectItem
+                    value="PT Serif"
+                    className="text-sm hover:bg-gray-700"
+                  >
+                    Serif (PT Serif)
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Advanced Settings Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={toggleAdvancedSettings}
+            className={`gap-2 text-sm font-medium border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700 hover:text-gray-200 ${
+              showAdvancedSettings ? "bg-gray-700" : ""
+            }`}
+          >
+            <Settings className="h-4 w-4" />
+            {showAdvancedSettings ? "Hide Settings" : "More Settings"}
+          </Button>
+        </div>
+
+        {/* Right - Action Buttons */}
+        <div className="flex items-center gap-3">
+          {/* Edit/Preview Toggle */}
+          <Button
+            onClick={toggleEditMode}
+            variant="outline"
+            size="sm"
+            className="gap-2 text-sm font-medium border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700 hover:text-gray-200"
+          >
+            {state?.resumeEditingMode ? (
+              <>
+                <Eye className="h-4 w-4" />
+                Preview Resume
+              </>
+            ) : (
+              <>
+                <SquarePen className="h-4 w-4" />
+                Edit Resume
+              </>
+            )}
+          </Button>
+
+          {/* Sections Button */}
+          <Button
+            onClick={handleSectionsClick}
+            variant="outline"
+            size="sm"
+            className="gap-2 text-sm font-medium border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700 hover:text-gray-200"
+          >
+            <LayoutGrid className="h-4 w-4" />
+            Sections
+          </Button>
+
+          {/* Download Button */}
+          <Button
+            onClick={handleDownloadPDF}
+            disabled={state?.resumeDownloading}
+            size="sm"
+            className="gap-2 bg-blue-600 text-sm font-medium text-white hover:bg-blue-700"
+          >
+            <Download className="h-4 w-4" />
+            {state?.resumeDownloading ? "Exporting..." : "Export PDF"}
+          </Button>
+        </div>
+      </div>
+
+      {/* Advanced Settings Panel (Desktop) */}
+      {showAdvancedSettings && (
+        <div className="hidden lg:flex items-center justify-between px-6 py-3 bg-gray-800 border-t border-gray-700">
+          <div className="flex items-center gap-4">
+            {/* Font Size */}
+            <div className="flex items-center gap-2 w-48">
+              <span className="text-sm font-medium text-gray-400 whitespace-nowrap">
+                Font Size
+              </span>
+              <Slider
+                value={[state.resumeSettings?.fontSize || 14]}
+                onValueChange={(value) =>
+                  handleSettingChange("fontSize", value[0])
+                }
+                min={10}
+                max={16}
+                step={1}
+                className="w-full"
+              />
+              <span className="text-sm font-medium text-gray-300 w-6">
+                {state.resumeSettings?.fontSize || 14}px
+              </span>
+            </div>
+
+            {/* Line Height */}
+            <div className="flex items-center gap-2 w-48">
+              <span className="text-sm font-medium text-gray-400 whitespace-nowrap">
+                Line Height
+              </span>
+              <Slider
+                value={[((state.resumeSettings?.lineHeight || 1.2) - 1) * 100]}
+                onValueChange={(value) =>
+                  handleSettingChange("lineHeight", 1 + value[0] / 100)
+                }
+                min={0}
+                max={60}
+                step={10}
+                className="w-full"
+              />
+              <span className="text-sm font-medium text-gray-300 w-8">
+                {((state.resumeSettings?.lineHeight || 1.2) * 10).toFixed(1)}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Header */}
+      <div className="flex h-16 items-center justify-between px-4 lg:hidden">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => navigate("/dashboard")}
-          className="gap-2 text-xs uppercase h-9 px-3 transition-all"
+          className="gap-2 text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-gray-300"
         >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          <span className="sr-only">Back</span>
+          <ArrowLeft className="h-4 w-4" />
         </Button>
 
-        {/* Center - Edit/Preview Toggle */}
-        <div className="flex items-center p-[1px] rounded-sm bg-white border-2 border-black/20 h-9">
-          <button
-            onClick={toggleEditMode}
-            className={`flex items-center rounded-sm gap-1 px-3 h-full text-xs font-semibold uppercase transition-all ${
-              state?.resumeEditingMode ? "bg-black text-white" : "hover:bg-gray-100"
-            }`}
-          >
-            <Edit3 className="h-3.5 w-3.5" />
-            Edit
-          </button>
-          <button
-            onClick={toggleEditMode}
-            className={`flex items-center rounded-sm gap-1 px-3 h-full text-xs font-semibold uppercase transition-all ${
-              !state?.resumeEditingMode ? "bg-black text-white" : "hover:bg-gray-100"
-            }`}
-          >
-            <Eye className="h-3.5 w-3.5" />
-            Preview
-          </button>
-        </div>
+        <h2 className="text-gray-200 font-medium">Resume Editor</h2>
 
         <div className="flex items-center gap-2">
-          {/* Download Button */}
+          {/* Edit/Preview Toggle */}
           <Button
+            onClick={toggleEditMode}
+            variant="outline"
             size="sm"
+            className="gap-2 text-sm font-medium border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700 hover:text-gray-200"
+          >
+            {state?.resumeEditingMode ? (
+              <>
+                <Eye className="h-4 w-4" />
+                Preview
+              </>
+            ) : (
+              <>
+                <SquarePen className="h-4 w-4" />
+                Edit
+              </>
+            )}
+          </Button>
+
+          <Button
             onClick={handleDownloadPDF}
             disabled={state?.resumeDownloading}
-            className="gap-1 font-semibold text-xs uppercase bg-yellow-400 text-black hover:bg-yellow-500 h-9 px-3 transition-all"
-          >
-            <Download className="h-3.5 w-3.5" />
-          </Button>
-
-          {/* Manage Sections Button */}
-          <Button
             size="sm"
-            onClick={handleSectionsClick}
-            className="border-2 border-black/20 h-9 px-3 bg-white text-black hover:bg-black hover:text-white transition-all"
-            variant="outline"
+            className="bg-blue-600 text-white hover:bg-blue-700"
           >
-            <LayoutGrid className="h-3.5 w-3.5" />
-            <span className="sr-only">Manage Sections</span>
+            <Download className="h-4 w-4" />
           </Button>
 
-          {/* Menu Button */}
           <Button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             variant="outline"
             size="sm"
-            className="gap-1 font-semibold text-xs uppercase border-2 border-black/20 hover:bg-black hover:text-white h-9 px-3 transition-all"
+            className="border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700 hover:text-gray-200"
           >
             {isMobileMenuOpen ? (
-              <X className="h-3.5 w-3.5" />
+              <X className="h-4 w-4" />
             ) : (
-              <Menu className="h-3.5 w-3.5" />
+              <Menu className="h-4 w-4" />
             )}
           </Button>
         </div>
       </div>
 
-      {/* Desktop Header */}
-      <div className="hidden h-14 items-center justify-between px-4 lg:flex">
-        {/* Left - Back Button */}
-        <div className="flex items-center">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate("/dashboard")}
-            className="gap-2 font-semibold text-xs uppercase h-9 px-3 transition-all"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Back
-          </Button>
-        </div>
-
-        {/* Center - Document Controls */}
-        <div className="flex items-center gap-2">
-          {/* Template Selector */}
-          <Select
-            value={state.resumeSettings?.template || "Creative"}
-            onValueChange={(value) =>
-              dispatch({
-                type: "UPDATE_RESUME_SETTINGS",
-                payload: { template: value },
-              })
-            }
-          >
-            <SelectTrigger className="h-9 border-2 border-black/20 bg-white hover:bg-gray-100 font-semibold text-xs">
-              <SelectValue placeholder="Template" />
-            </SelectTrigger>
-            <SelectContent className="border-2 border-black/20 bg-white">
-              <SelectItem value="Creative" className="hover:bg-black hover:text-white font-semibold text-xs">
-                Creative
-              </SelectItem>
-              <SelectItem value="Professional" className="hover:bg-black hover:text-white font-semibold text-xs">
-                Professional
-              </SelectItem>
-              <SelectItem value="Two Column" className="hover:bg-black hover:text-white font-semibold text-xs">
-                Two Column
-              </SelectItem>
-            </SelectContent>
-          </Select>
-
-          {/* Font Selector */}
-          <Select
-            value={state.resumeSettings?.fontFamily || "Roboto"}
-            onValueChange={(value) =>
-              dispatch({
-                type: "UPDATE_RESUME_SETTINGS",
-                payload: { fontFamily: value },
-              })
-            }
-          >
-            <SelectTrigger className="h-9 border-2 border-black/20 bg-white hover:bg-gray-100 font-semibold text-xs">
-              <SelectValue placeholder="Font" />
-            </SelectTrigger>
-            <SelectContent className="border-2 border-black/20 bg-white">
-              <SelectItem value="Roboto" className="hover:bg-black hover:text-white font-semibold text-xs">
-                Sans
-              </SelectItem>
-              <SelectItem value="PT Serif" className="hover:bg-black hover:text-white font-semibold text-xs">
-                Serif
-              </SelectItem>
-            </SelectContent>
-          </Select>
-
-          {/* Size Selector */}
-          <Select
-            value={state.resumeSettings?.fontSize?.toString() || "14"}
-            onValueChange={(value) =>
-              dispatch({
-                type: "UPDATE_RESUME_SETTINGS",
-                payload: { fontSize: parseInt(value) },
-              })
-            }
-          >
-          <SelectTrigger className="h-9 border-2 border-black/20 bg-white hover:bg-gray-100 font-semibold text-xs">
-              <SelectValue placeholder="Size" />
-            </SelectTrigger>
-            <SelectContent className="border-2 border-black/20 bg-white">
-              <SelectItem value="12" className="hover:bg-black hover:text-white font-semibold text-xs">12</SelectItem>
-              <SelectItem value="13" className="hover:bg-black hover:text-white font-semibold text-xs">13</SelectItem>
-              <SelectItem value="14" className="hover:bg-black hover:text-white font-semibold text-xs">14</SelectItem>
-              <SelectItem value="15" className="hover:bg-black hover:text-white font-semibold text-xs">15</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {/* Sections Button */}
-          <Button
-            onClick={onSectionsClick}
-            variant="outline"
-            size="sm"
-            className="gap-1 font-semibold text-xs uppercase border-2 border-black/20 hover:bg-black hover:text-white h-9 px-3 transition-all"
-          >
-            <Menu className="h-3.5 w-3.5" />
-            Sections
-          </Button>
-        </div>
-
-        {/* Right - Action Buttons */}
-        <div className="flex items-center gap-2">
-          {/* Edit/Preview Toggle */}
-          <div className="flex items-center p-[1px] rounded-sm bg-white border-2 border-black/20 h-9">
-            <button
-              onClick={toggleEditMode}
-              className={`flex items-center rounded-sm gap-1 px-3 h-full text-xs font-semibold uppercase transition-all ${
-                state?.resumeEditingMode ? "bg-black text-white" : "hover:bg-gray-100"
-              }`}
-            >
-              <Edit3 className="h-3.5 w-3.5" />
-              Edit
-            </button>
-            <button
-              onClick={toggleEditMode}
-              className={`flex items-center rounded-sm gap-1 px-3 h-full text-xs font-semibold uppercase transition-all ${
-                !state?.resumeEditingMode ? "bg-black text-white" : "hover:bg-gray-100"
-              }`}
-            >
-              <Eye className="h-3.5 w-3.5" />
-              Preview
-            </button>
-          </div>
-
-          {/* Download Button */}
-          <Button
-            size="sm"
-            onClick={handleDownloadPDF}
-            disabled={state?.resumeDownloading}
-            className="gap-1 font-semibold text-xs uppercase bg-yellow-400 text-black hover:bg-yellow-500 h-9 px-3 transition-all"
-          >
-            <Download className="h-3.5 w-3.5" />
-            {state?.resumeDownloading ? "Preparing..." : "Export"}
-          </Button>
-        </div>
-      </div>
-
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <>
-          {/* Mobile Menu Content - Horizontal Bar */}
-          <div className="fixed inset-x-0 top-14 z-50 lg:hidden bg-white border-b-2 border-black/20 shadow-lg">
-            <div className="flex items-center justify-between px-4 py-3">
-              {/* Settings Controls */}
-              <div className="flex items-center gap-3 w-full">
-                {/* Template Selector */}
+        <div className="fixed inset-x-0 top-16 z-50 border-b bg-gray-800 border-gray-700 p-4 shadow-lg lg:hidden">
+          <div className="space-y-4">
+            {/* Sections Button */}
+            <Button
+              onClick={handleSectionsClick}
+              variant="outline"
+              className="w-full text-sm font-medium border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700 hover:text-gray-200"
+            >
+              <LayoutGrid className="h-4 w-4 mr-2" />
+              Manage Sections
+            </Button>
+
+            <div className="border-t border-gray-700 pt-4">
+              <h3 className="text-sm font-medium text-gray-400 mb-3">
+                Design Settings
+              </h3>
+
+              {/* Template Selector */}
+              <div className="mb-4">
+                <label className="mb-1 block text-sm font-medium text-gray-300">
+                  Template
+                </label>
                 <Select
-                  value={state.resumeSettings?.template || "Creative"}
+                  value={state.resumeSettings?.template || "Professional"}
                   onValueChange={(value) => {
-                    dispatch({
-                      type: "UPDATE_RESUME_SETTINGS",
-                      payload: { template: value },
-                    });
-                    setIsMobileMenuOpen(false);
+                    handleSettingChange("template", value);
                   }}
                 >
-                  <SelectTrigger className="h-8 w-full border-2 border-black/20 bg-white hover:bg-gray-100 font-semibold text-xs">
+                  <SelectTrigger className="w-full border-gray-700 bg-gray-700 text-gray-200">
                     <SelectValue placeholder="Template" />
                   </SelectTrigger>
-                  <SelectContent className="border-2 border-black/20 bg-white">
-                    <SelectItem value="Creative" className="hover:bg-black hover:text-white font-semibold text-xs">Creative</SelectItem>
-                    <SelectItem value="Professional" className="hover:bg-black hover:text-white font-semibold text-xs">Professional</SelectItem>
-                    <SelectItem value="Two Column" className="hover:bg-black hover:text-white font-semibold text-xs">Two Column</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                {/* Font Selector */}
-                <Select
-                  value={state.resumeSettings?.fontFamily || "Roboto"}
-                  onValueChange={(value) => {
-                    dispatch({
-                      type: "UPDATE_RESUME_SETTINGS",
-                      payload: { fontFamily: value },
-                    });
-                    setIsMobileMenuOpen(false);
-                  }}
-                >
-                  <SelectTrigger className="h-8 w-full border-2 border-black/20 bg-white hover:bg-gray-100 font-semibold text-xs">
-                    <SelectValue placeholder="Font" />
-                  </SelectTrigger>
-                  <SelectContent className="border-2 border-black/20 bg-white">
-                    <SelectItem value="Roboto" className="hover:bg-black hover:text-white font-semibold text-xs">Sans</SelectItem>
-                    <SelectItem value="PT Serif" className="hover:bg-black hover:text-white font-semibold text-xs">Serif</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                {/* Size Selector */}
-                <Select
-                  value={state.resumeSettings?.fontSize?.toString() || "14"}
-                  onValueChange={(value) => {
-                    dispatch({
-                      type: "UPDATE_RESUME_SETTINGS",
-                      payload: { fontSize: parseInt(value) },
-                    });
-                    setIsMobileMenuOpen(false);
-                  }}
-                >
-                  <SelectTrigger className="h-8 w-full border-2 border-black/20 bg-white hover:bg-gray-100 font-semibold text-xs">
-                    <SelectValue placeholder="Size" />
-                  </SelectTrigger>
-                  <SelectContent className="border-2 border-black/20 bg-white">
-                    <SelectItem value="12" className="hover:bg-black hover:text-white font-semibold text-xs">12</SelectItem>
-                    <SelectItem value="13" className="hover:bg-black hover:text-white font-semibold text-xs">13</SelectItem>
-                    <SelectItem value="14" className="hover:bg-black hover:text-white font-semibold text-xs">14</SelectItem>
-                    <SelectItem value="15" className="hover:bg-black hover:text-white font-semibold text-xs">15</SelectItem>
+                  <SelectContent className="border-gray-700 bg-gray-800 text-gray-200">
+                    <SelectItem
+                      value="Professional"
+                      className="text-sm hover:bg-gray-700"
+                    >
+                      Professional
+                    </SelectItem>
+                    <SelectItem
+                      value="Modern"
+                      className="text-sm hover:bg-gray-700"
+                    >
+                      Modern
+                    </SelectItem>
+                    <SelectItem
+                      value="Minimal"
+                      className="text-sm hover:bg-gray-700"
+                    >
+                      Minimal
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
+
+              {/* Font Selector */}
+              <div className="mb-4">
+                <label className="mb-1 block text-sm font-medium text-gray-300">
+                  Font
+                </label>
+                <Select
+                  value={state.resumeSettings?.fontFamily || "Roboto"}
+                  onValueChange={(value) => {
+                    handleSettingChange("fontFamily", value);
+                  }}
+                >
+                  <SelectTrigger className="w-full border-gray-700 bg-gray-700 text-gray-200">
+                    <SelectValue placeholder="Font" />
+                  </SelectTrigger>
+                  <SelectContent className="border-gray-700 bg-gray-800 text-gray-200">
+                    <SelectItem
+                      value="Roboto"
+                      className="text-sm hover:bg-gray-700"
+                    >
+                      Sans (Roboto)
+                    </SelectItem>
+                    <SelectItem
+                      value="PT Serif"
+                      className="text-sm hover:bg-gray-700"
+                    >
+                      Serif (PT Serif)
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Font Size */}
+              <div className="mb-4">
+                <label className="mb-1 block text-sm font-medium text-gray-300">
+                  Font Size: {state.resumeSettings?.fontSize || 14}px
+                </label>
+                <Slider
+                  value={[state.resumeSettings?.fontSize || 14]}
+                  onValueChange={(value) =>
+                    handleSettingChange("fontSize", value[0])
+                  }
+                  min={10}
+                  max={16}
+                  step={1}
+                  className="bg-gray-700"
+                />
+              </div>
+
+              {/* Line Height */}
+              <div className="mb-2">
+                <label className="mb-1 block text-sm font-medium text-gray-300">
+                  Spacing:{" "}
+                  {((state.resumeSettings?.lineHeight || 1.2) * 10).toFixed(1)}
+                </label>
+                <Slider
+                  value={[
+                    ((state.resumeSettings?.lineHeight || 1.2) - 1) * 100,
+                  ]}
+                  onValueChange={(value) =>
+                    handleSettingChange("lineHeight", 1 + value[0] / 100)
+                  }
+                  min={0}
+                  max={60}
+                  step={10}
+                />
+              </div>
             </div>
           </div>
-        </>
+        </div>
       )}
     </header>
   );

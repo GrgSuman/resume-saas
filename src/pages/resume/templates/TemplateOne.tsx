@@ -12,7 +12,9 @@ import { useResume } from "../../../hooks/useResume";
 const ResumeTemplate = ({
   ref,
 }: {
-  ref: React.RefObject<HTMLDivElement | null>;
+  ref: React.RefObject<HTMLDivElement |
+  
+  null>;
 }) => {
   const { state } = useResume();
 
