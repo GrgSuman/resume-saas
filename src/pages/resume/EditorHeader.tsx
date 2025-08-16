@@ -163,6 +163,12 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
                   >
                     Professional
                   </SelectItem>
+                  <SelectItem
+                    value="Two Column"
+                    className="text-sm hover:bg-gray-700"
+                  >
+                    Two Column
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
