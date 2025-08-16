@@ -3,6 +3,7 @@ import { TEMPLATES } from "../../../lib/constants";
 import CreativeTemplate from "../templates/CreativeTemplate";
 import ProfessionalTemplate from "../templates/ProfessionalTemplate";
 import ModernTemplate from "../templates/ModernTemplate";
+import TwoColumn from "../templates/TwoColumn";
 
 const ResumePreview = ({
   resumeRef,
@@ -25,6 +26,9 @@ const ResumePreview = ({
           )}
           {state?.resumeSettings?.template === TEMPLATES.MODERN && (
             <ModernTemplate ref={resumeRef} />
+          )}
+          {state?.resumeSettings?.template === "Two Column" && (
+            <TwoColumn ref={resumeRef} />
           )}
         </>
       )}
