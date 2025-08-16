@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Plus, Trash2 } from "lucide-react";
+import { X, Trash2 } from "lucide-react";
 
 interface InterestsFormProps {
   isOpen: boolean;
