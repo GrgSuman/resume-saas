@@ -298,7 +298,7 @@ const Chat = () => {
                         </div>
                       )}
                       <div className="flex-1">
-                        <div className="whitespace-pre-wrap text-justify text-sm">
+                        <div className="text-sm whitespace-pre-wrap">
                           {msg.text}
                         </div>
                         <div className="text-xs text-gray-500 mt-1">

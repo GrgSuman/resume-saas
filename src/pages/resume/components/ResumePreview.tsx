@@ -1,9 +1,10 @@
 import { useResume } from "../../../hooks/useResume";
 import { TEMPLATES } from "../../../lib/constants";
+
 import CreativeTemplate from "../templates/CreativeTemplate";
 import ProfessionalTemplate from "../templates/ProfessionalTemplate";
 import ModernTemplate from "../templates/ModernTemplate";
-import TwoColumn from "../templates/TwoColumn";
+import TwoColumnTemplate from "../templates/TwoColumnTemplate";
 
 const ResumePreview = ({
   resumeRef,
@@ -13,7 +14,7 @@ const ResumePreview = ({
   const { state } = useResume();
 
   return (
-    <div ref={resumeRef}>
+    <div>
       {state.isLoading ? (
         <LoadingIndicator />
       ) : (
@@ -27,8 +28,8 @@ const ResumePreview = ({
           {state?.resumeSettings?.template === TEMPLATES.MODERN && (
             <ModernTemplate ref={resumeRef} />
           )}
-          {state?.resumeSettings?.template === "Two Column" && (
-            <TwoColumn ref={resumeRef} />
+          {state?.resumeSettings?.template === TEMPLATES.TWO_COLUMN && (
+            <TwoColumnTemplate ref={resumeRef} />
           )}
         </>
       )}

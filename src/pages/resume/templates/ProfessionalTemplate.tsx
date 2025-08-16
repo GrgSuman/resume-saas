@@ -447,7 +447,8 @@ const ProfessionalTemplate = ({
             <div className="font-bold mb-1">{ref.name}</div>
             <div>
               <div>
-                {ref.position} at {ref.company}
+              {ref.position} {ref.position && ref.company && "at"} {ref.company}
+
               </div>
               {ref.contact && (
                 <div>

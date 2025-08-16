@@ -363,7 +363,8 @@ const ModernTemplate = ({
           <div className="font-bold mb-1">{ref.name}</div>
           <div className="ml-4">
             <div>
-              {ref.position} at {ref.company}
+            {ref.position} {ref.position && ref.company && "at"} {ref.company}
+
             </div>
             {ref.contact && (
               <div>
