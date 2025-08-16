@@ -8,13 +8,24 @@ import {
   SelectValue,
 } from "../../components/ui/select";
 import { Slider } from "../../components/ui/slider";
-import { ArrowLeft, Download, Eye, SquarePen, Menu, X, LayoutGrid, Settings } from "lucide-react";
+import {
+  ArrowLeft,
+  Download,
+  Eye,
+  SquarePen,
+  Menu,
+  X,
+  LayoutGrid,
+  Settings,
+  Palette,
+} from "lucide-react";
 import { useResume } from "../../hooks/useResume";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import axiosInstance from "../../api/axios";
 import { toast } from "sonner";
 import { useAuth } from "../../hooks/useAuth";
+import TemplateSelector from "./components/TemplateSelector";
 
 interface EditorHeaderProps {
   resumeRef: React.RefObject<HTMLDivElement | null>;
@@ -27,6 +38,7 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
   const [shouldDownload, setShouldDownload] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
+  const [isTemplateSelectorOpen, setIsTemplateSelectorOpen] = useState(false);
   const { deductCredits } = useAuth();
 
   useEffect(() => {
@@ -126,52 +138,20 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
           <div className="h-6 w-px bg-gray-700" />
 
           {/* Main Controls */}
-          <div className="flex items-center gap-3">
-            {/* Template Selector */}
-            <div className="relative">
-              <Select
-                value={state.resumeSettings?.template || "Professional"}
-                onValueChange={(value) =>
-                  handleSettingChange("template", value)
-                }
-              >
-                <SelectTrigger
-                  size="sm"
-                  className="border-gray-700 bg-gray-800 text-sm font-medium text-gray-200 hover:bg-gray-700"
-                >
-                  <div className="absolute -top-2 left-3 px-1 text-xs text-gray-400 bg-gray-900 group-hover:bg-gray-800 transition-colors">
-                    Template
-                  </div>
-                  <SelectValue placeholder="Professional" />
-                </SelectTrigger>
-                <SelectContent className="border-gray-700 bg-gray-800 text-gray-200">
-                  <SelectItem
-                    value="Creative"
-                    className="text-sm hover:bg-gray-700"
-                  >
-                    Creative
-                  </SelectItem>
-                  <SelectItem
-                    value="Modern"
-                    className="text-sm hover:bg-gray-700"
-                  >
-                    Modern
-                  </SelectItem>
-                  <SelectItem
-                    value="Professional"
-                    className="text-sm hover:bg-gray-700"
-                  >
-                    Professional
-                  </SelectItem>
-                  <SelectItem
-                    value="Two Column"
-                    className="text-sm hover:bg-gray-700"
-                  >
-                    Two Column
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="flex items-center gap-3 relative">
+            {/* Template Selector Button */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsTemplateSelectorOpen(true)}
+              className="gap-2 text-sm font-medium border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700 hover:text-gray-200"
+            >
+              <div className="absolute -top-2 left-3 px-1 text-xs text-gray-400 bg-gray-900 group-hover:bg-gray-800 transition-colors">
+                Template
+              </div>
+              <Palette className="h-4 w-4" />
+              {state.resumeSettings?.template || "Professional"}
+            </Button>
 
             {/* Font Selector */}
             <div className="relative">
@@ -397,42 +377,17 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
                 <label className="mb-1 block text-sm font-medium text-gray-300">
                   Template
                 </label>
-                <Select
-                  value={state.resumeSettings?.template || "Professional"}
-                  onValueChange={(value) => {
-                    handleSettingChange("template", value);
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsTemplateSelectorOpen(true);
+                    setIsMobileMenuOpen(false);
                   }}
+                  className="w-full text-sm font-medium border-gray-700 bg-gray-700 text-gray-200 hover:bg-gray-600 hover:text-gray-200"
                 >
-                  <SelectTrigger className="w-full border-gray-700 bg-gray-700 text-gray-200">
-                    <SelectValue placeholder="Template" />
-                  </SelectTrigger>
-                  <SelectContent className="border-gray-700 bg-gray-800 text-gray-200">
-                    <SelectItem
-                      value="Creative"
-                      className="text-sm hover:bg-gray-700"
-                    >
-                      Creative
-                    </SelectItem>
-                    <SelectItem
-                      value="Modern"
-                      className="text-sm hover:bg-gray-700"
-                    >
-                      Modern
-                    </SelectItem>
-                    <SelectItem
-                      value="Professional"
-                      className="text-sm hover:bg-gray-700"
-                    >
-                      Professional
-                    </SelectItem>
-                    <SelectItem
-                      value="Two Column"
-                      className="text-sm hover:bg-gray-700"
-                    >
-                      Two Column
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                  <Palette className="h-4 w-4 mr-2" />
+                  {state.resumeSettings?.template || "Professional"}
+                </Button>
               </div>
 
               {/* Font Selector */}
@@ -505,6 +460,12 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
           </div>
         </div>
       )}
+
+      {/* Template Selector Modal */}
+      <TemplateSelector
+        isOpen={isTemplateSelectorOpen}
+        onClose={() => setIsTemplateSelectorOpen(false)}
+      />
     </header>
   );
 };

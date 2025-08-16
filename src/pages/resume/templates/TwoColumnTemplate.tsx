@@ -25,7 +25,7 @@ import type {
   Section,
 } from "../../../types/resumeDataType";
 
-const TwoColumn = ({
+const TwoColumnTemplate = ({
   ref,
 }: {
   ref: React.RefObject<HTMLDivElement | null>;
@@ -315,21 +315,24 @@ const TwoColumn = ({
       <div>
         {education?.map((edu, index) => (
           <div key={index} className="mb-3">
-            <div className="flex justify-between items-start mb-1">
+            <div className="mb-1">
               <div className="font-bold">
-                {edu.degree} | {edu.institution}
-              </div>
-              <div>
-                {edu.startDate}
-                {edu.startDate && edu.endDate && " - "}
-                {edu.endDate}
+                {edu.degree} | {edu.institution} 
               </div>
             </div>
+            <div  className="flex justify-between items-center">
             <div>
               {edu.grade && <div className="mb-1">{edu.grade}</div>}
               {edu.description && (
                 <div className=" text-gray-600">{edu.description}</div>
               )}
+            </div>
+
+            <div>
+              {edu.startDate}
+              {edu.startDate && edu.endDate && " - "}
+              {edu.endDate}
+            </div>
             </div>
           </div>
         ))}
@@ -441,7 +444,8 @@ const TwoColumn = ({
             <div className="font-bold mb-1">{ref.name}</div>
             <div>
               <div>
-                {ref.position} at {ref.company}
+              {ref.position} {ref.position && ref.company && "at"} {ref.company}
+
               </div>
               {ref.contact && (
                 <div>
@@ -593,7 +597,7 @@ const TwoColumn = ({
           </div>
 
           {/* Right Column - Supporting Information */}
-          <div className="w-72 space-y-6">
+          <div className="w-80 space-y-6">
             {rightColumnSections?.map((section, index) => (
               <div key={section.key} className="break-inside-avoid">
                 {renderSection(section, index + (leftColumnSections?.length || 0) + 1)}
@@ -692,4 +696,4 @@ const TwoColumn = ({
   );
 };
 
-export default TwoColumn;
+export default TwoColumnTemplate;
