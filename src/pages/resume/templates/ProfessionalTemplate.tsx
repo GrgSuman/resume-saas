@@ -136,7 +136,9 @@ const ProfessionalTemplate = ({
                {personalInfo.email}
              </a>
            )}
-           {personalInfo?.email && personalInfo?.portfolio && <span> | </span>}
+           {personalInfo?.email && personalInfo?.phone && <span> | </span>}
+           {personalInfo?.phone && <span>{personalInfo.phone}</span>}
+           {personalInfo?.phone && personalInfo?.portfolio && <span> | </span>}
            {personalInfo?.portfolio && (
              <a
                href={personalInfo.portfolio}
@@ -148,6 +150,44 @@ const ProfessionalTemplate = ({
              </a>
            )}
          </div>
+         
+         {/* Social Media Links */}
+         {(personalInfo?.github || personalInfo?.linkedin || personalInfo?.twitter) && (
+           <div className="mb-2">
+             {personalInfo?.github && (
+               <a
+                 href={personalInfo.github}
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 className="hover:underline"
+               >
+                 {personalInfo.github}
+               </a>
+             )}
+             {personalInfo?.github && personalInfo?.linkedin && <span> | </span>}
+             {personalInfo?.linkedin && (
+               <a
+                 href={personalInfo.linkedin}
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 className="hover:underline"
+               >
+                 {personalInfo.linkedin}
+               </a>
+             )}
+             {personalInfo?.linkedin && personalInfo?.twitter && <span> | </span>}
+             {personalInfo?.twitter && (
+               <a
+                 href={personalInfo.twitter}
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 className="hover:underline"
+               >
+                 {personalInfo.twitter}
+               </a>
+             )}
+           </div>
+         )}
          
          {/* Professional Title */}
          {personalInfo?.label && (
@@ -189,29 +229,23 @@ const ProfessionalTemplate = ({
       </div>
 
       <div className="px-2">
-        {skills?.map((category, index) => (
-          <div key={index} className="mb-3">
-            <div className="font-semibold mb-2">{category.category}</div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                {category.items.slice(0, Math.ceil(category.items.length / 2)).map((skill, skillIndex) => (
-                  <div key={skillIndex} className="mb-1 flex">
-                    <span className="mr-2">•</span>
-                    <span>{skill}</span>
-                  </div>
-                ))}
-              </div>
-              <div>
-                {category.items.slice(Math.ceil(category.items.length / 2)).map((skill, skillIndex) => (
-                  <div key={skillIndex} className="mb-1 flex">
-                    <span className="mr-2">•</span>
-                    <span>{skill}</span>
-                  </div>
-                ))}
-              </div>
+      {skills?.map((skillCategory, index) => (
+        <div key={index} className="mb-1">
+          <div className="flex justify-between items-start">
+            <div>
+              {skillCategory.category && (
+                <>
+                  <strong>{skillCategory.category}:</strong>{" "}
+                  {skillCategory.items.slice().join(", ")}
+                </>
+              )}
+              {!skillCategory.category && (
+                <>{skillCategory.items.slice().join(", ")}</>
+              )}
             </div>
           </div>
-        ))}
+        </div>
+      ))}
       </div>
     </div>
   );
@@ -284,7 +318,7 @@ const ProfessionalTemplate = ({
               <div className="font-bold">
                 {edu.degree} | {edu.institution}
               </div>
-              <div className="text-sm">
+              <div>
                 {edu.startDate}
                 {edu.startDate && edu.endDate && " - "}
                 {edu.endDate}
@@ -293,7 +327,7 @@ const ProfessionalTemplate = ({
             <div>
               {edu.grade && <div className="mb-1">{edu.grade}</div>}
               {edu.description && (
-                <div className="text-sm text-gray-600">{edu.description}</div>
+                <div className=" text-gray-600">{edu.description}</div>
               )}
             </div>
           </div>
@@ -326,14 +360,14 @@ const ProfessionalTemplate = ({
               <div className="font-bold">
                 {exp.role} | {exp.company}
               </div>
-              <div className="text-sm">
+              <div>
                 {exp.startDate}
                 {exp.startDate && exp.endDate && " - "}
                 {exp.endDate}
               </div>
             </div>
             {exp.location && (
-              <div className="text-sm text-gray-600 mb-2">{exp.location}</div>
+              <div className=" text-gray-600 mb-2">{exp.location}</div>
             )}
             {exp.achievements && (
               <div>
@@ -380,7 +414,7 @@ const ProfessionalTemplate = ({
               </span>
             </div>
             {cert.description && (
-              <div className="ml-4 text-sm text-gray-600 mt-1">
+              <div className="ml-4  text-gray-600 mt-1">
                 {cert.description}
               </div>
             )}

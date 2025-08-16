@@ -260,7 +260,7 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
             onClick={handleDownloadPDF}
             disabled={state?.resumeDownloading}
             size="sm"
-            className="gap-2 bg-blue-600 text-sm font-medium text-white hover:bg-blue-700"
+            className="gap-2 bg-[#7060fc] text-sm font-medium text-white hover:bg-[#5a4fd8]"
           >
             <Download className="h-4 w-4" />
             {state?.resumeDownloading ? "Exporting..." : "Export PDF"}
@@ -353,7 +353,7 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
             onClick={handleDownloadPDF}
             disabled={state?.resumeDownloading}
             size="sm"
-            className="bg-blue-600 text-white hover:bg-blue-700"
+            className="bg-[#7060fc] text-white hover:bg-[#5a4fd8]"
           >
             <Download className="h-4 w-4" />
           </Button>
@@ -408,10 +408,10 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
                   </SelectTrigger>
                   <SelectContent className="border-gray-700 bg-gray-800 text-gray-200">
                     <SelectItem
-                      value="Professional"
+                      value="Creative"
                       className="text-sm hover:bg-gray-700"
                     >
-                      Professional
+                      Creative
                     </SelectItem>
                     <SelectItem
                       value="Modern"
@@ -420,10 +420,16 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
                       Modern
                     </SelectItem>
                     <SelectItem
-                      value="Minimal"
+                      value="Professional"
                       className="text-sm hover:bg-gray-700"
                     >
-                      Minimal
+                      Professional
+                    </SelectItem>
+                    <SelectItem
+                      value="Two Column"
+                      className="text-sm hover:bg-gray-700"
+                    >
+                      Two Column
                     </SelectItem>
                   </SelectContent>
                 </Select>

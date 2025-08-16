@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "../../../components/ui/button";
-import { Send, X, Edit3, Sparkles, Bot } from "lucide-react";
+import { Send, X, Edit3, Bot } from "lucide-react";
 import { useResume } from "../../../hooks/useResume";
 import axiosInstance from "../../../api/axios";
 import { useParams } from "react-router";
@@ -43,7 +43,12 @@ const Chat = () => {
         const response = await axiosInstance.get(`/resumegpt/${id}`);
         setMessages(
           response.data.conversation.map(
-            (msg: { id: number; role: string; text: string; timestamp: Date }) => ({
+            (msg: {
+              id: number;
+              role: string;
+              text: string;
+              timestamp: Date;
+            }) => ({
               id: msg.id,
               type: msg.role as "user" | "model",
               text: msg.text,
@@ -53,9 +58,12 @@ const Chat = () => {
         );
       } catch (error) {
         if (axios.isAxiosError(error)) {
-          toast.error(error.response?.data?.message || 'Failed to fetch conversation',{
-            position: "top-right",
-          });
+          toast.error(
+            error.response?.data?.message || "Failed to fetch conversation",
+            {
+              position: "top-right",
+            }
+          );
         }
       } finally {
         setConversationLoading(false);
@@ -106,8 +114,14 @@ const Chat = () => {
         resumeId: id,
       });
 
-      dispatch({type: "UPDATE_RESUME_DATA",payload: response.data.response.resumeUpdates});
-      dispatch({type: "UPDATE_RESUME_SETTINGS",payload: response.data.response.settingsUpdates});
+      dispatch({
+        type: "UPDATE_RESUME_DATA",
+        payload: response.data.response.resumeUpdates,
+      });
+      dispatch({
+        type: "UPDATE_RESUME_SETTINGS",
+        payload: response.data.response.settingsUpdates,
+      });
 
       const aiResponse = {
         id: updatedMessages.length + 1,
@@ -119,11 +133,11 @@ const Chat = () => {
       setMessages(updatedMessages);
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        if(error.response?.data?.message === 'Insufficient credits'){
-          console.log('Insufficient credits');
+        if (error.response?.data?.message === "Insufficient credits") {
+          console.log("Insufficient credits");
           deductCredits();
         }
-        toast.error(error.response?.data?.message || 'Failed to send message',{
+        toast.error(error.response?.data?.message || "Failed to send message", {
           position: "top-right",
         });
       }
@@ -138,8 +152,6 @@ const Chat = () => {
       handleSendMessage();
     }
   };
-
-
 
   const removeAttachment = () => setAttachedFile(null);
 
@@ -204,56 +216,87 @@ const Chat = () => {
             <div className="text-sm text-gray-600">Loading conversation...</div>
           </div>
         ) : isEmpty ? (
-          <div className="flex flex-col items-center px-4 flex-1 mt-8">
-            <div className="mb-6">
-              <Sparkles className="h-12 w-12 text-yellow-400" />
-            </div>
-            <div className="text-xl font-bold text-gray-900 mb-3">
-              Transform Your Resume
-            </div>
-            <div className="text-sm text-gray-600 text-center my-4 max-w-md">
-              Ask for resume tips, section ideas, or upload your file for instant
-              feedback.
-            </div>
-            <div className="flex flex-wrap gap-3 justify-center max-w-lg p-4">
-              {[
-                "Rewrite my work experience",
-                "Add a summary section",
-                "Make it ATS-friendly",
-                "Suggest skills",
-                "Review my resume",
-              ].map((prompt) => (
-                <button
-                  key={prompt}
-                  className="px-4 py-2 text-sm font-medium bg-white border border-gray-200 rounded-lg hover:border-[#00E0C6] hover:text-[#00E0C6] transition-colors shadow-sm"
-                  onClick={() => setMessage(prompt)}
-                >
-                  {prompt}
-                </button>
-              ))}
-            </div>
+          <div className="flex flex-col items-center justify-center px-6 flex-1">
+            {/* Quick Actions */}
+             <div className="w-full max-w-3xl mx-auto mb-8">
+               <h2 className="text-lg font-semibold text-gray-800 mb-4">
+                 Quick Actions
+               </h2>
+               <div className="grid grid-cols-2 gap-3">
+                 {[
+                   {
+                     title: "Rewrite my work experience",
+                     icon: "💼"
+                   },
+                   {
+                     title: "Add a summary section",
+                     icon: "📝"
+                   },
+                   {
+                     title: "Make it ATS-friendly",
+                     icon: "🎯"
+                   },
+                   {
+                     title: "Suggest skills",
+                     icon: "⚡"
+                   },
+                   {
+                     title: "Review my resume",
+                     icon: "🔍"
+                   },
+                   {
+                     title: "Improve formatting",
+                     icon: "🎨"
+                   }
+                 ].map((prompt) => (
+                   <button
+                     key={prompt.title}
+                     className="group p-3 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-md transition-all duration-200 text-left"
+                     onClick={() => setMessage(prompt.title)}
+                   >
+                     <div className="flex items-start gap-2">
+                       <span className="text-lg">{prompt.icon}</span>
+                       <div>
+                         <div className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors text-sm">
+                           {prompt.title}
+                         </div>
+                       </div>
+                     </div>
+                   </button>
+                 ))}
+               </div>
+             </div>
           </div>
         ) : (
           <div className="flex-1 overflow-y-auto light-scrollbar px-6 py-4">
-            <div className="max-w-3xl mx-auto space-y-4" style={{
-              WebkitOverflowScrolling: "touch",
-              overflowAnchor: "none",
-            }}>
+            <div
+              className="max-w-3xl mx-auto space-y-4"
+              style={{
+                WebkitOverflowScrolling: "touch",
+                overflowAnchor: "none",
+              }}
+            >
               {messages.map((msg) => (
                 <div
                   key={msg.id}
-                  className={`flex transform-gpu ${msg.type === "user" ? "justify-end" : "justify-start"}`}
+                  className={`flex transform-gpu ${
+                    msg.type === "user" ? "justify-end" : "justify-start"
+                  }`}
                 >
                   <div
                     className={`rounded-lg px-4 py-3 ${
-                      msg.type === "user"? "bg-gray-200 max-w-[80%]": "bg-white"}`}>
-                                         <div className="flex items-start gap-2">
-                       {/* if it is not user then use bot icon */}
-                       {msg.type !== "user" && (
-                         <div className="flex-shrink-0 mt-0.5">
-                           <Bot className="h-4 w-4 text-gray-500" />
-                         </div>
-                       )}
+                      msg.type === "user"
+                        ? "bg-gray-200 max-w-[80%]"
+                        : "bg-white"
+                    }`}
+                  >
+                    <div className="flex items-start gap-2">
+                      {/* if it is not user then use bot icon */}
+                      {msg.type !== "user" && (
+                        <div className="flex-shrink-0 mt-0.5">
+                          <Bot className="h-4 w-4 text-gray-500" />
+                        </div>
+                      )}
                       <div className="flex-1">
                         <div className="whitespace-pre-wrap text-justify text-sm">
                           {msg.text}
@@ -304,26 +347,25 @@ const Chat = () => {
       {/* Input Area - Always at bottom */}
       <div className="px-4 pb-4 pt-2 bg-white border-t border-gray-200 flex-shrink-0">
         <div className="max-w-3xl mx-auto">
-          
-                         <div className="relative bg-white border border-gray-300 rounded-lg flex items-center px-4 py-2 gap-2 hover:border-gray-400 focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600 transition-shadow shadow-sm">
-               <textarea
-                 ref={textareaRef}
-                 value={message}
-                 onChange={(e) => setMessage(e.target.value)}
-                 onKeyDown={handleKeyDown}
-                 placeholder="Type your message..."
-                 rows={1}
-                 className="flex-1 w-full resize-none border-0 outline-none bg-transparent px-2 py-2 text-sm min-h-[44px] max-h-32 placeholder-gray-400"
-               />
-               <Button
-                 onClick={handleSendMessage}
-                 disabled={!message.trim() && !attachedFile}
-                 size="icon"
-                 className="bg-blue-600 text-white hover:bg-blue-700 rounded-full p-2 shadow transition-colors disabled:opacity-50"
-               >
-                 <Send className="h-5 w-5" />
-               </Button>
-             </div>
+          <div className="relative bg-white border border-gray-300 rounded-lg flex items-center px-4 py-2 gap-2 hover:border-gray-400 focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600 transition-shadow shadow-sm">
+            <textarea
+              ref={textareaRef}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Type your message..."
+              rows={1}
+              className="flex-1 w-full resize-none border-0 outline-none bg-transparent px-2 py-2 text-sm min-h-[44px] max-h-32 placeholder-gray-400"
+            />
+            <Button
+              onClick={handleSendMessage}
+              disabled={!message.trim() && !attachedFile}
+              size="icon"
+              className="bg-blue-600 text-white hover:bg-blue-700 rounded-full p-2 shadow transition-colors disabled:opacity-50"
+            >
+              <Send className="h-5 w-5" />
+            </Button>
+          </div>
 
           {attachedFile && (
             <div className="flex items-center mt-2 text-xs text-gray-600 bg-gray-100 rounded-md px-3 py-1.5 w-fit border border-gray-200 shadow-sm">

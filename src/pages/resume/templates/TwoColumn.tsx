@@ -163,7 +163,7 @@ const TwoColumn = ({
               {personalInfo?.name?.toUpperCase()}
             </h1>
             {personalInfo?.label && (
-              <div className="text-sm text-gray-600 mt-1">
+              <div className=" text-gray-600 mt-1">
                 {personalInfo.label}
               </div>
             )}
@@ -319,7 +319,7 @@ const TwoColumn = ({
               <div className="font-bold">
                 {edu.degree} | {edu.institution}
               </div>
-              <div className="text-sm">
+              <div>
                 {edu.startDate}
                 {edu.startDate && edu.endDate && " - "}
                 {edu.endDate}
@@ -328,7 +328,7 @@ const TwoColumn = ({
             <div>
               {edu.grade && <div className="mb-1">{edu.grade}</div>}
               {edu.description && (
-                <div className="text-sm text-gray-600">{edu.description}</div>
+                <div className=" text-gray-600">{edu.description}</div>
               )}
             </div>
           </div>
@@ -358,7 +358,7 @@ const TwoColumn = ({
           <div key={index} className="mb-3">
             <div className="flex justify-between items-start mb-1">
               <div><span className="font-bold">{exp.role}</span></div>
-              <div className="text-sm">
+              <div>
                 {exp.startDate}
                 {exp.startDate && exp.endDate && " - "}
                 {exp.endDate}
@@ -409,7 +409,7 @@ const TwoColumn = ({
               </span>
             </div>
             {cert.description && (
-              <div className="ml-4 text-sm text-gray-600 mt-1">
+              <div className="ml-4  text-gray-600 mt-1">
                 {cert.description}
               </div>
             )}
@@ -568,7 +568,7 @@ const TwoColumn = ({
   return (
     <div ref={ref}>
       <div
-        className="max-w-[210mm] min-w-[210mm] min-h-[297mm] max-h-[297mm] mx-auto bg-white text-black leading-tight overflow-hidden"
+        className="max-w-[210mm] min-w-[210mm] min-h-[297mm] max-h-[297mm] mx-auto bg-white text-black p-6 py-8 overflow-hidden"
         style={{ 
           fontSize: `${state.resumeSettings?.fontSize}px`, 
           boxSizing: "border-box",
