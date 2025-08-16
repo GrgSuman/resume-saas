@@ -41,7 +41,6 @@ function App() {
             </Routes>
 
 
-          {/* </ResumeProvider> */}
         </AuthProvider>
       </GoogleOAuthProvider>
     </QueryClientProvider>

@@ -1,4 +1,11 @@
+import { useEffect } from "react"
+import { useNavigate } from "react-router"
+
 const Home = () => {
+  const navigate = useNavigate()
+  useEffect(() => {
+      navigate("/dashboard")
+  })
   return (
     <div>
         <div className="flex justify-center items-center h-screen">
