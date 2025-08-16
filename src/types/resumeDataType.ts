@@ -103,30 +103,3 @@ export type CustomSection = {
   title: string
   content: string 
 }
-
-
-
-// Default data
-// const ResumeDefaultData: ResumeMetaData = {
-//     resumeData: demoData,
-//     resumeSettings: {
-//         fontSize: 13,
-//         fontFamily: "Arial, sans-serif",
-//         lineHeight: 1.5,
-//         template: "Creative",
-//         resumeTitle: "My Professional Resume",
-//         sections: [
-//             { key: "personalInfo", order: 0, visible: true },
-//             { key: "experience", order: 1, visible: true },
-//             { key: "education", order: 2, visible: true },
-//             { key: "projects", order: 3, visible: true },
-//             { key: "skills", order: 4, visible: true },
-//             { key: "certifications", order: 5, visible: false },
-//             { key: "references", order: 6, visible: false },
-//             { key: "interests", order: 7, visible: true },
-//             { key: "customSections", order: 8, visible: false }
-//         ]
-//     },
-//     resumeDownloading: false,
-//     resumeEditingMode: true
-// };

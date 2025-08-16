@@ -1,8 +1,8 @@
-import TemplateTwo from "../templates/TemplateTwo";
-import TemplateThree from "../templates/TemplateThree";
 import { useResume } from "../../../hooks/useResume";
 import { TEMPLATES } from "../../../lib/constants";
 import CreativeTemplate from "../templates/CreativeTemplate";
+import ProfessionalTemplate from "../templates/ProfessionalTemplate";
+import ModernTemplate from "../templates/ModernTemplate";
 
 const ResumePreview = ({
   resumeRef,
@@ -21,10 +21,10 @@ const ResumePreview = ({
             <CreativeTemplate ref={resumeRef} />
           )}
           {state?.resumeSettings?.template === TEMPLATES.PROFESSIONAL && (
-            <TemplateTwo ref={resumeRef} />
+            <ProfessionalTemplate ref={resumeRef} />
           )}
-          {state?.resumeSettings?.template === TEMPLATES.TWO_COLUMN && (
-            <TemplateThree ref={resumeRef} />
+          {state?.resumeSettings?.template === TEMPLATES.MODERN && (
+            <ModernTemplate ref={resumeRef} />
           )}
         </>
       )}
