@@ -9,7 +9,7 @@ const initialState: InitialStateType = {
     resumeData: null,
     resumeSettings: null,
     resumeDownloading: false,
-    resumeEditingMode: true,
+    resumeEditingMode: false,
     resumeTitle: "",
     isLoading: true,
     error: null,

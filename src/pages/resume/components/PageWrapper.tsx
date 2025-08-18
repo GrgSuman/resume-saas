@@ -25,7 +25,10 @@ import InterestsForm from "../forms/InterestsForm";
 import CustomSectionForm from "../forms/CustomSectionForm";
 import { useResume } from "../../../hooks/useResume";
 
-const PAGE_BREAK_HEIGHT = A4_HEIGHT + 20; // 1123 + 20 (padding) = 1143px
+// User view padding: 28px, Print view padding: 35px
+const USER_PADDING = 28;
+const PRINT_PADDING = 35;
+const PAGE_BREAK_HEIGHT = A4_HEIGHT + PRINT_PADDING ; 
 
 const PageWrapper = ({
   children,
@@ -68,7 +71,7 @@ const PageWrapper = ({
 }) => {
   const checkHeightRef = useRef<HTMLDivElement>(null); //checking the height of the page
   const [height, setHeight] = useState(0); //height of the page
-  const { dispatch } = useResume(); //dispatching the data to the resume data
+  const {state, dispatch } = useResume(); //dispatching the data to the resume data
 
   useEffect(() => {
     checkHeight();
@@ -86,7 +89,11 @@ const PageWrapper = ({
 
   // Create page break elements
   for (let i = 1; i <= numberOfBreaks; i++) {
-    const breakPosition = i * PAGE_BREAK_HEIGHT;
+    // Calculate break position accounting for user padding
+    // Each page break should be at: A4_HEIGHT + (PRINT_PADDING * 2) from the start
+    // But in user view, we need to account for the user padding
+    const breakPosition = (i * PAGE_BREAK_HEIGHT) - (USER_PADDING * 2);
+    
     pageBreaks.push(
       <div
         key={`break-${i}`}
@@ -154,7 +161,7 @@ const PageWrapper = ({
               minHeight: `${A4_HEIGHT}px`,
               color: "black",
               backgroundColor: "white",
-              padding: "28px 25px",
+              padding: `${USER_PADDING}px`,
               fontSize: `${resumeSettings?.fontSize}px`,
               boxSizing: "border-box",
               fontFamily: resumeSettings?.fontFamily,
@@ -165,7 +172,7 @@ const PageWrapper = ({
           </div>
         </section>
 
-        {pageBreaks}
+         { !state.resumeEditingMode && pageBreaks}
 
         {/* Hidden section for printing */}
         <section ref={htmlRef} className="hidden">
@@ -174,6 +181,7 @@ const PageWrapper = ({
               maxWidth: `${A4_WIDTH}px`,
               minWidth: `${A4_WIDTH}px`,
               minHeight: `${A4_HEIGHT}px`,
+              padding: `${PRINT_PADDING}px`,
               color: "black",
               backgroundColor: "white",
               fontSize: `${resumeSettings?.fontSize}px`,

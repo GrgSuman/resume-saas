@@ -219,7 +219,7 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
             ) : (
               <>
                 <SquarePen className="h-4 w-4" />
-                Edit Resume
+                Edit Resume Manually
               </>
             )}
           </Button>
