@@ -123,8 +123,8 @@ const Credits = () => {
           {creditPacks.map((pack) => (
             <div
               key={pack.id}
-              className={`relative bg-white rounded-2xl shadow-lg border-2 transition-all duration-300 ${
-                pack.popular ? "border-[#7060fc] shadow-[#7060fc]/10 scale-105" : "border-slate-200 hover:border-slate-300"
+              className={`relative bg-white rounded-2xl shadow-lg border-2 transition-all duration-300 hover:border-[#7060fc] hover:shadow-[#7060fc]/10 ${
+                pack.popular ? "border-[#7060fc] shadow-[#7060fc]/10 scale-105" : "border-slate-200"
               }`}
             >
               {pack.popular && (
@@ -169,7 +169,7 @@ const Credits = () => {
                   className={`w-full py-4 px-6 font-semibold rounded-xl transition-all duration-200 ${
                     pack.popular
                       ? "bg-[#7060fc] text-white hover:bg-[#6050e5] shadow-lg"
-                      : "bg-slate-100 text-slate-900 hover:bg-slate-200 border border-slate-300"
+                      : "bg-slate-100 text-slate-900 border border-slate-300 hover:bg-[#7060fc] hover:text-white hover:border-[#6050e5] hover:shadow-lg"
                   }`}
                 >
                   Get Started

@@ -8,13 +8,14 @@ import axiosInstance from "../../api/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import axios from "axios";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router";
 
 export default function Dashboard() {
   const { user, deductCredits } = useAuth();
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const navigate = useNavigate(); 
   const {
     data: resumeData,
     isLoading,
@@ -34,9 +35,17 @@ export default function Dashboard() {
     },
     onError: (error) => {
       if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data?.message || "Something went wrong", {
-          position: "top-right",
-        });
+        if(error.response?.data?.message === "Insufficient credits"){
+          toast.info("Insufficient credits, Click to Buy credits",{
+            onClick:()=>{
+              navigate("/dashboard/credits");
+            }
+          });
+        }else{
+          toast.error(error.response?.data?.message || "Something went wrong", {
+            position: "top-right",
+          });
+        }
       }
     },
   });

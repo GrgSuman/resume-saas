@@ -1,13 +1,43 @@
-export const API_URL = 'http://localhost:8000/api';
-// export const API_URL = 'https://server.clonecv.com/api';
+// export const API_URL = 'http://localhost:8000/api';
+export const API_URL = 'https://server.clonecv.com/api';
 
 // Template Constants
 export const TEMPLATES = {
   CREATIVE: "Creative",
-  PROFESSIONAL: "Professional", 
+  PROFESSIONAL: "Professional",
   MODERN: "Modern",
-  TWO_COLUMN: "Two Column"
+  TWO_COLUMN: "Two Column",
+  MINIMALIST: "Minimalist",
+  ELEGANT: "Elegant",
+  EXECUTIVE: "Executive",
+  CLASSIC: "Classic",
+  BOLD: "Bold",
+  INNOVATIVE: "Innovative",
+  CLEAN: "Clean",
+  CORPORATE: "Corporate",
+  CONTEMPORARY: "Contemporary",
+  VISION: "Vision",
+  FOCUS: "Focus"
 } as const;
+
+
+// Font Constants
+export const FONTS = {
+  "Roboto": "Roboto, sans-serif",
+  "Open Sans": "Open Sans, sans-serif",
+  "PT Serif": "PT Serif, serif",
+  "Lora": "Lora, serif"
+} as const;
+
+// Type for font values
+export type FontName = keyof typeof FONTS;
+
+// Dropdown options
+export const FONT_OPTIONS = Object.entries(FONTS).map(([key, value]) => ({
+  id: key,
+  name: key,
+  css: value
+}));
 
 export const CREDIT_COSTS = {
   CREATE_RESUME: 3,

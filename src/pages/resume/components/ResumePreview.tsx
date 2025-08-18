@@ -10,6 +10,9 @@ import type { ResumeSettings } from "../../../types/resumeDataType";
 import CircularLoadingIndicator from "../../../components/sections/CircularLoadingIndicator";
 import { useState } from "react";
 import type { PersonalInfo, Education, Experience, Project, SkillCategory, Certification, Reference, CustomSection } from "../../../types/resumeDataType";
+import MinimalistTemplate from "../templates/MinimalistTemplate";
+import ElegantTemplate from "../templates/ElegantTemplate";
+import ExecutiveTemplate from "../templates/ExecutiveTemplate";
 
 const ResumePreview = ({resumeRef}: {resumeRef: React.RefObject<HTMLDivElement | null>}) => {
   const { state } = useResume();
@@ -47,6 +50,15 @@ const ResumePreview = ({resumeRef}: {resumeRef: React.RefObject<HTMLDivElement |
           )}
           {state?.resumeSettings?.template === TEMPLATES.TWO_COLUMN && (
             <TwoColumnTemplate setActiveForm={setActiveForm} setFormData={setFormData} />
+          )}
+          {state?.resumeSettings?.template === TEMPLATES.MINIMALIST && (
+            <MinimalistTemplate setActiveForm={setActiveForm} setFormData={setFormData} />
+          )}
+          {state?.resumeSettings?.template === TEMPLATES.ELEGANT && (
+            <ElegantTemplate setActiveForm={setActiveForm} setFormData={setFormData} />
+          )}
+          {state?.resumeSettings?.template === TEMPLATES.EXECUTIVE && (
+            <ExecutiveTemplate setActiveForm={setActiveForm} setFormData={setFormData} />
           )}
           </PageWrapper>
         </>

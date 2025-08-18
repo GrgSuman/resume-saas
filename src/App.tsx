@@ -8,17 +8,17 @@ import { PrivateRoute } from "./pages/PrivateRoute";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthProvider } from "./context/auth/AuthContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "sonner";
 import UserDetails from "./pages/profile/UserDetails";
 import Credits from "./pages/credits/Credits";
 import SuccessPage from "./pages/credits/SuccessPage";
 import Home from "./pages/home/Home";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   const queryClient = new QueryClient();
   return (
     <QueryClientProvider client={queryClient}>
-       <Toaster />
+       <ToastContainer />
       <GoogleOAuthProvider clientId="620421156218-5b2p94rdcismn2eqr8afggor7tqd2sum.apps.googleusercontent.com">
         <AuthProvider>
             <Routes>
