@@ -1,17 +1,5 @@
-import { useState } from "react";
 import { Edit3, Plus } from "lucide-react";
 import { useResume } from "../../../hooks/useResume";
-
-// Form imports
-import PersonalInfoForm from "../forms/PersonalInfoForm";
-import ExperienceForm from "../forms/ExperienceForm";
-import EducationForm from "../forms/EducationForm";
-import ProjectsForm from "../forms/ProjectsForm";
-import SkillsForm from "../forms/SkillsForm";
-import CertificationsForm from "../forms/CertificationsForm";
-import ReferencesForm from "../forms/ReferencesForm";
-import InterestsForm from "../forms/InterestsForm";
-import CustomSectionForm from "../forms/CustomSectionForm";
 
 import type {
   PersonalInfo,
@@ -24,28 +12,31 @@ import type {
   CustomSection,
   Section,
 } from "../../../types/resumeDataType";
+import CircularLoadingIndicator from "../../../components/sections/CircularLoadingIndicator";
 
 const TwoColumnTemplate = ({
-  ref,
+  setActiveForm,
+  setFormData,
 }: {
-  ref: React.RefObject<HTMLDivElement | null>;
+  setActiveForm: (formType: string | null) => void;
+  setFormData: (
+    data:
+      | PersonalInfo
+      | Education[]
+      | Experience[]
+      | Project[]
+      | SkillCategory[]
+      | Certification[]
+      | Reference[]
+      | string[]
+      | CustomSection[]
+      | null
+  ) => void;
 }) => {
-  const { state, dispatch } = useResume();
-  const [activeForm, setActiveForm] = useState<string | null>(null);
-  const [formData, setFormData] = useState<
-    | PersonalInfo
-    | Education[]
-    | Experience[]
-    | Project[]
-    | SkillCategory[]
-    | Certification[]
-    | Reference[]
-    | string[]
-    | CustomSection[]
-    | null
-  >(null);
+  const { state } = useResume();
 
-  if (!state.resumeData) return null;
+  if (!state.resumeData || !state.resumeSettings)
+    return <CircularLoadingIndicator />;
 
   const {
     personalInfo,
@@ -58,9 +49,6 @@ const TwoColumnTemplate = ({
     interests,
     customSections,
   } = state.resumeData;
-
-  // Early return if resumeSettings is null
-  if (!state.resumeSettings) return null;
 
   const openForm = (
     formType: string,
@@ -79,28 +67,6 @@ const TwoColumnTemplate = ({
     setFormData(data);
   };
 
-  const closeForm = () => {
-    setActiveForm(null);
-    setFormData(null);
-  };
-
-  const handleSave = (
-    formType: string,
-    data:
-      | PersonalInfo
-      | Education[]
-      | Experience[]
-      | Project[]
-      | SkillCategory[]
-      | Certification[]
-      | Reference[]
-      | string[]
-      | CustomSection[]
-  ) => {
-    dispatch({ type: "UPDATE_RESUME_DATA", payload: { [formType]: data } });
-    closeForm();
-  };
-
   const renderPersonalInfo = () => (
     <div className="mb-4">
       {state.resumeEditingMode && (
@@ -116,7 +82,7 @@ const TwoColumnTemplate = ({
           </button>
         </div>
       )}
-      
+
       <div className="text-center mb-3 border-b-1 border-black pb-2">
         <div className="flex justify-between items-start mb-1">
           <div className="text-left flex-1">
@@ -163,9 +129,7 @@ const TwoColumnTemplate = ({
               {personalInfo?.name?.toUpperCase()}
             </h1>
             {personalInfo?.label && (
-              <div className=" text-gray-600 mt-1">
-                {personalInfo.label}
-              </div>
+              <div className=" text-gray-600 mt-1">{personalInfo.label}</div>
             )}
           </div>
           <div className="text-right flex-1">
@@ -231,20 +195,24 @@ const TwoColumnTemplate = ({
             <div className="font-semibold mb-2">{category.category}</div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                {category.items.slice(0, Math.ceil(category.items.length / 2)).map((skill, skillIndex) => (
-                  <div key={skillIndex} className="mb-1 flex">
-                    <span className="mr-2">•</span>
-                    <span>{skill}</span>
-                  </div>
-                ))}
+                {category.items
+                  .slice(0, Math.ceil(category.items.length / 2))
+                  .map((skill, skillIndex) => (
+                    <div key={skillIndex} className="mb-1 flex">
+                      <span className="mr-2">•</span>
+                      <span>{skill}</span>
+                    </div>
+                  ))}
               </div>
               <div>
-                {category.items.slice(Math.ceil(category.items.length / 2)).map((skill, skillIndex) => (
-                  <div key={skillIndex} className="mb-1 flex">
-                    <span className="mr-2">•</span>
-                    <span>{skill}</span>
-                  </div>
-                ))}
+                {category.items
+                  .slice(Math.ceil(category.items.length / 2))
+                  .map((skill, skillIndex) => (
+                    <div key={skillIndex} className="mb-1 flex">
+                      <span className="mr-2">•</span>
+                      <span>{skill}</span>
+                    </div>
+                  ))}
               </div>
             </div>
           </div>
@@ -276,7 +244,18 @@ const TwoColumnTemplate = ({
               <div className="font-bold">
                 {project.name}
                 {project.link && (
-                  <span className="font-normal"> | <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">{project.link}</a></span>
+                  <span className="font-normal">
+                    {" "}
+                    |{" "}
+                    <a
+                      href={project.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800"
+                    >
+                      {project.link}
+                    </a>
+                  </span>
                 )}
               </div>
             </div>
@@ -317,22 +296,22 @@ const TwoColumnTemplate = ({
           <div key={index} className="mb-3">
             <div className="mb-1">
               <div className="font-bold">
-                {edu.degree} | {edu.institution} 
+                {edu.degree} | {edu.institution}
               </div>
             </div>
-            <div  className="flex justify-between items-center">
-            <div>
-              {edu.grade && <div className="mb-1">{edu.grade}</div>}
-              {edu.description && (
-                <div className=" text-gray-600">{edu.description}</div>
-              )}
-            </div>
+            <div className="flex justify-between items-center">
+              <div>
+                {edu.grade && <div className="mb-1">{edu.grade}</div>}
+                {edu.description && (
+                  <div className=" text-gray-600">{edu.description}</div>
+                )}
+              </div>
 
-            <div>
-              {edu.startDate}
-              {edu.startDate && edu.endDate && " - "}
-              {edu.endDate}
-            </div>
+              <div>
+                {edu.startDate}
+                {edu.startDate && edu.endDate && " - "}
+                {edu.endDate}
+              </div>
             </div>
           </div>
         ))}
@@ -360,14 +339,22 @@ const TwoColumnTemplate = ({
         {experience?.map((exp, index) => (
           <div key={index} className="mb-3">
             <div className="flex justify-between items-start mb-1">
-              <div><span className="font-bold">{exp.role}</span></div>
+              <div>
+                <span className="font-bold">{exp.role}</span>
+              </div>
               <div>
                 {exp.startDate}
                 {exp.startDate && exp.endDate && " - "}
                 {exp.endDate}
               </div>
             </div>
-            <div><span>{exp.company}{exp.company && exp.location && ' - '}{exp.location}</span></div>
+            <div>
+              <span>
+                {exp.company}
+                {exp.company && exp.location && " - "}
+                {exp.location}
+              </span>
+            </div>
             {exp.achievements && (
               <div className="mt-1">
                 {exp.achievements.map((achievement, achIndex) => (
@@ -387,7 +374,9 @@ const TwoColumnTemplate = ({
   const renderCertifications = () => (
     <div className="mb-4">
       <div className="flex justify-between items-center mb-1">
-        <h2 className="font-bold tracking-wide uppercase">AWARDS & ACHIEVEMENTS</h2>
+        <h2 className="font-bold tracking-wide uppercase">
+          AWARDS & ACHIEVEMENTS
+        </h2>
         {state.resumeEditingMode && (
           <button
             onClick={() =>
@@ -412,9 +401,7 @@ const TwoColumnTemplate = ({
               </span>
             </div>
             {cert.description && (
-              <div className="ml-4  text-gray-600 mt-1">
-                {cert.description}
-              </div>
+              <div className="ml-4  text-gray-600 mt-1">{cert.description}</div>
             )}
           </div>
         ))}
@@ -444,8 +431,8 @@ const TwoColumnTemplate = ({
             <div className="font-bold mb-1">{ref.name}</div>
             <div>
               <div>
-              {ref.position} {ref.position && ref.company && "at"} {ref.company}
-
+                {ref.position} {ref.position && ref.company && "at"}{" "}
+                {ref.company}
               </div>
               {ref.contact && (
                 <div>
@@ -483,10 +470,7 @@ const TwoColumnTemplate = ({
       <div>
         <div className="flex flex-wrap gap-2">
           {interests?.map((interest, index) => (
-            <span
-              key={index}
-              className="bg-gray-200 rounded px-3 py-1"
-            >
+            <span key={index} className="bg-gray-200 rounded px-3 py-1">
               {interest}
             </span>
           ))}
@@ -527,21 +511,30 @@ const TwoColumnTemplate = ({
   );
 
   // Sort sections by order
-  const sortedSections = state?.resumeSettings?.sections?.slice()
+  const sortedSections = state?.resumeSettings?.sections
+    ?.slice()
     .sort((a, b) => a.order - b.order)
-    .filter(x => x.visible);
+    .filter((x) => x.visible);
 
   // Split sections into left and right columns after personal info
-  const personalInfoSection = sortedSections?.find(s => s.key === "personalInfo");
-  const otherSections = sortedSections?.filter(s => s.key !== "personalInfo");
-  
-  // Define which sections go in left vs right column
-  const leftColumnSections = otherSections?.filter(s => 
-    ['experience', 'projects', 'customSections'].includes(s.key)
+  const personalInfoSection = sortedSections?.find(
+    (s) => s.key === "personalInfo"
   );
-  
-  const rightColumnSections = otherSections?.filter(s => 
-    ['education', 'skills', 'certifications', 'references', 'interests'].includes(s.key)
+  const otherSections = sortedSections?.filter((s) => s.key !== "personalInfo");
+
+  // Define which sections go in left vs right column
+  const leftColumnSections = otherSections?.filter((s) =>
+    ["experience", "projects", "customSections"].includes(s.key)
+  );
+
+  const rightColumnSections = otherSections?.filter((s) =>
+    [
+      "education",
+      "skills",
+      "certifications",
+      "references",
+      "interests",
+    ].includes(s.key)
   );
 
   const renderSection = (section: Section, index: number) => {
@@ -570,129 +563,36 @@ const TwoColumnTemplate = ({
   };
 
   return (
-    <div ref={ref}>
-      <div
-        className="max-w-[210mm] min-w-[210mm] min-h-[297mm] max-h-[297mm] mx-auto bg-white text-black p-6 py-8 overflow-hidden"
-        style={{ 
-          fontSize: `${state.resumeSettings?.fontSize}px`, 
-          boxSizing: "border-box",
-          fontFamily: state.resumeSettings?.fontFamily,
-          lineHeight: state.resumeSettings?.lineHeight
-        }}
-      >
-        {/* Header Section - Personal Info */}
-        <div className="mb-6">
-          {personalInfoSection && renderSection(personalInfoSection, 0)}
-        </div>
-
-        {/* Two Column Layout */}
-        <div className="flex gap-8">
-          {/* Left Column - Main Content */}
-          <div className="flex-1 space-y-6">
-            {leftColumnSections?.map((section, index) => (
-              <div key={section.key} className="break-inside-avoid">
-                {renderSection(section, index + 1)}
-              </div>
-            ))}
-          </div>
-
-          {/* Right Column - Supporting Information */}
-          <div className="w-80 space-y-6">
-            {rightColumnSections?.map((section, index) => (
-              <div key={section.key} className="break-inside-avoid">
-                {renderSection(section, index + (leftColumnSections?.length || 0) + 1)}
-              </div>
-            ))}
-          </div>
-        </div>
+    <>
+      {/* Header Section - Personal Info */}
+      <div className="mb-6">
+        {personalInfoSection && renderSection(personalInfoSection, 0)}
       </div>
 
-      {/* Form Modals */}
-      {activeForm === "personalInfo" && (
-        <PersonalInfoForm
-          isOpen={true}
-          data={formData as PersonalInfo}
-          onSave={(data) => handleSave("personalInfo", data as PersonalInfo)}
-          onClose={closeForm}
-        />
-      )}
+      {/* Two Column Layout */}
+      <div className="flex gap-8">
+        {/* Left Column - Main Content */}
+        <div className="flex-1 space-y-6">
+          {leftColumnSections?.map((section, index) => (
+            <div key={section.key} className="break-inside-avoid">
+              {renderSection(section, index + 1)}
+            </div>
+          ))}
+        </div>
 
-      {activeForm === "experience" && (
-        <ExperienceForm
-          isOpen={true}
-          data={formData as Experience[]}
-          onSave={(data) => handleSave("experience", data as Experience[])}
-          onClose={closeForm}
-        />
-      )}
-
-      {activeForm === "education" && (
-        <EducationForm
-          isOpen={true}
-          data={formData as Education[]}
-          onSave={(data) => handleSave("education", data as Education[])}
-          onClose={closeForm}
-        />
-      )}
-
-      {activeForm === "projects" && (
-        <ProjectsForm
-          isOpen={true}
-          data={formData as Project[]}
-          onSave={(data) => handleSave("projects", data as Project[])}
-          onClose={closeForm}
-        />
-      )}
-
-      {activeForm === "skills" && (
-        <SkillsForm
-          isOpen={true}
-          data={formData as SkillCategory[]}
-          onSave={(data) => handleSave("skills", data as SkillCategory[])}
-          onClose={closeForm}
-        />
-      )}
-
-      {activeForm === "certifications" && (
-        <CertificationsForm
-          isOpen={true}
-          data={formData as Certification[]}
-          onSave={(data) =>
-            handleSave("certifications", data as Certification[])
-          }
-          onClose={closeForm}
-        />
-      )}
-
-      {activeForm === "references" && (
-        <ReferencesForm
-          isOpen={true}
-          data={formData as Reference[]}
-          onSave={(data) => handleSave("references", data as Reference[])}
-          onClose={closeForm}
-        />
-      )}
-
-      {activeForm === "interests" && (
-        <InterestsForm
-          isOpen={true}
-          data={formData as string[]}
-          onSave={(data) => handleSave("interests", data as string[])}
-          onClose={closeForm}
-        />
-      )}
-
-      {activeForm === "customSections" && (
-        <CustomSectionForm
-          isOpen={true}
-          data={formData as CustomSection[]}
-          onSave={(data) =>
-            handleSave("customSections", data as CustomSection[])
-          }
-          onClose={closeForm}
-        />
-      )}
-    </div>
+        {/* Right Column - Supporting Information */}
+        <div className="w-80 space-y-6">
+          {rightColumnSections?.map((section, index) => (
+            <div key={section.key} className="break-inside-avoid">
+              {renderSection(
+                section,
+                index + (leftColumnSections?.length || 0) + 1
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
   );
 };
 
