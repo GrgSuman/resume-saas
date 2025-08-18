@@ -1,17 +1,5 @@
-import { useState } from "react";
 import { Edit3, Plus } from "lucide-react";
 import { useResume } from "../../../hooks/useResume";
-
-// Form imports
-import PersonalInfoForm from "../forms/PersonalInfoForm";
-import ExperienceForm from "../forms/ExperienceForm";
-import EducationForm from "../forms/EducationForm";
-import ProjectsForm from "../forms/ProjectsForm";
-import SkillsForm from "../forms/SkillsForm";
-import CertificationsForm from "../forms/CertificationsForm";
-import ReferencesForm from "../forms/ReferencesForm";
-import InterestsForm from "../forms/InterestsForm";
-import CustomSectionForm from "../forms/CustomSectionForm";
 
 import type {
   PersonalInfo,
@@ -23,28 +11,13 @@ import type {
   Reference,
   CustomSection,
 } from "../../../types/resumeDataType";
+import CircularLoadingIndicator from "../../../components/sections/CircularLoadingIndicator";
 
-const ProfessionalTemplate = ({
-  ref,
-}: {
-  ref: React.RefObject<HTMLDivElement | null>;
-}) => {
-  const { state, dispatch } = useResume();
-  const [activeForm, setActiveForm] = useState<string | null>(null);
-  const [formData, setFormData] = useState<
-    | PersonalInfo
-    | Education[]
-    | Experience[]
-    | Project[]
-    | SkillCategory[]
-    | Certification[]
-    | Reference[]
-    | string[]
-    | CustomSection[]
-    | null
-  >(null);
 
-  if (!state.resumeData) return null;
+const ProfessionalTemplate = ({setActiveForm,setFormData}:{setActiveForm: (formType: string | null) => void,setFormData: (data: PersonalInfo | Education[] | Experience[] | Project[] | SkillCategory[] | Certification[] | Reference[] | string[] | CustomSection[] | null) => void}) => {
+  const { state } = useResume();
+
+  if (!state.resumeData || !state.resumeSettings) return <CircularLoadingIndicator />;
 
   const {
     personalInfo,
@@ -57,9 +30,6 @@ const ProfessionalTemplate = ({
     interests,
     customSections,
   } = state.resumeData;
-
-  // Early return if resumeSettings is null
-  if (!state.resumeSettings) return null;
 
   const openForm = (
     formType: string,
@@ -78,30 +48,10 @@ const ProfessionalTemplate = ({
     setFormData(data);
   };
 
-  const closeForm = () => {
-    setActiveForm(null);
-    setFormData(null);
-  };
 
-  const handleSave = (
-    formType: string,
-    data:
-      | PersonalInfo
-      | Education[]
-      | Experience[]
-      | Project[]
-      | SkillCategory[]
-      | Certification[]
-      | Reference[]
-      | string[]
-      | CustomSection[]
-  ) => {
-    dispatch({ type: "UPDATE_RESUME_DATA", payload: { [formType]: data } });
-    closeForm();
-  };
 
   const renderPersonalInfo = () => (
-    <div className="mb-6">
+    <div className="mb-6 bg-white">
       {state.resumeEditingMode && (
         <div className="flex justify-end items-center mb-2">
           <button
@@ -115,104 +65,108 @@ const ProfessionalTemplate = ({
           </button>
         </div>
       )}
-      
-             {/* Centered Header Section */}
-       <div className="text-center mb-4">
-         <h1 className="font-bold tracking-wider mb-2 text-xl">
-           {personalInfo?.name?.toUpperCase()}
-         </h1>
-         
-         {/* Contact Information */}
-         <div className="mb-2">
-           {personalInfo?.address && <span>{personalInfo.address}</span>}
-           {personalInfo?.address && personalInfo?.email && <span> | </span>}
-           {personalInfo?.email && (
-             <a
-               href={`mailto:${personalInfo.email}`}
-               target="_blank"
-               rel="noopener noreferrer"
-               className="hover:underline"
-             >
-               {personalInfo.email}
-             </a>
-           )}
-           {personalInfo?.email && personalInfo?.phone && <span> | </span>}
-           {personalInfo?.phone && <span>{personalInfo.phone}</span>}
-           {personalInfo?.phone && personalInfo?.portfolio && <span> | </span>}
-           {personalInfo?.portfolio && (
-             <a
-               href={personalInfo.portfolio}
-               target="_blank"
-               rel="noopener noreferrer"
-               className="hover:underline"
-             >
-               {personalInfo.portfolio}
-             </a>
-           )}
-         </div>
-         
-         {/* Social Media Links */}
-         {(personalInfo?.github || personalInfo?.linkedin || personalInfo?.twitter) && (
-           <div className="mb-2">
-             {personalInfo?.github && (
-               <a
-                 href={personalInfo.github}
-                 target="_blank"
-                 rel="noopener noreferrer"
-                 className="hover:underline"
-               >
-                 {personalInfo.github}
-               </a>
-             )}
-             {personalInfo?.github && personalInfo?.linkedin && <span> | </span>}
-             {personalInfo?.linkedin && (
-               <a
-                 href={personalInfo.linkedin}
-                 target="_blank"
-                 rel="noopener noreferrer"
-                 className="hover:underline"
-               >
-                 {personalInfo.linkedin}
-               </a>
-             )}
-             {personalInfo?.linkedin && personalInfo?.twitter && <span> | </span>}
-             {personalInfo?.twitter && (
-               <a
-                 href={personalInfo.twitter}
-                 target="_blank"
-                 rel="noopener noreferrer"
-                 className="hover:underline"
-               >
-                 {personalInfo.twitter}
-               </a>
-             )}
-           </div>
-         )}
-         
-         {/* Professional Title */}
-         {personalInfo?.label && (
-           <div className="font-semibold text-md">
-             {personalInfo.label.toUpperCase()}
-           </div>
-         )}
-       </div>
 
-             {/* Summary */}
-       {personalInfo?.summary && (
-         <div className="mb-4">
-           <div className="bg-gray-100 px-3 py-1 mb-2">
-             <h2 className="font-bold uppercase">SUMMARY</h2>
-           </div>
-           <div className="px-2">
-             <p>{personalInfo.summary}</p>
-           </div>
-         </div>
-       )}
+      {/* Centered Header Section */}
+      <div className="text-center mb-4">
+        <h1 className="font-bold tracking-wider mb-2 text-xl">
+          {personalInfo?.name?.toUpperCase()}
+        </h1>
+
+        {/* Contact Information */}
+        <div className="mb-2">
+          {personalInfo?.address && <span>{personalInfo.address}</span>}
+          {personalInfo?.address && personalInfo?.email && <span> | </span>}
+          {personalInfo?.email && (
+            <a
+              href={`mailto:${personalInfo.email}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              {personalInfo.email}
+            </a>
+          )}
+          {personalInfo?.email && personalInfo?.phone && <span> | </span>}
+          {personalInfo?.phone && <span>{personalInfo.phone}</span>}
+          {personalInfo?.phone && personalInfo?.portfolio && <span> | </span>}
+          {personalInfo?.portfolio && (
+            <a
+              href={personalInfo.portfolio}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              {personalInfo.portfolio}
+            </a>
+          )}
+        </div>
+
+        {/* Social Media Links */}
+        {(personalInfo?.github ||
+          personalInfo?.linkedin ||
+          personalInfo?.twitter) && (
+          <div className="mb-2">
+            {personalInfo?.github && (
+              <a
+                href={personalInfo.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:underline"
+              >
+                {personalInfo.github}
+              </a>
+            )}
+            {personalInfo?.github && personalInfo?.linkedin && <span> | </span>}
+            {personalInfo?.linkedin && (
+              <a
+                href={personalInfo.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:underline"
+              >
+                {personalInfo.linkedin}
+              </a>
+            )}
+            {personalInfo?.linkedin && personalInfo?.twitter && (
+              <span> | </span>
+            )}
+            {personalInfo?.twitter && (
+              <a
+                href={personalInfo.twitter}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:underline"
+              >
+                {personalInfo.twitter}
+              </a>
+            )}
+          </div>
+        )}
+
+        {/* Professional Title */}
+        {personalInfo?.label && (
+          <div className="font-semibold text-md">
+            {personalInfo.label.toUpperCase()}
+          </div>
+        )}
+      </div>
+
+      {/* Summary */}
+      {personalInfo?.summary && (
+        <div className="mb-4">
+          <div className="bg-gray-100 px-3 py-1 mb-2">
+            <h2 className="font-bold uppercase">SUMMARY</h2>
+          </div>
+          <div className="px-2">
+            <p>{personalInfo.summary}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 
   const renderSkills = () => (
-    <div className="mb-6">
+    <div className="mb-6 bg-white">
       <div className="flex justify-between items-center mb-2">
         <div className="bg-gray-100 px-3 py-2 flex-1">
           <h2 className="font-bold uppercase">TECHNICAL SKILLS</h2>
@@ -229,29 +183,29 @@ const ProfessionalTemplate = ({
       </div>
 
       <div className="px-2">
-      {skills?.map((skillCategory, index) => (
-        <div key={index} className="mb-1">
-          <div className="flex justify-between items-start">
-            <div>
-              {skillCategory.category && (
-                <>
-                  <strong>{skillCategory.category}:</strong>{" "}
-                  {skillCategory.items.slice().join(", ")}
-                </>
-              )}
-              {!skillCategory.category && (
-                <>{skillCategory.items.slice().join(", ")}</>
-              )}
+        {skills?.map((skillCategory, index) => (
+          <div key={index} className="mb-1">
+            <div className="flex justify-between items-start">
+              <div>
+                {skillCategory.category && (
+                  <>
+                    <strong>{skillCategory.category}:</strong>{" "}
+                    {skillCategory.items.slice().join(", ")}
+                  </>
+                )}
+                {!skillCategory.category && (
+                  <>{skillCategory.items.slice().join(", ")}</>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      ))}
+        ))}
       </div>
     </div>
   );
 
   const renderProjects = () => (
-    <div className="mb-6">
+    <div className="mb-6 bg-white">
       <div className="flex justify-between items-center mb-2">
         <div className="bg-gray-100 px-3 py-2 flex-1">
           <h2 className="font-bold uppercase">PROJECTS</h2>
@@ -270,14 +224,14 @@ const ProfessionalTemplate = ({
       <div className="px-2">
         {projects?.map((project, index) => (
           <div key={index} className="mb-4">
-                         <div className="flex justify-between items-start mb-1">
-               <div className="font-bold">
-                 {project.name}
-                 {project.link && (
-                   <span className="font-normal"> | {project.link}</span>
-                 )}
-               </div>
-             </div>
+            <div className="flex justify-between items-start mb-1">
+              <div className="font-bold">
+                {project.name}
+                {project.link && (
+                  <span className="font-normal"> | {project.link}</span>
+                )}
+              </div>
+            </div>
             {project.achievements && (
               <div>
                 {project.achievements.map((achievement, achIndex) => (
@@ -295,7 +249,7 @@ const ProfessionalTemplate = ({
   );
 
   const renderEducation = () => (
-    <div className="mb-6">
+    <div className="mb-6 bg-white">
       <div className="flex justify-between items-center mb-2">
         <div className="bg-gray-100 px-3 py-2 flex-1">
           <h2 className="font-bold uppercase">EDUCATION</h2>
@@ -337,7 +291,7 @@ const ProfessionalTemplate = ({
   );
 
   const renderExperience = () => (
-    <div className="mb-6">
+    <div className="mb-6 bg-white">
       <div className="flex justify-between items-center mb-2">
         <div className="bg-gray-100 px-3 py-2 flex-1">
           <h2 className="font-bold uppercase">WORK EXPERIENCE</h2>
@@ -386,7 +340,7 @@ const ProfessionalTemplate = ({
   );
 
   const renderCertifications = () => (
-    <div className="mb-6">
+    <div className="mb-6 bg-white">
       <div className="flex justify-between items-center mb-2">
         <div className="bg-gray-100 px-3 py-2 flex-1">
           <h2 className="font-bold uppercase">AWARDS & ACHIEVEMENTS</h2>
@@ -414,9 +368,7 @@ const ProfessionalTemplate = ({
               </span>
             </div>
             {cert.description && (
-              <div className="ml-4  text-gray-600 mt-1">
-                {cert.description}
-              </div>
+              <div className="ml-4  text-gray-600 mt-1">{cert.description}</div>
             )}
           </div>
         ))}
@@ -425,7 +377,7 @@ const ProfessionalTemplate = ({
   );
 
   const renderReferences = () => (
-    <div className="mb-6">
+    <div className="mb-6 bg-white">
       <div className="flex justify-between items-center mb-2">
         <div className="bg-gray-100 px-3 py-2 flex-1">
           <h2 className="font-bold uppercase">REFERENCES</h2>
@@ -447,8 +399,8 @@ const ProfessionalTemplate = ({
             <div className="font-bold mb-1">{ref.name}</div>
             <div>
               <div>
-              {ref.position} {ref.position && ref.company && "at"} {ref.company}
-
+                {ref.position} {ref.position && ref.company && "at"}{" "}
+                {ref.company}
               </div>
               {ref.contact && (
                 <div>
@@ -468,7 +420,7 @@ const ProfessionalTemplate = ({
   );
 
   const renderInterests = () => (
-    <div className="mb-6">
+    <div className="mb-6 bg-white">
       <div className="flex justify-between items-center mb-2">
         <div className="bg-gray-100 px-3 py-2 flex-1">
           <h2 className="font-bold uppercase">INTERESTS</h2>
@@ -487,10 +439,7 @@ const ProfessionalTemplate = ({
       <div>
         <div className="flex flex-wrap gap-2">
           {interests?.map((interest, index) => (
-            <span
-              key={index}
-              className="bg-gray-200 rounded px-3 py-1"
-            >
+            <span key={index} className="bg-gray-200 rounded px-3 py-1">
               {interest}
             </span>
           ))}
@@ -500,7 +449,7 @@ const ProfessionalTemplate = ({
   );
 
   const renderCustomSections = () => (
-    <div className="mb-6">
+    <div className="mb-6 bg-white">
       <div className="flex justify-between items-center mb-2">
         <div className="bg-gray-100 px-3 py-2 flex-1">
           <h2 className="font-bold uppercase">CUSTOM SECTIONS</h2>
@@ -532,134 +481,39 @@ const ProfessionalTemplate = ({
   );
 
   return (
-    <div ref={ref}>
-      <div
-        className="max-w-[210mm] min-w-[210mm] max-h-[297mm] min-h-[297mm] mx-auto bg-white text-black p-6 py-8 overflow-hidden"
-        style={{
-          fontSize: `${state.resumeSettings.fontSize}px`,
-          boxSizing: "border-box",
-          fontFamily: state.resumeSettings.fontFamily,
-          lineHeight: state.resumeSettings.lineHeight,
-        }}
-      >
-        {state.resumeSettings.sections
-          ?.slice()
-          .sort((a, b) => a.order - b.order)
-          .map((x, index) => {
-            if (x.visible) {
-              switch (x.key) {
-                case "personalInfo":
-                  return <div key={index}>{renderPersonalInfo()}</div>;
-                case "skills":
-                  return <div key={index}>{renderSkills()}</div>;
-                case "projects":
-                  return <div key={index}>{renderProjects()}</div>;
-                case "education":
-                  return <div key={index}>{renderEducation()}</div>;
-                case "experience":
-                  return <div key={index}>{renderExperience()}</div>;
-                case "certifications":
-                  return <div key={index}>{renderCertifications()}</div>;
-                case "references":
-                  return <div key={index}>{renderReferences()}</div>;
-                case "interests":
-                  return <div key={index}>{renderInterests()}</div>;
-                case "customSections":
-                  return <div key={index}>{renderCustomSections()}</div>;
-                default:
-                  return null;
-              }
+    <>
+      {state?.resumeSettings?.sections
+        ?.slice()
+        .sort((a, b) => a.order - b.order)
+        .map((x, index) => {
+          if (x.visible) {
+            switch (x.key) {
+              case "personalInfo":
+                return <div key={index}>{renderPersonalInfo()}</div>;
+              case "skills":
+                return <div key={index}>{renderSkills()}</div>;
+              case "projects":
+                return <div key={index}>{renderProjects()}</div>;
+              case "education":
+                return <div key={index}>{renderEducation()}</div>;
+              case "experience":
+                return <div key={index}>{renderExperience()}</div>;
+              case "certifications":
+                return <div key={index}>{renderCertifications()}</div>;
+              case "references":
+                return <div key={index}>{renderReferences()}</div>;
+              case "interests":
+                return <div key={index}>{renderInterests()}</div>;
+              case "customSections":
+                return <div key={index}>{renderCustomSections()}</div>;
+              default:
+                return null;
             }
-            return null;
-          })}
-      </div>
-
-      {/* Form Modals */}
-      {activeForm === "personalInfo" && (
-        <PersonalInfoForm
-          isOpen={true}
-          data={formData as PersonalInfo}
-          onSave={(data) => handleSave("personalInfo", data as PersonalInfo)}
-          onClose={closeForm}
-        />
-      )}
-
-      {activeForm === "experience" && (
-        <ExperienceForm
-          isOpen={true}
-          data={formData as Experience[]}
-          onSave={(data) => handleSave("experience", data as Experience[])}
-          onClose={closeForm}
-        />
-      )}
-
-      {activeForm === "education" && (
-        <EducationForm
-          isOpen={true}
-          data={formData as Education[]}
-          onSave={(data) => handleSave("education", data as Education[])}
-          onClose={closeForm}
-        />
-      )}
-
-      {activeForm === "projects" && (
-        <ProjectsForm
-          isOpen={true}
-          data={formData as Project[]}
-          onSave={(data) => handleSave("projects", data as Project[])}
-          onClose={closeForm}
-        />
-      )}
-
-      {activeForm === "skills" && (
-        <SkillsForm
-          isOpen={true}
-          data={formData as SkillCategory[]}
-          onSave={(data) => handleSave("skills", data as SkillCategory[])}
-          onClose={closeForm}
-        />
-      )}
-
-      {activeForm === "certifications" && (
-        <CertificationsForm
-          isOpen={true}
-          data={formData as Certification[]}
-          onSave={(data) =>
-            handleSave("certifications", data as Certification[])
           }
-          onClose={closeForm}
-        />
-      )}
+          return null;
+        })}
 
-      {activeForm === "references" && (
-        <ReferencesForm
-          isOpen={true}
-          data={formData as Reference[]}
-          onSave={(data) => handleSave("references", data as Reference[])}
-          onClose={closeForm}
-        />
-      )}
-
-      {activeForm === "interests" && (
-        <InterestsForm
-          isOpen={true}
-          data={formData as string[]}
-          onSave={(data) => handleSave("interests", data as string[])}
-          onClose={closeForm}
-        />
-      )}
-
-      {activeForm === "customSections" && (
-        <CustomSectionForm
-          isOpen={true}
-          data={formData as CustomSection[]}
-          onSave={(data) =>
-            handleSave("customSections", data as CustomSection[])
-          }
-          onClose={closeForm}
-        />
-      )}
-    </div>
+    </>
   );
 };
 

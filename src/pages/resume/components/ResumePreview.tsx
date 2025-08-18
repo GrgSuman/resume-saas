@@ -5,32 +5,50 @@ import CreativeTemplate from "../templates/CreativeTemplate";
 import ProfessionalTemplate from "../templates/ProfessionalTemplate";
 import ModernTemplate from "../templates/ModernTemplate";
 import TwoColumnTemplate from "../templates/TwoColumnTemplate";
+import PageWrapper from "./PageWrapper";
+import type { ResumeSettings } from "../../../types/resumeDataType";
+import CircularLoadingIndicator from "../../../components/sections/CircularLoadingIndicator";
+import { useState } from "react";
+import type { PersonalInfo, Education, Experience, Project, SkillCategory, Certification, Reference, CustomSection } from "../../../types/resumeDataType";
 
-const ResumePreview = ({
-  resumeRef,
-}: {
-  resumeRef: React.RefObject<HTMLDivElement | null>;
-}) => {
+const ResumePreview = ({resumeRef}: {resumeRef: React.RefObject<HTMLDivElement | null>}) => {
   const { state } = useResume();
+
+  const [activeForm, setActiveForm] = useState<string | null>(null);
+  const [formData, setFormData] = useState<
+    | PersonalInfo
+    | Education[]
+    | Experience[]
+    | Project[]
+    | SkillCategory[]
+    | Certification[]
+    | Reference[]
+    | string[]
+    | CustomSection[]
+    | null
+  >(null);
+
 
   return (
     <div>
       {state.isLoading ? (
-        <LoadingIndicator />
+        <CircularLoadingIndicator />
       ) : (
         <>
+          <PageWrapper setActiveForm={setActiveForm} setFormData={setFormData} activeForm={activeForm} formData={formData} resumeSettings={state?.resumeSettings as ResumeSettings} htmlRef={resumeRef as React.RefObject<HTMLDivElement>}>
           {state?.resumeSettings?.template === TEMPLATES.CREATIVE && (
-            <CreativeTemplate ref={resumeRef} />
+            <CreativeTemplate setActiveForm={setActiveForm} setFormData={setFormData} />
           )}
           {state?.resumeSettings?.template === TEMPLATES.PROFESSIONAL && (
-            <ProfessionalTemplate ref={resumeRef} />
+            <ProfessionalTemplate setActiveForm={setActiveForm} setFormData={setFormData}/>
           )}
           {state?.resumeSettings?.template === TEMPLATES.MODERN && (
-            <ModernTemplate ref={resumeRef} />
+            <ModernTemplate setActiveForm={setActiveForm} setFormData={setFormData} />
           )}
           {state?.resumeSettings?.template === TEMPLATES.TWO_COLUMN && (
-            <TwoColumnTemplate ref={resumeRef} />
+            <TwoColumnTemplate setActiveForm={setActiveForm} setFormData={setFormData} />
           )}
+          </PageWrapper>
         </>
       )}
     </div>
@@ -38,14 +56,3 @@ const ResumePreview = ({
 };
 
 export default ResumePreview;
-
-const LoadingIndicator = () => {
-  return (
-    <div className="flex flex-col items-center justify-center space-y-4 h-[400px]">
-      <div className="relative">
-        <div className="w-16 h-16 border-4 border-gray-200 rounded-full"></div>
-        <div className="absolute top-0 left-0 w-16 h-16 border-4 border-transparent border-t-blue-600 rounded-full animate-spin"></div>
-      </div>
-    </div>
-  );
-};

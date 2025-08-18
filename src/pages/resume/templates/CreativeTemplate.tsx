@@ -1,17 +1,5 @@
-import { useState } from "react";
 import { Edit3, Plus } from "lucide-react";
 import { useResume } from "../../../hooks/useResume";
-
-// Form imports
-import PersonalInfoForm from "../forms/PersonalInfoForm";
-import ExperienceForm from "../forms/ExperienceForm";
-import EducationForm from "../forms/EducationForm";
-import ProjectsForm from "../forms/ProjectsForm";
-import SkillsForm from "../forms/SkillsForm";
-import CertificationsForm from "../forms/CertificationsForm";
-import ReferencesForm from "../forms/ReferencesForm";
-import InterestsForm from "../forms/InterestsForm";
-import CustomSectionForm from "../forms/CustomSectionForm";
 
 import type {
   PersonalInfo,
@@ -23,28 +11,31 @@ import type {
   Reference,
   CustomSection,
 } from "../../../types/resumeDataType";
+import CircularLoadingIndicator from "../../../components/sections/CircularLoadingIndicator";
 
 const CreativeTemplate = ({
-  ref,
+  setActiveForm,
+  setFormData,
 }: {
-  ref: React.RefObject<HTMLDivElement | null>;
+  setActiveForm: (formType: string | null) => void;
+  setFormData: (
+    data:
+      | PersonalInfo
+      | Education[]
+      | Experience[]
+      | Project[]
+      | SkillCategory[]
+      | Certification[]
+      | Reference[]
+      | string[]
+      | CustomSection[]
+      | null
+  ) => void;
 }) => {
-  const { state, dispatch } = useResume();
-  const [activeForm, setActiveForm] = useState<string | null>(null);
-  const [formData, setFormData] = useState<
-    | PersonalInfo
-    | Education[]
-    | Experience[]
-    | Project[]
-    | SkillCategory[]
-    | Certification[]
-    | Reference[]
-    | string[]
-    | CustomSection[]
-    | null
-  >(null);
+  const { state } = useResume();
 
-  if (!state.resumeData) return null;
+  if (!state.resumeData || !state.resumeSettings)
+    return <CircularLoadingIndicator />;
 
   const {
     personalInfo,
@@ -57,9 +48,6 @@ const CreativeTemplate = ({
     interests,
     customSections,
   } = state.resumeData;
-
-  // Early return if resumeSettings is null
-  if (!state.resumeSettings) return null;
 
   const openForm = (
     formType: string,
@@ -76,28 +64,6 @@ const CreativeTemplate = ({
   ) => {
     setActiveForm(formType);
     setFormData(data);
-  };
-
-  const closeForm = () => {
-    setActiveForm(null);
-    setFormData(null);
-  };
-
-  const handleSave = (
-    formType: string,
-    data:
-      | PersonalInfo
-      | Education[]
-      | Experience[]
-      | Project[]
-      | SkillCategory[]
-      | Certification[]
-      | Reference[]
-      | string[]
-      | CustomSection[]
-  ) => {
-    dispatch({ type: "UPDATE_RESUME_DATA", payload: { [formType]: data } });
-    closeForm();
   };
 
   const renderPersonalInfo = () => (
@@ -525,134 +491,38 @@ const CreativeTemplate = ({
   );
 
   return (
-    <div ref={ref}>
-      <div
-        className="max-w-[210mm] min-w-[210mm] max-h-[297mm] min-h-[297mm]  mx-auto bg-white text-black leading-tight p-6 py-8 overflow-hidden"
-        style={{
-          fontSize: `${state.resumeSettings.fontSize}px`,
-          boxSizing: "border-box",
-          fontFamily: state.resumeSettings.fontFamily,
-        }}
-      >
-        {state.resumeSettings.sections
-          ?.slice()
-          .sort((a, b) => a.order - b.order)
-          .map((x, index) => {
-            if (x.visible) {
-              switch (x.key) {
-                case "personalInfo":
-                  return <div key={index}>{renderPersonalInfo()}</div>;
-                case "experience":
-                  return <div key={index}>{renderExperience()}</div>;
-                case "education":
-                  return <div key={index}>{renderEducation()}</div>;
-                case "projects":
-                  return <div key={index}>{renderProjects()}</div>;
-                case "skills":
-                  return <div key={index}>{renderSkills()}</div>;
-                case "certifications":
-                  return <div key={index}>{renderCertifications()}</div>;
-                case "references":
-                  return <div key={index}>{renderReferences()}</div>;
-                case "interests":
-                  return <div key={index}>{renderInterests()}</div>;
-                case "customSections":
-                  return <div key={index}>{renderCustomSections()}</div>;
-                default:
-                  return null;
-              }
+    <>
+      {state.resumeSettings.sections
+        ?.slice()
+        .sort((a, b) => a.order - b.order)
+        .map((x, index) => {
+          if (x.visible) {
+            switch (x.key) {
+              case "personalInfo":
+                return <div key={index}>{renderPersonalInfo()}</div>;
+              case "experience":
+                return <div key={index}>{renderExperience()}</div>;
+              case "education":
+                return <div key={index}>{renderEducation()}</div>;
+              case "projects":
+                return <div key={index}>{renderProjects()}</div>;
+              case "skills":
+                return <div key={index}>{renderSkills()}</div>;
+              case "certifications":
+                return <div key={index}>{renderCertifications()}</div>;
+              case "references":
+                return <div key={index}>{renderReferences()}</div>;
+              case "interests":
+                return <div key={index}>{renderInterests()}</div>;
+              case "customSections":
+                return <div key={index}>{renderCustomSections()}</div>;
+              default:
+                return null;
             }
-            return null;
-          })}
-
-      </div>
-
-      {/* Form Modals */}
-      {activeForm === "personalInfo" && (
-        <PersonalInfoForm
-          isOpen={true}
-          data={formData as PersonalInfo}
-          onSave={(data) => handleSave("personalInfo", data as PersonalInfo)}
-          onClose={closeForm}
-        />
-      )}
-
-      {activeForm === "experience" && (
-        <ExperienceForm
-          isOpen={true}
-          data={formData as Experience[]}
-          onSave={(data) => handleSave("experience", data as Experience[])}
-          onClose={closeForm}
-        />
-      )}
-
-      {activeForm === "education" && (
-        <EducationForm
-          isOpen={true}
-          data={formData as Education[]}
-          onSave={(data) => handleSave("education", data as Education[])}
-          onClose={closeForm}
-        />
-      )}
-
-      {activeForm === "projects" && (
-        <ProjectsForm
-          isOpen={true}
-          data={formData as Project[]}
-          onSave={(data) => handleSave("projects", data as Project[])}
-          onClose={closeForm}
-        />
-      )}
-
-      {activeForm === "skills" && (
-        <SkillsForm
-          isOpen={true}
-          data={formData as SkillCategory[]}
-          onSave={(data) => handleSave("skills", data as SkillCategory[])}
-          onClose={closeForm}
-        />
-      )}
-
-      {activeForm === "certifications" && (
-        <CertificationsForm
-          isOpen={true}
-          data={formData as Certification[]}
-          onSave={(data) =>
-            handleSave("certifications", data as Certification[])
           }
-          onClose={closeForm}
-        />
-      )}
-
-      {activeForm === "references" && (
-        <ReferencesForm
-          isOpen={true}
-          data={formData as Reference[]}
-          onSave={(data) => handleSave("references", data as Reference[])}
-          onClose={closeForm}
-        />
-      )}
-
-      {activeForm === "interests" && (
-        <InterestsForm
-          isOpen={true}
-          data={formData as string[]}
-          onSave={(data) => handleSave("interests", data as string[])}
-          onClose={closeForm}
-        />
-      )}
-
-      {activeForm === "customSections" && (
-        <CustomSectionForm
-          isOpen={true}
-          data={formData as CustomSection[]}
-          onSave={(data) =>
-            handleSave("customSections", data as CustomSection[])
-          }
-          onClose={closeForm}
-        />
-      )}
-    </div>
+          return null;
+        })}
+    </>
   );
 };
 
