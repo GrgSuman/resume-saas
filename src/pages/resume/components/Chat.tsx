@@ -3,10 +3,9 @@ import { Button } from "../../../components/ui/button";
 import { Send, X, Edit3, Bot } from "lucide-react";
 import { useResume } from "../../../hooks/useResume";
 import axiosInstance from "../../../api/axios";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import axios from "axios";
-import { toast } from "sonner";
-import { useAuth } from "../../../hooks/useAuth";
+import { toast } from "react-toastify";
 
 type Message = {
   id: number;
@@ -23,13 +22,15 @@ const Chat = () => {
   const [chatLoading, setChatLoading] = useState(false);
   const [conversationLoading, setConversationLoading] = useState(true);
 
+  const navigate = useNavigate();
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { id } = useParams();
   const { state, dispatch } = useResume();
   const resumeTitle = state?.resumeTitle || "";
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleInput, setTitleInput] = useState(resumeTitle);
-  const { deductCredits } = useAuth();
+
   // Auto-scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -134,12 +135,15 @@ const Chat = () => {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.data?.message === "Insufficient credits") {
-          console.log("Insufficient credits");
-          deductCredits();
+          toast.info("Insufficient credits, Click to Buy credits",{
+            onClick:()=>{navigate("/dashboard/credits");
+            }
+          });
+        }else{
+          toast.error(error.response?.data?.message || "Failed to send message", {
+            position: "top-right",
+          });
         }
-        toast.error(error.response?.data?.message || "Failed to send message", {
-          position: "top-right",
-        });
       }
     } finally {
       setChatLoading(false);

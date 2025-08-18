@@ -23,9 +23,10 @@ import { useResume } from "../../hooks/useResume";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import axiosInstance from "../../api/axios";
-import { toast } from "sonner";
 import { useAuth } from "../../hooks/useAuth";
 import TemplateSelector from "./components/TemplateSelector";
+import { toast } from "react-toastify";
+import { FONT_OPTIONS, TEMPLATES } from "../../lib/constants";
 
 interface EditorHeaderProps {
   resumeRef: React.RefObject<HTMLDivElement | null>;
@@ -47,7 +48,13 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
         dispatch({ type: "SET_DOWNLOADING", payload: true });
         const response = await axiosInstance.post(
           "/generate-pdf",
-          { htmlContent },
+          {
+            htmlContent,
+            marginStatus:
+              state.resumeSettings?.template === TEMPLATES.EXECUTIVE
+                ? false
+                : true,
+          },
           {
             responseType: "blob",
           }
@@ -65,7 +72,15 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
           try {
             const text = await error?.response?.data?.text();
             const errorData = JSON.parse(text);
-            toast.error(errorData.message || "Failed to download PDF");
+            if (errorData.message === "Insufficient credits") {
+              toast.info("Insufficient credits, Click to Buy credits", {
+                onClick: () => {
+                  navigate("/dashboard/credits");
+                },
+              });
+            } else {
+              toast.error(errorData.message || "Failed to download PDF");
+            }
           } catch (parseError) {
             console.log(parseError);
             toast.error("Failed to download PDF");
@@ -90,6 +105,8 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
     resumeRef,
     dispatch,
     deductCredits,
+    navigate,
+    state.resumeSettings?.template,
   ]);
 
   const handleDownloadPDF = () => {
@@ -170,19 +187,17 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
                   </div>
                   <SelectValue placeholder="Roboto" />
                 </SelectTrigger>
+
                 <SelectContent className="border-gray-700 bg-gray-800 text-gray-200">
-                  <SelectItem
-                    value="Roboto"
-                    className="text-sm hover:bg-gray-700"
-                  >
-                    Sans (Roboto)
-                  </SelectItem>
-                  <SelectItem
-                    value="PT Serif"
-                    className="text-sm hover:bg-gray-700"
-                  >
-                    Serif (PT Serif)
-                  </SelectItem>
+                  {FONT_OPTIONS.map((font) => (
+                    <SelectItem
+                      key={font.id}
+                      value={font.name}
+                      className="text-sm hover:bg-gray-700"
+                    >
+                      {font.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -405,18 +420,15 @@ const EditorHeader = ({ resumeRef, onSectionsClick }: EditorHeaderProps) => {
                     <SelectValue placeholder="Font" />
                   </SelectTrigger>
                   <SelectContent className="border-gray-700 bg-gray-800 text-gray-200">
-                    <SelectItem
-                      value="Roboto"
-                      className="text-sm hover:bg-gray-700"
-                    >
-                      Sans (Roboto)
-                    </SelectItem>
-                    <SelectItem
-                      value="PT Serif"
-                      className="text-sm hover:bg-gray-700"
-                    >
-                      Serif (PT Serif)
-                    </SelectItem>
+                    {FONT_OPTIONS.map((font) => (
+                      <SelectItem
+                        key={font.id}
+                        value={font.name}
+                        className="text-sm hover:bg-gray-700"
+                      >
+                        {font.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

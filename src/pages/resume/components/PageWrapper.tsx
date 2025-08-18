@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { A4_WIDTH } from "../../../lib/constants";
+import { A4_WIDTH, TEMPLATES } from "../../../lib/constants";
 import { A4_HEIGHT } from "../../../lib/constants";
 import type {
   Reference,
@@ -25,10 +25,7 @@ import InterestsForm from "../forms/InterestsForm";
 import CustomSectionForm from "../forms/CustomSectionForm";
 import { useResume } from "../../../hooks/useResume";
 
-// User view padding: 28px, Print view padding: 35px
-const USER_PADDING = 28;
-const PRINT_PADDING = 35;
-const PAGE_BREAK_HEIGHT = A4_HEIGHT + PRINT_PADDING ; 
+const PRINT_PADDING = 28;
 
 const PageWrapper = ({
   children,
@@ -71,11 +68,11 @@ const PageWrapper = ({
 }) => {
   const checkHeightRef = useRef<HTMLDivElement>(null); //checking the height of the page
   const [height, setHeight] = useState(0); //height of the page
-  const {state, dispatch } = useResume(); //dispatching the data to the resume data
+  const { state, dispatch } = useResume(); //dispatching the data to the resume data
 
   useEffect(() => {
     checkHeight();
-  }, [checkHeightRef.current?.clientHeight,dispatch]);
+  }, [checkHeightRef.current?.clientHeight, dispatch]);
 
   const checkHeight = () => {
     if (checkHeightRef.current) {
@@ -83,38 +80,35 @@ const PageWrapper = ({
     }
   };
 
-  // Calculate how many page breaks we need
-  const numberOfBreaks = Math.floor(height / PAGE_BREAK_HEIGHT);
+  // Calculate how many page breaks we need (account for viewer padding)
+  const viewerPadding = state.resumeSettings?.template === TEMPLATES.EXECUTIVE ? 0 : PRINT_PADDING;
+  const pageHeightInViewer = A4_HEIGHT + viewerPadding*2
+  const numberOfBreaks = Math.floor(height / pageHeightInViewer);
   const pageBreaks = [];
 
   // Create page break elements
   for (let i = 1; i <= numberOfBreaks; i++) {
-    // Calculate break position accounting for user padding
-    // Each page break should be at: A4_HEIGHT + (PRINT_PADDING * 2) from the start
-    // But in user view, we need to account for the user padding
-    const breakPosition = (i * PAGE_BREAK_HEIGHT) - (USER_PADDING * 2);
-    
+    // Each break occurs every A4_HEIGHT plus any viewer padding, 
+    // with an initial offset equal to that padding
+    const breakPosition = i * pageHeightInViewer;
+
     pageBreaks.push(
       <div
         key={`break-${i}`}
-        className="absolute left-0 right-0 flex items-center justify-center"
+        className="absolute left-0 right-0 flex items-center min-w-[794px] justify-center"
         style={{
           top: `${breakPosition}px`,
           height: "20px",
           zIndex: 10,
         }}
       >
-        <div className="flex items-center justify-center w-full">
-          <div
-            className="flex-1 h-px bg-gray-400"
-            style={{ borderTop: "1px dashed #9ca3af" }}
-          />
-          <span className="mx-4 text-xs text-gray-500 font-medium uppercase tracking-wider">
+        <div className="flex items-center w-full">
+          <span className="text-xs text-gray-500 font-medium uppercase tracking-wider mr-4">
             Page Break
           </span>
           <div
-            className="flex-1 h-px bg-gray-400"
-            style={{ borderTop: "1px dashed #9ca3af" }}
+            className="flex-1 border-t border-dashed border-gray-400"
+            style={{ height: "1px" }}
           />
         </div>
       </div>
@@ -161,7 +155,7 @@ const PageWrapper = ({
               minHeight: `${A4_HEIGHT}px`,
               color: "black",
               backgroundColor: "white",
-              padding: `${USER_PADDING}px`,
+              padding: `${state.resumeSettings?.template === TEMPLATES.EXECUTIVE ? 0 : PRINT_PADDING}px`,
               fontSize: `${resumeSettings?.fontSize}px`,
               boxSizing: "border-box",
               fontFamily: resumeSettings?.fontFamily,
@@ -172,7 +166,7 @@ const PageWrapper = ({
           </div>
         </section>
 
-         { !state.resumeEditingMode && pageBreaks}
+        {!state.resumeEditingMode && pageBreaks}
 
         {/* Hidden section for printing */}
         <section ref={htmlRef} className="hidden">
@@ -181,7 +175,6 @@ const PageWrapper = ({
               maxWidth: `${A4_WIDTH}px`,
               minWidth: `${A4_WIDTH}px`,
               minHeight: `${A4_HEIGHT}px`,
-              padding: `${PRINT_PADDING}px`,
               color: "black",
               backgroundColor: "white",
               fontSize: `${resumeSettings?.fontSize}px`,

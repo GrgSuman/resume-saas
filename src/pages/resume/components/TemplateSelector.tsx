@@ -32,8 +32,75 @@ const templates = [
     name: "Two Column",
     image: "/twocolumn.png",
     description: "Side-by-side layout for more content"
-  }
+  },
+  {
+    id: "Minimalist",
+    name: "Minimalist",
+    image: "/minimalist.png",
+    description: "Simple and distraction-free layout"
+  },
+  {
+    id: "Elegant",
+    name: "Elegant",
+    image: "/elegant.png",
+    description: "Sophisticated design with refined typography"
+  },
+  {
+    id: "Executive",
+    name: "Executive",
+    image: "/Executive.png",
+    description: "Polished layout for leadership roles"
+  },
+  // {
+  //   id: "Classic",
+  //   name: "Classic",
+  //   image: "/classic.png",
+  //   description: "Timeless format trusted by professionals"
+  // },
+  // {
+  //   id: "Bold",
+  //   name: "Bold",
+  //   image: "/bold.png",
+  //   description: "Strong design to make your profile stand out"
+  // },
+  // {
+  //   id: "Innovative",
+  //   name: "Innovative",
+  //   image: "/innovative.png",
+  //   description: "Modern approach with creative sections"
+  // },
+  // {
+  //   id: "Clean",
+  //   name: "Clean",
+  //   image: "/clean.png",
+  //   description: "Neat and easy-to-read layout"
+  // },
+  // {
+  //   id: "Corporate",
+  //   name: "Corporate",
+  //   image: "/corporate.png",
+  //   description: "Professional look tailored for companies"
+  // },
+  // {
+  //   id: "Contemporary",
+  //   name: "Contemporary",
+  //   image: "/contemporary.png",
+  //   description: "Trendy design with fresh styling"
+  // },
+  // {
+  //   id: "Vision",
+  //   name: "Vision",
+  //   image: "/vision.png",
+  //   description: "Forward-looking layout for innovators"
+  // },
+  // {
+  //   id: "Focus",
+  //   name: "Focus",
+  //   image: "/focus.png",
+  //   description: "Straight-to-the-point format for clarity"
+  // }
 ];
+
 
 const TemplateSelector = ({ isOpen, onClose }: TemplateSelectorProps) => {
   const { state, dispatch } = useResume();

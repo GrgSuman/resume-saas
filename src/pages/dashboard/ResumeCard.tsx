@@ -13,7 +13,7 @@ import EditTitleModal from "./EditTitleModal";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "../../api/axios";
 import axios from "axios";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { useAuth } from "../../hooks/useAuth";
 
 const colors = [
@@ -54,9 +54,17 @@ export default function ResumeCard({id, title, updatedAt}: {id: string, title: s
     },
     onError: (error) => {
       if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data?.message || "Something went wrong",{
-          position: "top-right",
-        });
+        if(error.response?.data?.message === "Insufficient credits"){
+          toast.info("Insufficient credits, Click to Buy credits",{
+            onClick:()=>{
+              navigate("/dashboard/credits");
+            }
+          });
+        }else{
+          toast.error(error.response?.data?.message || "Something went wrong",{
+            position: "top-right",
+          });
+        }
       } 
       }
   });
