@@ -13,6 +13,7 @@ import type {
   Section,
 } from "../../../types/resumeDataType";
 import CircularLoadingIndicator from "../../../components/sections/CircularLoadingIndicator";
+import { SECTION_LABELS } from "../../../lib/constants";
 
 const TwoColumnTemplate = ({
   setActiveForm,
@@ -163,7 +164,7 @@ const TwoColumnTemplate = ({
       {/* Summary */}
       {personalInfo?.summary && (
         <div className="mb-4">
-          <h2 className="font-bold mb-1 tracking-wide uppercase">SUMMARY</h2>
+          <h2 className="font-bold mb-1 tracking-wide uppercase">{SECTION_LABELS.summary}</h2>
           <div className="border-b border-black mb-2"></div>
           <div>
             <div className="mb-1">{personalInfo.summary}</div>
@@ -176,7 +177,7 @@ const TwoColumnTemplate = ({
   const renderSkills = () => (
     <div className="mb-4">
       <div className="flex justify-between items-center mb-1">
-        <h2 className="font-bold tracking-wide uppercase">TECHNICAL SKILLS</h2>
+        <h2 className="font-bold tracking-wide uppercase">{SECTION_LABELS.skills}</h2>
         {state.resumeEditingMode && (
           <button
             onClick={() => openForm("skills", skills as SkillCategory[])}
@@ -224,7 +225,7 @@ const TwoColumnTemplate = ({
   const renderProjects = () => (
     <div className="mb-4">
       <div className="flex justify-between items-center mb-1">
-        <h2 className="font-bold tracking-wide uppercase">PROJECTS</h2>
+        <h2 className="font-bold tracking-wide uppercase">{SECTION_LABELS.projects}</h2>
         {state.resumeEditingMode && (
           <button
             onClick={() => openForm("projects", projects as Project[])}
@@ -278,7 +279,7 @@ const TwoColumnTemplate = ({
   const renderEducation = () => (
     <div className="mb-4">
       <div className="flex justify-between items-center mb-1">
-        <h2 className="font-bold tracking-wide uppercase">EDUCATION</h2>
+        <h2 className="font-bold tracking-wide uppercase">{SECTION_LABELS.education}</h2>
         {state.resumeEditingMode && (
           <button
             onClick={() => openForm("education", education as Education[])}
@@ -322,7 +323,7 @@ const TwoColumnTemplate = ({
   const renderExperience = () => (
     <div className="mb-4">
       <div className="flex justify-between items-center mb-1">
-        <h2 className="font-bold tracking-wide uppercase">EMPLOYMENT</h2>
+        <h2 className="font-bold tracking-wide uppercase">{SECTION_LABELS.experience}</h2>
         {state.resumeEditingMode && (
           <button
             onClick={() => openForm("experience", experience as Experience[])}
@@ -375,7 +376,7 @@ const TwoColumnTemplate = ({
     <div className="mb-4">
       <div className="flex justify-between items-center mb-1">
         <h2 className="font-bold tracking-wide uppercase">
-          AWARDS & ACHIEVEMENTS
+          {SECTION_LABELS.certifications}
         </h2>
         {state.resumeEditingMode && (
           <button
@@ -412,7 +413,7 @@ const TwoColumnTemplate = ({
   const renderReferences = () => (
     <div className="mb-4">
       <div className="flex justify-between items-center mb-1">
-        <h2 className="font-bold tracking-wide uppercase">REFERENCES</h2>
+        <h2 className="font-bold tracking-wide uppercase">{SECTION_LABELS.references}</h2>
         {state.resumeEditingMode && (
           <button
             onClick={() => openForm("references", references as Reference[])}
@@ -454,7 +455,7 @@ const TwoColumnTemplate = ({
   const renderInterests = () => (
     <div className="mb-4">
       <div className="flex justify-between items-center mb-1">
-        <h2 className="font-bold tracking-wide uppercase">INTERESTS</h2>
+        <h2 className="font-bold tracking-wide uppercase">{SECTION_LABELS.interests}</h2>
         {state.resumeEditingMode && (
           <button
             onClick={() => openForm("interests", interests as string[])}
@@ -480,34 +481,30 @@ const TwoColumnTemplate = ({
   );
 
   const renderCustomSections = () => (
-    <div className="mb-4">
-      <div className="flex justify-between items-center mb-1">
-        <h2 className="font-bold tracking-wide uppercase">CUSTOM SECTIONS</h2>
-        {state.resumeEditingMode && (
-          <button
-            onClick={() =>
-              openForm("customSections", customSections as CustomSection[])
-            }
-            className="flex items-center gap-1 px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600"
-          >
-            <Plus className="h-3 w-3" />
-            Edit Custom Sections
-          </button>
-        )}
-      </div>
-      <div className="border-b border-black mb-2"></div>
-
-      <div>
-        {customSections?.map((section, index) => (
-          <div key={index} className="mb-3">
-            <div className="font-bold mb-1">{section.title}</div>
-            <div>
-              <div>{section.content}</div>
-            </div>
+    <>
+      {customSections?.map((section, index) => (
+        <div key={index} className="mb-4">
+          <div className="flex justify-between items-center mb-1">
+            <h2 className="font-bold tracking-wide uppercase">{section.title?.toUpperCase()}</h2>
+            {state.resumeEditingMode && (
+              <button
+                onClick={() =>
+                  openForm("customSections", customSections as CustomSection[])
+                }
+                className="flex items-center gap-1 px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600"
+              >
+                <Plus className="h-3 w-3" />
+                Edit Custom Sections
+              </button>
+            )}
           </div>
-        ))}
-      </div>
-    </div>
+          <div className="border-b border-black mb-2"></div>
+          <div>
+            <div>{section.content}</div>
+          </div>
+        </div>
+      ))}
+    </>
   );
 
   // Sort sections by order

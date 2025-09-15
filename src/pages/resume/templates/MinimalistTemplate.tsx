@@ -12,6 +12,7 @@ import type {
   CustomSection,
 } from "../../../types/resumeDataType";
 import CircularLoadingIndicator from "../../../components/sections/CircularLoadingIndicator";
+import { SECTION_LABELS } from "../../../lib/constants";
 
 const MinimalistTemplate = ({
   setActiveForm,
@@ -168,7 +169,7 @@ const MinimalistTemplate = ({
         <div className="mb-6">
           <div className="flex">
             <div className="w-1/4 font-bold uppercase tracking-wide">
-              SUMMARY
+              {SECTION_LABELS.summary}
             </div>
             <div className="w-3/4 pl-4">
               <div>{personalInfo.summary}</div>
@@ -183,7 +184,7 @@ const MinimalistTemplate = ({
     <div className="mb-6">
       <div className="flex relative">
         <div className="w-1/4 uppercase tracking-wide ">
-         <h1 className="font-bold">PROFESSIONAL EXPERIENCE</h1> 
+         <h1 className="font-bold">{SECTION_LABELS.experience}</h1> 
           {state.resumeEditingMode && (
             <button
               onClick={() => openForm("experience", experience as Experience[])}
@@ -233,7 +234,7 @@ const MinimalistTemplate = ({
      <div className="mb-6">
        <div className="flex relative">
          <div className="w-1/4 uppercase tracking-wide">
-           <h1 className="font-bold">EDUCATION</h1>
+           <h1 className="font-bold">{SECTION_LABELS.education}</h1>
            {state.resumeEditingMode && (
              <button
                onClick={() => openForm("education", education as Education[])}
@@ -276,7 +277,7 @@ const MinimalistTemplate = ({
      <div className="mb-6">
        <div className="flex relative">
          <div className="w-1/4 uppercase tracking-wide">
-           <h1 className="font-bold">PROJECTS</h1>
+           <h1 className="font-bold">{SECTION_LABELS.projects}</h1>
            {state.resumeEditingMode && (
              <button
                onClick={() => openForm("projects", projects as Project[])}
@@ -326,7 +327,7 @@ const MinimalistTemplate = ({
      <div className="mb-6">
        <div className="flex relative">
          <div className="w-1/4 uppercase tracking-wide">
-           <h1 className="font-bold">SKILLS</h1>
+           <h1 className="font-bold">{SECTION_LABELS.skills}</h1>
            {state.resumeEditingMode && (
              <button
                onClick={() => openForm("skills", skills as SkillCategory[])}
@@ -364,7 +365,7 @@ const MinimalistTemplate = ({
      <div className="mb-6">
        <div className="flex relative">
          <div className="w-1/4 uppercase tracking-wide">
-           <h1 className="font-bold">CERTIFICATES</h1>
+           <h1 className="font-bold">{SECTION_LABELS.certifications}</h1>
            {state.resumeEditingMode && (
              <button
                onClick={() =>
@@ -401,7 +402,7 @@ const MinimalistTemplate = ({
      <div className="mb-6">
        <div className="flex relative">
          <div className="w-1/4 uppercase tracking-wide">
-           <h1 className="font-bold">REFERENCES</h1>
+           <h1 className="font-bold">{SECTION_LABELS.references}</h1>
            {state.resumeEditingMode && (
              <button
                onClick={() => openForm("references", references as Reference[])}
@@ -442,7 +443,7 @@ const MinimalistTemplate = ({
      <div className="mb-6">
        <div className="flex relative">
          <div className="w-1/4 uppercase tracking-wide">
-           <h1 className="font-bold">INTERESTS</h1>
+           <h1 className="font-bold">{SECTION_LABELS.interests}</h1>
            {state.resumeEditingMode && (
              <button
                onClick={() => openForm("interests", interests as string[])}
@@ -470,34 +471,31 @@ const MinimalistTemplate = ({
    );
 
      const renderCustomSections = () => (
-     <div className="mb-6">
-       <div className="flex relative">
-         <div className="w-1/4 uppercase tracking-wide">
-           <h1 className="font-bold">CUSTOM SECTIONS</h1>
-           {state.resumeEditingMode && (
-             <button
-               onClick={() =>
-                 openForm("customSections", customSections as CustomSection[])
-               }
-               className="absolute top-[-10px] right-0 flex items-center gap-1 px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600"
-             >
-               <Plus className="h-3 w-3" />
-               Edit Custom Sections
-             </button>
-           )}
-         </div>
-         <div className="w-3/4 pl-4">
-           {customSections?.map((section, index) => (
-             <div key={index} className="mb-4">
-               <div className="font-bold uppercase tracking-wide mb-1">
-                 {section.title}
-               </div>
+     <>
+       {customSections?.map((section, index) => (
+         <div key={index} className="mb-6">
+           <div className="flex relative">
+             <div className="w-1/4 uppercase tracking-wide">
+               <h1 className="font-bold">{section.title?.toUpperCase()}</h1>
+               {state.resumeEditingMode && (
+                 <button
+                   onClick={() =>
+                     openForm("customSections", customSections as CustomSection[])
+                   }
+                   className="absolute top-[-10px] right-0 flex items-center gap-1 px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600"
+                 >
+                   <Plus className="h-3 w-3" />
+                   Edit Custom Sections
+                 </button>
+               )}
+             </div>
+             <div className="w-3/4 pl-4">
                <div>{section.content}</div>
              </div>
-           ))}
+           </div>
          </div>
-       </div>
-     </div>
+       ))}
+     </>
    );
 
   return (

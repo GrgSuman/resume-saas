@@ -12,6 +12,7 @@ import type {
   CustomSection,
 } from "../../../types/resumeDataType";
 import CircularLoadingIndicator from "../../../components/sections/CircularLoadingIndicator";
+import { SECTION_LABELS } from "../../../lib/constants";
 
 const ExecutiveTemplate = ({
   setActiveForm,
@@ -165,7 +166,7 @@ const ExecutiveTemplate = ({
   const renderSidebarSkills = () => (
     <div className="mb-6">
       <div className="flex justify-between items-center mb-1">
-        <h2 className="font-bold text-white">Skills</h2>
+        <h2 className="font-bold text-white">{SECTION_LABELS.skills}</h2>
         {state.resumeEditingMode && (
           <button
             onClick={() => openForm("skills", skills as SkillCategory[])}
@@ -191,7 +192,7 @@ const ExecutiveTemplate = ({
   const renderSidebarCertifications = () => (
     <div className="mb-6">
       <div className="flex justify-between items-center mb-1">
-        <h2 className="font-bold text-white">Certifications</h2>
+        <h2 className="font-bold text-white">{SECTION_LABELS.certifications}</h2>
         {state.resumeEditingMode && (
           <button
             onClick={() =>
@@ -221,7 +222,7 @@ const ExecutiveTemplate = ({
   const renderSidebarInterests = () => (
     <div className="mb-6">
       <div className="flex justify-between items-center mb-1">
-        <h2 className="font-bold text-white">Interests</h2>
+        <h2 className="font-bold text-white">{SECTION_LABELS.interests}</h2>
         {state.resumeEditingMode && (
           <button
             onClick={() => openForm("interests", interests as string[])}
@@ -244,7 +245,7 @@ const ExecutiveTemplate = ({
 
   const renderAboutMe = () => (
     <div className="mb-6">
-      <h2 className="font-bold text-gray-800 mb-3 border-b border-gray-300 pb-1">About Me</h2>
+        <h2 className="font-bold text-gray-800 mb-3 border-b border-gray-300 pb-1">{SECTION_LABELS.summary}</h2>
       {personalInfo?.summary && (
         <div className="text-gray-700 leading-relaxed">
           {personalInfo.summary}
@@ -256,7 +257,7 @@ const ExecutiveTemplate = ({
   const renderExperience = () => (
     <div className="mb-6">
       <div className="flex justify-between items-center">
-        <h2 className="font-bold text-gray-800 border-b border-gray-300 mb-1">Work Experience</h2>
+        <h2 className="font-bold text-gray-800 border-b border-gray-300 mb-1">{SECTION_LABELS.experience}</h2>
         {state.resumeEditingMode && (
           <button
             onClick={() => openForm("experience", experience as Experience[])}
@@ -299,7 +300,7 @@ const ExecutiveTemplate = ({
   const renderProjects = () => (
     <div className="mb-6">
       <div className="flex justify-between items-center mb-1">
-        <h2 className="font-bold text-gray-800 border-b border-gray-300 pb-1">Projects</h2>
+        <h2 className="font-bold text-gray-800 border-b border-gray-300 pb-1">{SECTION_LABELS.projects}</h2>
         {state.resumeEditingMode && (
           <button
             onClick={() => openForm("projects", projects as Project[])}
@@ -344,7 +345,7 @@ const ExecutiveTemplate = ({
   const renderEducationMain = () => (
     <div className="mb-6">
       <div className="flex justify-between items-center mb-1">
-        <h2 className="font-bold text-gray-800 border-b border-gray-300 pb-1">Education</h2>
+        <h2 className="font-bold text-gray-800 border-b border-gray-300 pb-1">{SECTION_LABELS.education}</h2>
         {state.resumeEditingMode && (
           <button
             onClick={() => openForm("education", education as Education[])}
@@ -378,7 +379,7 @@ const ExecutiveTemplate = ({
   const renderReferencesMain = () => (
     <div className="mb-6">
       <div className="flex justify-between items-center mb-1">
-        <h2 className="font-bold text-gray-800 border-b border-gray-300 pb-1">References</h2>
+        <h2 className="font-bold text-gray-800 border-b border-gray-300 pb-1">{SECTION_LABELS.references}</h2>
         {state.resumeEditingMode && (
           <button
             onClick={() => openForm("references", references as Reference[])}
@@ -408,27 +409,26 @@ const ExecutiveTemplate = ({
   );
 
   const renderSidebarCustomSections = () => (
-    <div className="mb-6">
-      <div className="flex justify-between items-center mb-1">
-        <h2 className="font-bold text-white">Custom Sections</h2>
-        {state.resumeEditingMode && (
-          <button
-            onClick={() =>
-              openForm("customSections", customSections as CustomSection[])
-            }
-            className="flex items-center gap-1 px-1 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600"
-          >
-            <Plus className="h-3 w-3" />
-          </button>
-        )}
-      </div>
+    <>
       {customSections?.map((section, index) => (
-        <div key={index} className="mb-3">
-          <div className="font-bold text-white">{section.title}</div>
+        <div key={index} className="mb-6">
+          <div className="flex justify-between items-center mb-1">
+            <h2 className="font-bold text-white">{section.title?.toUpperCase()}</h2>
+            {state.resumeEditingMode && (
+              <button
+                onClick={() =>
+                  openForm("customSections", customSections as CustomSection[])
+                }
+                className="flex items-center gap-1 px-1 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600"
+              >
+                <Plus className="h-3 w-3" />
+              </button>
+            )}
+          </div>
           <div className="text-gray-300">{section.content}</div>
         </div>
       ))}
-    </div>
+    </>
   );
 
   const getSidebarSections = () => {
