@@ -329,7 +329,20 @@ const ProfessionalTemplate = ({
           <div key={index} className="mb-4">
             <div className="flex justify-between items-start mb-1">
               <div className="font-bold">
-                {exp.role} | {exp.company}
+                {exp.role} | {exp.company && (
+                  (exp.company.startsWith("http://") || exp.company.startsWith("https://")) ? (
+                    <a
+                      href={exp.company}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:underline"
+                    >
+                      {exp.company}
+                    </a>
+                  ) : (
+                    <span>{exp.company}</span>
+                  )
+                )}
               </div>
               <div>
                 {exp.startDate}
