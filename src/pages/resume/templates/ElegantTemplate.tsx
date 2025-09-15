@@ -12,6 +12,7 @@ import type {
   CustomSection,
 } from "../../../types/resumeDataType";
 import CircularLoadingIndicator from "../../../components/sections/CircularLoadingIndicator";
+import { SECTION_LABELS } from "../../../lib/constants";
 
 const ElegantTemplate = ({
   setActiveForm,
@@ -123,7 +124,7 @@ const ElegantTemplate = ({
       {personalInfo?.summary && (
         <div className="mt-6 mb-6">
           <div className="flex items-stretch justify-between">
-            <div className="w-1/4 font-bold tracking-wide uppercase border-r border-gray-300 pr-4">SUMMARY</div>
+            <div className="w-1/4 font-bold tracking-wide uppercase border-r border-gray-300 pr-4">{SECTION_LABELS.summary}</div>
             <div className="w-3/4 pl-6">
               <div>{personalInfo.summary}</div>
             </div>
@@ -136,7 +137,7 @@ const ElegantTemplate = ({
   const renderExperience = () => (
     <div className="mb-6">
       <div className="flex items-stretch justify-between relative">
-        <div className="w-1/4 font-bold tracking-wide uppercase border-r border-gray-300 pr-4">WORK EXPERIENCE</div>
+        <div className="w-1/4 font-bold tracking-wide uppercase border-r border-gray-300 pr-4">{SECTION_LABELS.experience}</div>
         {state.resumeEditingMode && (
           <button
             onClick={() => openForm("experience", experience as Experience[])}
@@ -182,7 +183,7 @@ const ElegantTemplate = ({
   const renderEducation = () => (
     <div className="mb-6">
       <div className="flex items-stretch justify-between relative">
-        <div className="w-1/4 font-bold tracking-wide uppercase border-r border-gray-300 pr-4">EDUCATION</div>
+        <div className="w-1/4 font-bold tracking-wide uppercase border-r border-gray-300 pr-4">{SECTION_LABELS.education}</div>
         {state.resumeEditingMode && (
           <button
             onClick={() => openForm("education", education as Education[])}
@@ -221,7 +222,7 @@ const ElegantTemplate = ({
   const renderProjects = () => (
     <div className="mb-6">
       <div className="flex items-stretch justify-between relative">
-        <div className="w-1/4 font-bold tracking-wide uppercase border-r border-gray-300 pr-4">PROJECTS</div>
+        <div className="w-1/4 font-bold tracking-wide uppercase border-r border-gray-300 pr-4">{SECTION_LABELS.projects}</div>
         {state.resumeEditingMode && (
           <button
             onClick={() => openForm("projects", projects as Project[])}
@@ -267,7 +268,7 @@ const ElegantTemplate = ({
   const renderSkills = () => (
     <div className="mb-6">
       <div className="flex items-stretch justify-between relative">
-        <div className="w-1/4 font-bold tracking-wide uppercase border-r border-gray-300 pr-4">KEY SKILLS</div>
+        <div className="w-1/4 font-bold tracking-wide uppercase border-r border-gray-300 pr-4">{SECTION_LABELS.skills}</div>
         {state.resumeEditingMode && (
           <button
             onClick={() => openForm("skills", skills as SkillCategory[])}
@@ -294,7 +295,7 @@ const ElegantTemplate = ({
   const renderCertifications = () => (
     <div className="mb-6">
       <div className="flex items-stretch justify-between relative">
-        <div className="w-1/4 font-bold tracking-wide uppercase border-r border-gray-300 pr-4">CERTIFICATIONS</div>
+        <div className="w-1/4 font-bold tracking-wide uppercase border-r border-gray-300 pr-4">{SECTION_LABELS.certifications}</div>
         {state.resumeEditingMode && (
           <button
             onClick={() =>
@@ -327,7 +328,7 @@ const ElegantTemplate = ({
   const renderReferences = () => (
     <div className="mb-6">
       <div className="flex items-stretch justify-between relative">
-        <div className="w-1/4 font-bold tracking-wide uppercase border-r border-gray-300 pr-4">REFERENCES</div>
+        <div className="w-1/4 font-bold tracking-wide uppercase border-r border-gray-300 pr-4">{SECTION_LABELS.references}</div>
         {state.resumeEditingMode && (
           <button
             onClick={() => openForm("references", references as Reference[])}
@@ -361,7 +362,7 @@ const ElegantTemplate = ({
   const renderInterests = () => (
     <div className="mb-6">
       <div className="flex items-stretch justify-between relative">
-        <div className="w-1/4 font-bold tracking-wide uppercase border-r border-gray-300 pr-4">INTERESTS</div>
+        <div className="w-1/4 font-bold tracking-wide uppercase border-r border-gray-300 pr-4">{SECTION_LABELS.interests}</div>
         {state.resumeEditingMode && (
           <button
             onClick={() => openForm("interests", interests as string[])}
@@ -386,30 +387,29 @@ const ElegantTemplate = ({
   );
 
   const renderCustomSections = () => (
-    <div className="mb-6">
-      <div className="flex items-stretch justify-between relative">
-        <div className="w-1/4 font-bold tracking-wide uppercase border-r border-gray-300 pr-4">CUSTOM SECTIONS</div>
-        {state.resumeEditingMode && (
-          <button
-            onClick={() =>
-              openForm("customSections", customSections as CustomSection[])
-            }
-            className="absolute right-0 -top-2 flex items-center gap-1 px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600"
-          >
-            <Plus className="h-3 w-3" />
-            Edit Custom Sections
-          </button>
-        )}
-        <div className="w-3/4 pl-6">
-          {customSections?.map((section, index) => (
-            <div key={index} className="mb-4">
-              <div className="font-bold mb-1 uppercase tracking-wide">{section.title}</div>
+    <>
+      {customSections?.map((section, index) => (
+        <div key={index} className="mb-6">
+          <div className="flex items-stretch justify-between relative">
+            <div className="w-1/4 font-bold tracking-wide uppercase border-r border-gray-300 pr-4">{section.title?.toUpperCase()}</div>
+            {state.resumeEditingMode && (
+              <button
+                onClick={() =>
+                  openForm("customSections", customSections as CustomSection[])
+                }
+                className="absolute right-0 -top-2 flex items-center gap-1 px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600"
+              >
+                <Plus className="h-3 w-3" />
+                Edit Custom Sections
+              </button>
+            )}
+            <div className="w-3/4 pl-6">
               <div>{section.content}</div>
             </div>
-          ))}
+          </div>
         </div>
-      </div>
-    </div>
+      ))}
+    </>
   );
 
   return (

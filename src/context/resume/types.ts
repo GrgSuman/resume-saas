@@ -25,6 +25,7 @@ export type Section = {
     key: string
     order: number
     visible: boolean
+    title?: string
 }
 
 export type ResumeSettings = {

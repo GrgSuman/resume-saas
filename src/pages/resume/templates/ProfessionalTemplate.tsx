@@ -12,12 +12,31 @@ import type {
   CustomSection,
 } from "../../../types/resumeDataType";
 import CircularLoadingIndicator from "../../../components/sections/CircularLoadingIndicator";
+import { SECTION_LABELS } from "../../../lib/constants";
 
-
-const ProfessionalTemplate = ({setActiveForm,setFormData}:{setActiveForm: (formType: string | null) => void,setFormData: (data: PersonalInfo | Education[] | Experience[] | Project[] | SkillCategory[] | Certification[] | Reference[] | string[] | CustomSection[] | null) => void}) => {
+const ProfessionalTemplate = ({
+  setActiveForm,
+  setFormData,
+}: {
+  setActiveForm: (formType: string | null) => void;
+  setFormData: (
+    data:
+      | PersonalInfo
+      | Education[]
+      | Experience[]
+      | Project[]
+      | SkillCategory[]
+      | Certification[]
+      | Reference[]
+      | string[]
+      | CustomSection[]
+      | null
+  ) => void;
+}) => {
   const { state } = useResume();
 
-  if (!state.resumeData || !state.resumeSettings) return <CircularLoadingIndicator />;
+  if (!state.resumeData || !state.resumeSettings)
+    return <CircularLoadingIndicator />;
 
   const {
     personalInfo,
@@ -47,8 +66,6 @@ const ProfessionalTemplate = ({setActiveForm,setFormData}:{setActiveForm: (formT
     setActiveForm(formType);
     setFormData(data);
   };
-
-
 
   const renderPersonalInfo = () => (
     <div className="mb-6 bg-white">
@@ -155,7 +172,7 @@ const ProfessionalTemplate = ({setActiveForm,setFormData}:{setActiveForm: (formT
       {personalInfo?.summary && (
         <div className="mb-4">
           <div className="bg-gray-100 px-3 py-1 mb-2">
-            <h2 className="font-bold uppercase">SUMMARY</h2>
+            <h2 className="font-bold uppercase">{SECTION_LABELS.summary}</h2>
           </div>
           <div className="px-2">
             <p>{personalInfo.summary}</p>
@@ -169,7 +186,7 @@ const ProfessionalTemplate = ({setActiveForm,setFormData}:{setActiveForm: (formT
     <div className="mb-6 bg-white">
       <div className="flex justify-between items-center mb-2">
         <div className="bg-gray-100 px-3 py-2 flex-1">
-          <h2 className="font-bold uppercase">TECHNICAL SKILLS</h2>
+          <h2 className="font-bold uppercase">{SECTION_LABELS.skills}</h2>
         </div>
         {state.resumeEditingMode && (
           <button
@@ -208,7 +225,7 @@ const ProfessionalTemplate = ({setActiveForm,setFormData}:{setActiveForm: (formT
     <div className="mb-6 bg-white">
       <div className="flex justify-between items-center mb-2">
         <div className="bg-gray-100 px-3 py-2 flex-1">
-          <h2 className="font-bold uppercase">PROJECTS</h2>
+          <h2 className="font-bold uppercase">{SECTION_LABELS.projects}</h2>
         </div>
         {state.resumeEditingMode && (
           <button
@@ -252,7 +269,7 @@ const ProfessionalTemplate = ({setActiveForm,setFormData}:{setActiveForm: (formT
     <div className="mb-6 bg-white">
       <div className="flex justify-between items-center mb-2">
         <div className="bg-gray-100 px-3 py-2 flex-1">
-          <h2 className="font-bold uppercase">EDUCATION</h2>
+          <h2 className="font-bold uppercase">{SECTION_LABELS.education}</h2>
         </div>
         {state.resumeEditingMode && (
           <button
@@ -294,7 +311,7 @@ const ProfessionalTemplate = ({setActiveForm,setFormData}:{setActiveForm: (formT
     <div className="mb-6 bg-white">
       <div className="flex justify-between items-center mb-2">
         <div className="bg-gray-100 px-3 py-2 flex-1">
-          <h2 className="font-bold uppercase">WORK EXPERIENCE</h2>
+          <h2 className="font-bold uppercase">{SECTION_LABELS.experience}</h2>
         </div>
         {state.resumeEditingMode && (
           <button
@@ -343,7 +360,7 @@ const ProfessionalTemplate = ({setActiveForm,setFormData}:{setActiveForm: (formT
     <div className="mb-6 bg-white">
       <div className="flex justify-between items-center mb-2">
         <div className="bg-gray-100 px-3 py-2 flex-1">
-          <h2 className="font-bold uppercase">AWARDS & ACHIEVEMENTS</h2>
+          <h2 className="font-bold uppercase">{SECTION_LABELS.certifications}</h2>
         </div>
         {state.resumeEditingMode && (
           <button
@@ -380,7 +397,7 @@ const ProfessionalTemplate = ({setActiveForm,setFormData}:{setActiveForm: (formT
     <div className="mb-6 bg-white">
       <div className="flex justify-between items-center mb-2">
         <div className="bg-gray-100 px-3 py-2 flex-1">
-          <h2 className="font-bold uppercase">REFERENCES</h2>
+          <h2 className="font-bold uppercase">{SECTION_LABELS.references}</h2>
         </div>
         {state.resumeEditingMode && (
           <button
@@ -423,7 +440,7 @@ const ProfessionalTemplate = ({setActiveForm,setFormData}:{setActiveForm: (formT
     <div className="mb-6 bg-white">
       <div className="flex justify-between items-center mb-2">
         <div className="bg-gray-100 px-3 py-2 flex-1">
-          <h2 className="font-bold uppercase">INTERESTS</h2>
+          <h2 className="font-bold uppercase">{SECTION_LABELS.interests}</h2>
         </div>
         {state.resumeEditingMode && (
           <button
@@ -449,35 +466,33 @@ const ProfessionalTemplate = ({setActiveForm,setFormData}:{setActiveForm: (formT
   );
 
   const renderCustomSections = () => (
-    <div className="mb-6 bg-white">
-      <div className="flex justify-between items-center mb-2">
-        <div className="bg-gray-100 px-3 py-2 flex-1">
-          <h2 className="font-bold uppercase">CUSTOM SECTIONS</h2>
-        </div>
-        {state.resumeEditingMode && (
-          <button
-            onClick={() =>
-              openForm("customSections", customSections as CustomSection[])
-            }
-            className="flex items-center gap-1 px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 ml-2"
-          >
-            <Plus className="h-3 w-3" />
-            Edit Custom Sections
-          </button>
-        )}
-      </div>
-
-      <div className="px-2">
-        {customSections?.map((section, index) => (
-          <div key={index} className="mb-3">
-            <div className="font-bold mb-1">{section.title}</div>
-            <div>
-              <div>{section.content}</div>
+    <>
+      {customSections?.map((section, index) => (
+        <div key={index} className="mb-6 bg-white">
+          <div className="flex justify-between items-center mb-2">
+            <div className="bg-gray-100 px-3 py-2 flex-1">
+              <h2 className="font-bold uppercase">
+                {section.title?.toUpperCase()}
+              </h2>
             </div>
+            {state.resumeEditingMode && (
+              <button
+                onClick={() =>
+                  openForm("customSections", customSections as CustomSection[])
+                }
+                className="flex items-center gap-1 px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 ml-2"
+              >
+                <Plus className="h-3 w-3" />
+                Edit Custom Sections
+              </button>
+            )}
           </div>
-        ))}
-      </div>
-    </div>
+          <div>
+            <div className="px-2">{section.content}</div>
+          </div>
+        </div>
+      ))}
+    </>
   );
 
   return (
@@ -512,7 +527,6 @@ const ProfessionalTemplate = ({setActiveForm,setFormData}:{setActiveForm: (formT
           }
           return null;
         })}
-
     </>
   );
 };
