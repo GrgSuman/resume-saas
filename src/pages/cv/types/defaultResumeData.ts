@@ -1,9 +1,9 @@
 import { ResumeSectionKey } from "./constants";
 import type { ResumeMetaData } from "./resume";
 
-
-
 export const defaultResumeData: ResumeMetaData = {
+    resumeTitle: "Alex Chen's Resume",
+    jobDescription: "Full Stack MERN Developer",
     resumeError: null,
     resumeLoading: false,
     resumeSettings:{
