@@ -1,5 +1,4 @@
 import { loadStripe } from "@stripe/stripe-js";
-import DashboardHeader from "../../components/layouts/DashboardHeader";
 import { toast } from "sonner";
 import axiosInstance from "../../api/axios";
 import { AxiosError } from "axios";
@@ -103,7 +102,6 @@ const Credits = () => {
 
   return (
     <div className="bg-slate-50 min-h-screen">
-      <DashboardHeader />
 
       {/* Header */}
       <div className="bg-white border-b border-slate-200">

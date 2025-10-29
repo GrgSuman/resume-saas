@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const [authStates, setAuthStates] = useState<AuthStates>({
         isAuthenticated: false,
-        isLoading: false,
+        isLoading: true,
         error: null
     });
 

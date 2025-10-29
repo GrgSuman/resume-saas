@@ -1,4 +1,3 @@
-import DashboardHeader from "../../components/layouts/DashboardHeader"
 import { useState } from "react";
 import { 
   User, 
@@ -54,7 +53,6 @@ const UserDetails = () => {
 
   return (
     <div className="bg-slate-50 min-h-screen">
-      <DashboardHeader />
       <div className="max-w-7xl mx-auto p-4 md:p-6">
         {/* Header */}
         <div className="mb-8">
