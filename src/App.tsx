@@ -1,6 +1,4 @@
 import { Route, Routes } from "react-router";
-import Dashboard from "./pages/dashboard/Dashboard";
-import ResumeDetail from "./pages/resume/ResumeDetail";
 import "./App.css";
 import Login from "./pages/auth/Login";
 import Layout from "./components/layouts/BaseLayout";
@@ -13,7 +11,11 @@ import Credits from "./pages/credits/Credits";
 import SuccessPage from "./pages/credits/SuccessPage";
 import Home from "./pages/home/Home";
 import { ToastContainer } from "react-toastify";
-
+import DashboardNew from "./pages/cv/DashboardNew";
+import ResumeList from "./pages/cv/resume/ResumeList";
+import BaseDashboardLayout from "./pages/cv/components/BaseDashboardLayout";
+import ResumeDetail from "./pages/cv/resume-detail/ResumeDetail";
+import { ResumeProvider } from "./pages/cv/context/ResumeContext";
 function App() {
   const queryClient = new QueryClient();
   return (
@@ -30,17 +32,22 @@ function App() {
 
               {/* Dashboard and Protected Routes */}
               <Route path="/dashboard" element={<PrivateRoute />}>
-                <Route path="/dashboard" index element={<Dashboard />} />
-                <Route path="/dashboard/credits" element={<Credits />} />
-                <Route path="/dashboard/resume/:id" element={<ResumeDetail />} />
-                <Route path="/dashboard/profile" element={<UserDetails />} />
+                  <Route path="/dashboard" element={<BaseDashboardLayout/>}>
+                  <Route index element={<DashboardNew />} />
+                  <Route path="/dashboard/resume" element={<ResumeList />} />
+                  <Route path="/dashboard/credits" element={<Credits />} />
+                  <Route path="/dashboard/profile" element={<UserDetails />} />
+                </Route>
+                <Route path="/dashboard/resume/:id" element={
+                  <ResumeProvider>
+                    <ResumeDetail/>
+                  </ResumeProvider>
+                } />
               </Route>
 
             <Route path="/dashboard/credits/success" element={<SuccessPage />} />
 
             </Routes>
-
-
         </AuthProvider>
       </GoogleOAuthProvider>
     </QueryClientProvider>

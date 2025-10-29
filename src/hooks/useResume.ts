@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import ResumeContext from "../context/resume/ResumeContext";
+import ResumeContext from "../pages/cv/context/ResumeContext";
 
     // Custom hook for using the context
 export const useResume = () => {
