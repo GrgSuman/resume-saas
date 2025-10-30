@@ -9,7 +9,7 @@ import NewResumeForm from "./NewResumeForm";
 import ResumeCardUI from "./ResumeCardUI";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { useAuth } from "../../../hooks/useAuth";
+// import { useAuth } from "../../../hooks/useAuth";
 
 const ResumeList = () => {
   const [isNewResumeOpen, setIsNewResumeOpen] = useState(false);
@@ -17,7 +17,7 @@ const ResumeList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { deductCredits } = useAuth();
+  // const { deductCredits } = useAuth();
 
   const {
     data: resumeData,
@@ -61,7 +61,7 @@ const ResumeList = () => {
     onSuccess: (data) => {
       toast.success("Resume created successfully!");
       queryClient.invalidateQueries({ queryKey: ["resumes"] });
-      deductCredits("CREATE_RESUME");
+      // deductCredits("CREATE_RESUME");
       setIsNewResumeOpen(false);
       navigate(`/dashboard/resume/${data.resume.id}`);
     },

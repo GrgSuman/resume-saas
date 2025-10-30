@@ -9,8 +9,9 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { Button } from "../../../components/ui/button";
-import { useResume } from '../../../hooks/useResume'
+import { useResume } from "../../../hooks/useResume";
 import LoadingResumeDetail from "./LoadingResumeDetail";
+import TEMPLATE_REGISTRY from "./templates/TemplateRegistry";
 const ResumeDetail = () => {
   const [activeTab, setActiveTab] = useState<"settings" | "preview" | "chat">(
     "preview"
@@ -21,7 +22,7 @@ const ResumeDetail = () => {
 
   return (
     <>
-      {state===null || state.resumeLoading ? (
+      {state === null || state.resumeLoading ? (
         <LoadingResumeDetail />
       ) : (
         <>
@@ -31,7 +32,7 @@ const ResumeDetail = () => {
               <Settings htmlRef={htmlRef} />
 
               <div className="flex-1 bg-[#f9f8f7] overflow-hidden relative">
-                <ResumePreview htmlRef={htmlRef} />
+                <ResumePreview/>
               </div>
 
               <div className="w-96 flex overflow-hidden flex-col shadow-xl">
@@ -100,7 +101,7 @@ const ResumeDetail = () => {
                 )}
                 {activeTab === "preview" && (
                   <div className="h-full bg-gray-100">
-                    <ResumePreview htmlRef={htmlRef} />
+                    <ResumePreview/>
                   </div>
                 )}
                 {activeTab === "chat" && (
@@ -110,6 +111,31 @@ const ResumeDetail = () => {
                 )}
               </div>
             </div>
+
+            {/* Hidden section for printing */}
+            <section ref={htmlRef} className="hidden">
+              <div
+                style={{
+                  maxWidth: "210mm",
+                  minWidth: "210mm",
+                  minHeight: "297mm",
+                  backgroundColor: "white",
+                  fontSize: `${state.resumeSettings?.fontSize}px`,
+                  boxSizing: "border-box",
+                  fontFamily: state.resumeSettings?.fontFamily,
+                  lineHeight: `${state.resumeSettings?.lineHeight ?? "1.4"}em`,
+                }}
+              >
+                <TEMPLATE_REGISTRY
+                  resumeData={state.resumeData}
+                  resumeSettings={state.resumeSettings}
+                  openForms={() => {}}
+                  templateName={
+                    state.resumeSettings?.template ?? "professional"
+                  }
+                />
+              </div>
+            </section>
           </div>
         </>
       )}

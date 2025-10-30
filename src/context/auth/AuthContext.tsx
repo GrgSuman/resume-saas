@@ -10,6 +10,7 @@ type User = {
     token: string;
     role: string;
     credits: number;
+    isPaidUser?: boolean;
 }
 
 type AuthStates = {
@@ -82,6 +83,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 if (data.success) {
                     // Token is valid
                     setUser(data.user);
+                    console.log(data.user);
                     setAuthStates({
                         isAuthenticated: true,
                         isLoading: false,

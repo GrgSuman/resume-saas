@@ -11,11 +11,12 @@ import Credits from "./pages/credits/Credits";
 import SuccessPage from "./pages/credits/SuccessPage";
 import Home from "./pages/home/Home";
 import { ToastContainer } from "react-toastify";
-import DashboardNew from "./pages/cv/DashboardNew";
-import ResumeList from "./pages/cv/resume/ResumeList";
-import BaseDashboardLayout from "./pages/cv/components/BaseDashboardLayout";
-import ResumeDetail from "./pages/cv/resume-detail/ResumeDetail";
-import { ResumeProvider } from "./pages/cv/context/ResumeContext";
+import DashboardNew from "./pages/dashboard/DashboardNew";
+import ResumeList from "./pages/dashboard/resume/ResumeList";
+import BaseDashboardLayout from "./pages/dashboard/components/BaseDashboardLayout";
+import ResumeDetail from "./pages/dashboard/resume-detail/ResumeDetail";
+import { ResumeProvider } from "./pages/dashboard/context/ResumeContext";
+import NotificationBannar from "./components/layouts/NotificationBannar";
 function App() {
   const queryClient = new QueryClient();
   return (
@@ -23,6 +24,7 @@ function App() {
        <ToastContainer />
       <GoogleOAuthProvider clientId="620421156218-5b2p94rdcismn2eqr8afggor7tqd2sum.apps.googleusercontent.com">
         <AuthProvider>
+          <NotificationBannar />
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<Layout />}>
