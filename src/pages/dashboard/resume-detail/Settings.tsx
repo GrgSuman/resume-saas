@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useCallback, useMemo } from "react";
+import { flushSync } from "react-dom";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Button } from "../../../components/ui/button";
@@ -219,6 +220,14 @@ const Settings = ({
   };
 
   const handleExport = async () => {
+    const previousEditMode = editMode;
+
+    // Force turn off edit mode and flush DOM updates before reading HTML
+    flushSync(() => {
+      dispatch({ type: "SET_EDITING_MODE", payload: false });
+    });
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+
     // Export logic here
     if (htmlRef.current) {
       const htmlContent = htmlRef.current.innerHTML;
@@ -264,6 +273,10 @@ const Settings = ({
           toast.error("Failed to download PDF");
         }
       } finally {
+        // Restore previous edit mode state after export attempt
+        flushSync(() => {
+          dispatch({ type: "SET_EDITING_MODE", payload: previousEditMode });
+        });
         dispatch({ type: "SET_DOWNLOADING", payload: false });
       }
     }

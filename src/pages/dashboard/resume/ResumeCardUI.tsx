@@ -10,7 +10,7 @@ import EditTitleModal from "./EditTitleModal";
 import DeleteResumeModal from "./DeleteResumeModal";
 import { toast } from "react-toastify";
 import { AxiosError } from "axios";
-import { useAuth } from "../../../hooks/useAuth";
+// import { useAuth } from "../../../hooks/useAuth";
 
 interface ResumeCardUIProps {
   resume: {
@@ -45,7 +45,7 @@ const ResumeCardUI = ({ resume }: ResumeCardUIProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { deductCredits } = useAuth();
+  // const { deductCredits } = useAuth();
 
 
   // Edit title mutation
@@ -74,7 +74,7 @@ const ResumeCardUI = ({ resume }: ResumeCardUIProps) => {
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["resumes"] });
-      deductCredits('CLONE_RESUME');
+      // deductCredits('CLONE_RESUME');
       setIsDeleteModalOpen(false);
     },
     onError: (error) => {

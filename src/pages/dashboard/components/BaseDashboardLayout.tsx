@@ -252,7 +252,8 @@ const BaseDashboardLayout = () => {
                           {user?.name}
                         </p>
                         <div className="px-2 py-0.5 bg-blue-100 text-[#7060fc] text-xs font-semibold rounded">
-                          {user?.credits} Credits
+                          {/* {user?.credits} Credits */}
+                          {user?.isPaidUser ? "Pro Plan" : "Free Plan"}
                         </div>
                       </div>
                       <p className="text-xs text-slate-600">{user?.email}</p>

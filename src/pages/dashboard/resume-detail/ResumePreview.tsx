@@ -6,11 +6,7 @@ import { ResumeSectionKey } from "../types/constants";
 import TEMPLATE_REGISTRY from "./templates/TemplateRegistry";
 
 
-const ResumePreview = ({
-  htmlRef,
-}: {
-  htmlRef: React.RefObject<HTMLDivElement | null>;
-}) => {
+const ResumePreview = () => {
   const { state } = useResume();
   const checkHeightRef = useRef<HTMLDivElement>(null); //checking the height of the page
   const [height, setHeight] = useState(0); //height of the page
@@ -117,29 +113,6 @@ const ResumePreview = ({
         onClose={() => setIsFormsOpen(false)}
         sectionKey={sectionKey}
       />
-
-      {/* Hidden section for printing */}
-      <section ref={htmlRef} className="hidden">
-        <div
-          style={{
-            maxWidth: "210mm",
-            minWidth: "210mm",
-            minHeight: "297mm",
-            backgroundColor: "white",
-            fontSize: `${state.resumeSettings?.fontSize}px`,
-            boxSizing: "border-box",
-            fontFamily: state.resumeSettings?.fontFamily,
-            lineHeight: `${state.resumeSettings?.lineHeight ?? "1.4"}em`,
-          }}
-        >
-          <TEMPLATE_REGISTRY
-            resumeData={state.resumeData}
-            resumeSettings={state.resumeSettings}
-            openForms={openForms}
-            templateName={state.resumeSettings?.template ?? "professional"}
-          />
-        </div>
-      </section>
     </>
   );
 };

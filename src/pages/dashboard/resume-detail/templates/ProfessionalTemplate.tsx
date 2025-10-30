@@ -131,9 +131,9 @@ const ProfessionalTemplate = ({resumeData, resumeSettings, openForms }: {resumeD
             <div key={index}>
               <div className="flex justify-between items-start mb-1">
                   <h3 className="font-bold">{edu.degree}</h3>
-                  <span>{edu.dateRange}</span>
+                  <p className="font-medium">{edu.dateRange}</p>
               </div>
-              <p className="font-bold">{edu.institution}, {edu.grade ? `GPA: ${edu.grade}` : ''}</p>
+              <p>{edu.institution}, {edu.grade ? `GPA: ${edu.grade}` : ''}</p>
               {edu.description && <p className="mt-1">{edu.description}</p>}
             </div>
           ))}
