@@ -292,17 +292,20 @@ const ModernTemplate = ({
           sectionKey="references"
         />
         <div className="space-y-2 pl-3">
-          {data.references?.map((ref, index) => (
-            <div key={index} className="mb-3">
-              <div className=" mb-1">
-                <h3 className="font-bold ">{ref.name}</h3>
-                <p className="font-medium">
-                  {ref.position} | {ref.company} | {ref.contact}
-                </p>
+          {data.references?.map((ref, index) => {
+            const refDetails = [ref.position, ref.company, ref.contact].filter(Boolean)
+            return (
+              <div key={index} className="mb-3">
+                <div className=" mb-1">
+                  <h3 className="font-bold ">{ref.name}</h3>
+                  {refDetails.length > 0 && (
+                    <p className="font-medium">{refDetails.join(' | ')}</p>
+                  )}
+                </div>
+                {ref.description && <p className="mt-[2px]">{ref.description}</p>}
               </div>
-              {ref.description && <p className="mt-[2px]">{ref.description}</p>}
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
     );

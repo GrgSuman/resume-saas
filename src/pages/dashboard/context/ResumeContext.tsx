@@ -74,11 +74,9 @@ const resumeReducer = (state: ResumeMetaData | null, action: ResumeAction) => {
             return { ...state, resumeTitle: action.payload.resumeTitle, resumeData: action.payload.resumeData, resumeSettings: action.payload.resumeSettings, jobDescription: action.payload.jobDescription };
 
         case 'UPDATE_RESUME_DATA':
-            console.log("update resume data", action.payload);
             return { ...state,resumeData: { ...state.resumeData, ...action.payload } };
 
         case 'UPDATE_RESUME_SETTINGS':
-            console.log("update resume settings", action.payload);
             return { ...state, resumeSettings: { ...state.resumeSettings, ...action.payload } };
 
         default:

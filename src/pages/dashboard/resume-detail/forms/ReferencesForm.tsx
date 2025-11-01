@@ -40,12 +40,6 @@ const ReferencesForm = ({ onClose }: { onClose: () => void }) => {
       if (!reference.name?.trim()) {
         newErrors[`${index}-name`] = 'Name is required'
       }
-      if (!reference.position?.trim()) {
-        newErrors[`${index}-position`] = 'Position is required'
-      }
-      if (!reference.company?.trim()) {
-        newErrors[`${index}-company`] = 'Company is required'
-      }
     })
     
     setErrors(newErrors)
