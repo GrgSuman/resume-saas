@@ -379,7 +379,7 @@ const Chat = () => {
                   onChange={(e) => setMessage(e.target.value)}
                   onKeyDown={handleKeyPress}
                   placeholder="Ask anything about your resume..."
-                  className="w-full text-sm resize-none focus:outline-none bg-transparent transition-all duration-200"
+                  className="w-full text-[16px] resize-none focus:outline-none bg-transparent transition-all duration-200"
                   rows={3}
                   style={{ minHeight: "60px", maxHeight: "200px" }}
                 />
