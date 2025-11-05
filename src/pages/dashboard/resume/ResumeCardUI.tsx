@@ -17,27 +17,10 @@ interface ResumeCardUIProps {
     id: string;
     title: string;
     updatedAt: string;
+    bgColor?:string;
+    emoji?:string
   };
 }
-
-const colors = [
-  '#E3F2FD', // Light Blue (calm)
-  '#F3E5F5', // Lavender (soft purple)
-  '#E8F5E9', // Mint Green (fresh)
-  '#FFF3E0', // Soft Orange (warm)
-  '#E0F7FA', // Aqua (cool + clean)
-  '#FFF0F6', // Pink Tint (gentle)
-  '#FFFDE7', // Pale Yellow (cheerful)
-  '#F9FBE7', // Soft Lime (energetic but subtle)
-  '#F1F8E9', // Green Tint (natural)
-  '#ECEFF1', // Cool Gray (neutral)
-]
-
-
-const emojis = [
-  '💼', '📄', '🎯', '🚀', '⭐', '💡', '🎨', '🔧', '📊', '🌟',
-  '🎪', '🎭', '🎪', '🎨', '🎯', '🎪', '🎭', '🎪', '🎨', '🎯'
-]
 
 const ResumeCardUI = ({ resume }: ResumeCardUIProps) => {
   const [isEditTitleOpen, setIsEditTitleOpen] = useState(false);
@@ -100,11 +83,6 @@ const ResumeCardUI = ({ resume }: ResumeCardUIProps) => {
     },
   });
 
-  const colorIndex = Math.abs(resume.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % colors.length;
-  const emojiIndex = Math.abs(resume.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % emojis.length;
-  const selectedColor = colors[colorIndex];
-  const selectedEmoji = emojis[emojiIndex];
-
   const handleEditTitle = (newTitle: string) => {
     editTitleMutation.mutate(newTitle);
   };
@@ -133,11 +111,10 @@ const ResumeCardUI = ({ resume }: ResumeCardUIProps) => {
       <div 
         onClick={() => navigate(`/dashboard/resume/${resume.id}`)} 
         className="group relative cursor-pointer rounded-2xl backdrop-blur-sm border  transition-all duration-300 hover:scale-105 p-6 flex flex-col h-[220px]"
-        style={{ backgroundColor: selectedColor }}
+        style={{ backgroundColor: resume.bgColor }}
       >
         <div className="flex items-start justify-between mb-4">
-          <span className="text-4xl">{selectedEmoji}</span>
-          
+          <span className="text-4xl">{resume.emoji}</span>
           {/* Dropdown Menu */}
           <DropdownMenu 
             open={isDropdownOpen} 
@@ -195,7 +172,7 @@ const ResumeCardUI = ({ resume }: ResumeCardUIProps) => {
         {/* Date Info */}
         <div className="mt-auto">
           <p className="text-sm text-slate-600 font-medium">
-            Updated {new Date(resume.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+            Last opened {new Date(resume.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
           </p>
         </div>
       </div>
