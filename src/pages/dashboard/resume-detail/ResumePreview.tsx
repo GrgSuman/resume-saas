@@ -4,16 +4,57 @@ import { useResume } from "../../../hooks/useResume";
 import Forms from "./forms/Forms";
 import { ResumeSectionKey } from "../types/constants";
 import TEMPLATE_REGISTRY from "./templates/TemplateRegistry";
+import ResumeWritingLoader from "./ResumeWritingLoader";
+import { manageLocalStorage } from "../../../lib/localstorage";
+import axiosInstance from "../../../api/axios";
 
 
 const ResumePreview = () => {
-  const { state } = useResume();
+  const { state,dispatch } = useResume();
   const checkHeightRef = useRef<HTMLDivElement>(null); //checking the height of the page
   const [height, setHeight] = useState(0); //height of the page
   const [isFormsOpen, setIsFormsOpen] = useState(false);
+  const [showSkeleton, setShowSkeleton] = useState(false);
+  
   const [sectionKey, setSectionKey] = useState<
     (typeof ResumeSectionKey)[keyof typeof ResumeSectionKey]
   >(ResumeSectionKey.PERSONAL_INFO);
+
+  useEffect(() => {
+    const fetchResumeData = async () => {
+      const jobTitleForResume = manageLocalStorage.get("jobTitleForResume");
+
+      if (!jobTitleForResume) {
+        setShowSkeleton(false);
+        return;
+      }
+  
+      setShowSkeleton(true);
+
+      try {
+        const response = await axiosInstance.post("/resumegpt/generate-sample-resume", {
+          jobTitle: jobTitleForResume,
+        });
+        
+        dispatch({
+          type: "UPDATE_RESUME_SETTINGS",
+          payload: response.data.resumeSettings
+        });
+        
+        dispatch({
+          type: "UPDATE_RESUME_DATA",
+          payload: response.data.resumeData
+        });
+
+        manageLocalStorage.remove("jobTitleForResume");
+      } catch (error) {
+        console.error("Error generating resume:", error);
+      } finally {
+        setShowSkeleton(false);
+      }
+    };
+    fetchResumeData();
+  }, [dispatch]);
 
   useEffect(() => {
     checkHeight();
@@ -67,47 +108,52 @@ const ResumePreview = () => {
     setIsFormsOpen(true);
   };
 
+
   return (
     <>
+      {showSkeleton ? (
+        <ResumeWritingLoader />
+      ) : (
       <ScrollArea className="w-full h-full">
-        <div className="flex justify-center items-center px-4 py-2">
-          <div
-            className={`bg-background
-         transition-all ${
-           state.resumeEditingMode
-             ? "ring-2 ring-primary ring-opacity-40 shadow-lg"
-             : ""
-         }`}
-            style={{
-              minWidth: "210mm",
-              minHeight: "297mm",
-              maxWidth: "210mm",
-              transform: "scale(0.92)",
-            }}
-          >
+          <div className="flex justify-center items-center px-4 py-2">
             <div
-              ref={checkHeightRef}
+              className={`bg-background
+           transition-all ${
+             state.resumeEditingMode
+               ? "ring-2 ring-primary ring-opacity-40 shadow-lg"
+               : ""
+           }`}
               style={{
-                position: "relative",
-                fontSize: `${state.resumeSettings?.fontSize ?? 14}px`,
-                fontFamily: state.resumeSettings?.fontFamily ?? "Lato",
-                padding: "28px",
-                lineHeight: `${state.resumeSettings?.lineHeight ?? "1.4"}em`,
+                minWidth: "210mm",
+                minHeight: "297mm",
+                maxWidth: "210mm",
+                transform: "scale(0.92)",
               }}
             >
-              {!state.resumeEditingMode && pageBreaks}
-              <TEMPLATE_REGISTRY
-                resumeData={state.resumeData}
-                resumeSettings={state.resumeSettings}
-                openForms={openForms}
-                templateName={state.resumeSettings?.template ?? "professional"}
-              />
+              <div
+                ref={checkHeightRef}
+                style={{
+                  position: "relative",
+                  fontSize: `${state.resumeSettings?.fontSize ?? 14}px`,
+                  fontFamily: state.resumeSettings?.fontFamily ?? "Lato",
+                  padding: "28px",
+                  lineHeight: `${state.resumeSettings?.lineHeight ?? "1.4"}em`,
+                }}
+              >
+                {!state.resumeEditingMode && pageBreaks}
+                <TEMPLATE_REGISTRY
+                  resumeData={state.resumeData}
+                  resumeSettings={state.resumeSettings}
+                  openForms={openForms}
+                  templateName={state.resumeSettings?.template ?? "professional"}
+                />
+              </div>
             </div>
           </div>
-        </div>
         <ScrollBar orientation="horizontal" />
         <ScrollBar orientation="vertical" />
       </ScrollArea>
+      )}
       <Forms
         isOpen={isFormsOpen}
         onClose={() => setIsFormsOpen(false)}

@@ -5,21 +5,19 @@ import Chat from "./Chat";
 import {
   ArrowLeft,
   Settings as SettingsIcon,
-  Eye,
   MessageSquare,
 } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { useResume } from "../../../hooks/useResume";
 import LoadingResumeDetail from "./LoadingResumeDetail";
 import TEMPLATE_REGISTRY from "./templates/TemplateRegistry";
+
 const ResumeDetail = () => {
-  const [activeTab, setActiveTab] = useState<"settings" | "preview" | "chat">(
-    "preview"
-  );
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const { state } = useResume();
   const htmlRef = useRef<HTMLDivElement>(null);
-
   return (
     <>
       {state === null || state.resumeLoading ? (
@@ -41,7 +39,7 @@ const ResumeDetail = () => {
             </div>
 
             {/* Mobile/Tablet Layout */}
-            <div className="xl:hidden flex flex-col h-full">
+            <div className="xl:hidden flex flex-col h-full relative">
               {/* Header */}
               <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
                 <div className="flex items-center gap-3">
@@ -55,61 +53,69 @@ const ResumeDetail = () => {
                 </div>
               </div>
 
-              {/* Tab Navigation */}
-              <div className="flex border-b border-gray-200 bg-white">
-                <button
-                  onClick={() => setActiveTab("settings")}
-                  className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium transition-colors ${
-                    activeTab === "settings"
-                      ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
-                      : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  <SettingsIcon className="h-4 w-4" />
-                  Settings
-                </button>
-                <button
-                  onClick={() => setActiveTab("preview")}
-                  className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium transition-colors ${
-                    activeTab === "preview"
-                      ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
-                      : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  <Eye className="h-4 w-4" />
-                  Preview
-                </button>
-                <button
-                  onClick={() => setActiveTab("chat")}
-                  className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium transition-colors ${
-                    activeTab === "chat"
-                      ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
-                      : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  <MessageSquare className="h-4 w-4" />
-                  Chat
-                </button>
+              {/* Preview - Always Visible */}
+              <div className="flex-1 overflow-hidden bg-[#f9f8f7]">
+                <ResumePreview/>
               </div>
 
-              {/* Tab Content */}
-              <div className="flex-1 overflow-hidden">
-                {activeTab === "settings" && (
-                  <div className="h-full">
-                    <Settings htmlRef={htmlRef} />
-                  </div>
-                )}
-                {activeTab === "preview" && (
-                  <div className="h-full bg-gray-100">
-                    <ResumePreview/>
-                  </div>
-                )}
-                {activeTab === "chat" && (
-                  <div className="h-full">
-                    <Chat />
-                  </div>
-                )}
+              {/* Floating Action Buttons */}
+              <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-50">
+                {/* Settings FAB */}
+                <Button
+                  onClick={() => setIsSettingsOpen(true)}
+                  size="icon"
+                  className="h-14 w-14 rounded-full shadow-lg"
+                  title="Settings"
+                >
+                  <SettingsIcon className="h-6 w-6" />
+                </Button>
+
+                {/* Chat FAB */}
+                <Button
+                  onClick={() => setIsChatOpen(true)}
+                  size="icon"
+                  className="h-14 w-14 rounded-full shadow-lg"
+                  title="Chat"
+                >
+                  <MessageSquare className="h-6 w-6" />
+                </Button>
               </div>
+
+              {/* Settings Drawer */}
+              {isSettingsOpen && (
+                <div className="fixed inset-0 z-[9999] flex items-stretch">
+                  {/* Backdrop */}
+                  <div 
+                    className="flex-1 bg-black/50 backdrop-blur-sm"
+                    onClick={() => setIsSettingsOpen(false)}
+                  />
+                  {/* Drawer */}
+                  <div className="w-full sm:w-[400px] bg-white shadow-xl flex flex-col animate-in slide-in-from-right duration-300">
+                    {/* Content */}
+                    <div className="flex-1 overflow-y-auto">
+                      <Settings htmlRef={htmlRef} />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Chat Drawer */}
+              {isChatOpen && (
+                <div className="fixed inset-0 z-[9999] flex items-stretch">
+                  {/* Backdrop */}
+                  <div 
+                    className="flex-1 bg-black/50 backdrop-blur-sm"
+                    onClick={() => setIsChatOpen(false)}
+                  />
+                  {/* Drawer */}
+                  <div className="w-full sm:w-[400px] bg-white shadow-xl flex flex-col animate-in slide-in-from-right duration-300">
+                    {/* Content */}
+                    <div className="flex-1 overflow-y-auto">
+                      <Chat />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Hidden section for printing */}

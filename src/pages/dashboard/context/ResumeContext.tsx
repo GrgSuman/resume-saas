@@ -126,7 +126,6 @@ export const ResumeProvider: React.FC<{children: React.ReactNode}> = ({ children
 
         //Set up debounce
         const debounceTimer = setTimeout(() => {
-            console.log("save API call");
             updateResume(id, state?.resumeData, state?.resumeSettings, state?.resumeTitle, state?.jobDescription);
         }, 1000); // waits 1s after the last change
 

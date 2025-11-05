@@ -5,10 +5,10 @@ import { Button } from "../../../components/ui/button";
 import { Plus } from "lucide-react";
 import { Skeleton } from "../../../components/ui/skeleton";
 import { useLocation, useNavigate, useSearchParams } from "react-router";
-import NewResumeForm from "./NewResumeForm";
 import ResumeCardUI from "./ResumeCardUI";
 import { toast } from "react-toastify";
 import axios from "axios";
+import ResumeDialog from "../resume-detail/ResumeDialog";
 // import { useAuth } from "../../../hooks/useAuth";
 
 const ResumeList = () => {
@@ -33,7 +33,8 @@ const ResumeList = () => {
   // Open "New Resume" modal when asked via route state or query
   useEffect(() => {
     type LocationState = { openCreateModal?: boolean } | null;
-    const openByState = ((location.state as LocationState)?.openCreateModal) === true;
+    const openByState =
+      (location.state as LocationState)?.openCreateModal === true;
     const openByQuery = searchParams.get("modal") === "new";
     const shouldOpen = openByState || openByQuery;
     if (shouldOpen) {
@@ -48,13 +49,20 @@ const ResumeList = () => {
         setSearchParams(next, { replace: true });
       }
     }
-  }, [location.state, location.pathname, searchParams, setSearchParams, navigate]);
+  }, [
+    location.state,
+    location.pathname,
+    searchParams,
+    setSearchParams,
+    navigate,
+  ]);
 
   // Create new resume mutation
   const createResumeMutation = useMutation({
-    mutationFn: async (resumeName: string) => {
+    mutationFn: async ({ resumeName, jobTitle }: { resumeName: string; jobTitle?: string }) => {
       const response = await axiosInstance.post("/resume", {
         title: resumeName,
+        jobTitle: jobTitle || "",
       });
       return response.data;
     },
@@ -62,6 +70,7 @@ const ResumeList = () => {
       toast.success("Resume created successfully!");
       queryClient.invalidateQueries({ queryKey: ["resumes"] });
       // deductCredits("CREATE_RESUME");
+    
       setIsNewResumeOpen(false);
       navigate(`/dashboard/resume/${data.resume.id}`);
     },
@@ -82,8 +91,8 @@ const ResumeList = () => {
     },
   });
 
-  const handleCreateResume = (resumeName: string) => {
-    createResumeMutation.mutate(resumeName);
+  const handleCreateResume = (resumeName: string, jobTitle?: string) => {
+    createResumeMutation.mutate({ resumeName, jobTitle });
   };
 
   return (
@@ -173,7 +182,8 @@ const ResumeList = () => {
                     No resumes yet
                   </h2>
                   <p className="text-slate-600 text-sm mb-6 leading-relaxed">
-                    Create your first professional resume quickly and easily. You can edit or duplicate it anytime.
+                    Create your first professional resume quickly and easily.
+                    You can edit or duplicate it anytime.
                   </p>
 
                   {/* CTA Button */}
@@ -226,13 +236,15 @@ const ResumeList = () => {
             {/* Existing Resumes */}
             {resumes.length > 0 &&
               resumes.map(
-                (resume: { id: string; title: string; updatedAt: string }) => (
+                (resume: { id: string; title: string; updatedAt: string,bgColor:string,emoji:string }) => (
                   <ResumeCardUI
                     key={resume.id}
                     resume={{
                       id: resume.id,
                       title: resume.title,
                       updatedAt: resume.updatedAt,
+                      bgColor:resume.bgColor,
+                      emoji:resume.emoji
                     }}
                   />
                 )
@@ -241,7 +253,7 @@ const ResumeList = () => {
         )}
 
         {/* New Resume Form Modal */}
-        <NewResumeForm
+        <ResumeDialog
           open={isNewResumeOpen}
           onOpenChange={setIsNewResumeOpen}
           onSubmit={handleCreateResume}
