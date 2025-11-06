@@ -93,8 +93,7 @@ const Forms = ({ isOpen, onClose, sectionKey }: FormsProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
-        className="p-0 gap-0 h-[95vh] flex flex-col"
-        style={{ width: "65vw", maxWidth: "65vw" }}
+        className="p-0 gap-0 h-[95vh] flex flex-col w-full max-w-full xl:w-[65vw] xl:max-w-[65vw]"
       >
         <div className="px-6 py-4 border-b">
           <DialogTitle className="text-xl font-semibold">

@@ -52,6 +52,17 @@ const ResumeDetail = () => {
                     <ArrowLeft className="h-4 w-4" /> Back
                   </Button>
                 </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsSettingsOpen(true)}
+                    className="gap-2"
+                  >
+                    <SettingsIcon className="h-4 w-4" />
+                    Settings
+                  </Button>
+                </div>
               </div>
 
               {/* Preview - Always Visible */}
@@ -59,28 +70,16 @@ const ResumeDetail = () => {
                 <ResumePreview/>
               </div>
 
-              {/* Floating Action Buttons */}
-              <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-50">
-                {/* Settings FAB */}
-                <Button
-                  onClick={() => setIsSettingsOpen(true)}
-                  size="icon"
-                  className="h-14 w-14 rounded-full shadow-lg"
-                  title="Settings"
-                >
-                  <SettingsIcon className="h-6 w-6" />
-                </Button>
+              {/* Chat FAB */}
+              <Button
+                onClick={() => setIsChatOpen(true)}
+                size="icon"
+                className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-50"
+                title="Chat"
+              >
+                <MessageSquare className="h-6 w-6" />
+              </Button>
 
-                {/* Chat FAB */}
-                <Button
-                  onClick={() => setIsChatOpen(true)}
-                  size="icon"
-                  className="h-14 w-14 rounded-full shadow-lg"
-                  title="Chat"
-                >
-                  <MessageSquare className="h-6 w-6" />
-                </Button>
-              </div>
 
               {/* Settings Drawer */}
               {isSettingsOpen && (
@@ -93,7 +92,7 @@ const ResumeDetail = () => {
                   {/* Drawer */}
                   <div className="w-full sm:w-[400px] bg-white shadow-xl flex flex-col animate-in slide-in-from-right duration-300">
                     {/* Header */}
-                    {/* <div className="flex items-center justify-between p-4 border-b">
+                    <div className="flex items-center justify-between p-4 border-b">
                       <h2 className="text-lg font-semibold">Settings</h2>
                       <Button
                         variant="ghost"
@@ -102,7 +101,7 @@ const ResumeDetail = () => {
                       >
                         <X className="h-4 w-4" />
                       </Button>
-                    </div> */}
+                    </div>
                     {/* Content */}
                     <div className="flex-1 overflow-y-auto">
                       <Settings htmlRef={htmlRef} />
