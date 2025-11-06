@@ -314,7 +314,8 @@ const Settings = ({
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b bg-background">
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            <Button asChild variant="ghost" size="icon" title="Go back">
+            {/* Back button - hidden on mobile */}
+            <Button asChild variant="ghost" size="icon" title="Go back" className="hidden xl:flex">
               <Link to="/dashboard">
                 <ArrowLeft className="h-3.5 w-3.5" />
               </Link>
@@ -348,10 +349,11 @@ const Settings = ({
             </div>
           </div>
 
+          {/* Close button - hidden on mobile */}
           <Button
             variant="outline"
             size="icon"
-            className="h-7 w-7 shrink-0 hover:bg-accent"
+            className="h-7 w-7 shrink-0 hover:bg-accent hidden xl:flex"
             onClick={() => setSettingsOpen(false)}
             title="Close settings"
           >

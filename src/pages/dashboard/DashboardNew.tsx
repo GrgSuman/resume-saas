@@ -24,7 +24,7 @@ const DashboardNew = () => {
       </div>
 
       {/* Video Tutorial */}
-      <div className="mb-10">
+      {/* <div className="mb-10">
         <div className="max-w-5xl">
           <div className="relative rounded-xl border bg-white/60 dark:bg-background overflow-hidden shadow-sm">
             <div className="aspect-video w-full bg-muted/20">
@@ -41,7 +41,7 @@ const DashboardNew = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
     </div>
   );

@@ -7,6 +7,8 @@ import TEMPLATE_REGISTRY from "./templates/TemplateRegistry";
 import ResumeWritingLoader from "./ResumeWritingLoader";
 import { manageLocalStorage } from "../../../lib/localstorage";
 import axiosInstance from "../../../api/axios";
+import { Button } from "../../../components/ui/button";
+import { ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
 
 
 const ResumePreview = () => {
@@ -15,6 +17,7 @@ const ResumePreview = () => {
   const [height, setHeight] = useState(0); //height of the page
   const [isFormsOpen, setIsFormsOpen] = useState(false);
   const [showSkeleton, setShowSkeleton] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(0.92); // Default zoom level
   
   const [sectionKey, setSectionKey] = useState<
     (typeof ResumeSectionKey)[keyof typeof ResumeSectionKey]
@@ -108,51 +111,102 @@ const ResumePreview = () => {
     setIsFormsOpen(true);
   };
 
+  const handleZoomIn = () => {
+    setZoomLevel((prev) => Math.min(prev + 0.1, 2.0));
+  };
+
+  const handleZoomOut = () => {
+    setZoomLevel((prev) => Math.max(prev - 0.1, 0.5));
+  };
+
+  const handleResetZoom = () => {
+    setZoomLevel(0.92);
+  };
+
 
   return (
     <>
       {showSkeleton ? (
         <ResumeWritingLoader />
       ) : (
-      <ScrollArea className="w-full h-full">
-          <div className="flex justify-center items-center px-4 py-2">
-            <div
-              className={`bg-background
-           transition-all ${
-             state.resumeEditingMode
-               ? "ring-2 ring-primary ring-opacity-40 shadow-lg"
-               : ""
-           }`}
-              style={{
-                minWidth: "210mm",
-                minHeight: "297mm",
-                maxWidth: "210mm",
-                transform: "scale(0.92)",
-              }}
+        <div className="relative w-full h-full">
+          {/* Zoom Controls */}
+          <div className="absolute top-2 right-4 z-50 flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-lg shadow-sm p-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleZoomOut}
+              disabled={zoomLevel <= 0.5}
+              className="h-8 w-8"
+              title="Zoom Out"
             >
+              <ZoomOut className="h-4 w-4" />
+            </Button>
+            <span className="text-sm font-medium min-w-[60px] text-center">
+              {Math.round(zoomLevel * 100)}%
+            </span>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleZoomIn}
+              disabled={zoomLevel >= 2.0}
+              className="h-8 w-8"
+              title="Zoom In"
+            >
+              <ZoomIn className="h-4 w-4" />
+            </Button>
+            <div className="h-6 w-px bg-border mx-1" />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleResetZoom}
+              className="h-8 w-8"
+              title="Reset Zoom"
+            >
+              <RotateCcw className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <ScrollArea className="w-full h-full">
+            <div className="flex justify-center items-center px-4 py-2">
               <div
-                ref={checkHeightRef}
+                className={`bg-background
+             transition-all ${
+               state.resumeEditingMode
+                 ? "ring-2 ring-primary ring-opacity-40 shadow-lg"
+                 : ""
+             }`}
                 style={{
-                  position: "relative",
-                  fontSize: `${state.resumeSettings?.fontSize ?? 14}px`,
-                  fontFamily: state.resumeSettings?.fontFamily ?? "Lato",
-                  padding: "28px",
-                  lineHeight: `${state.resumeSettings?.lineHeight ?? "1.4"}em`,
+                  minWidth: "210mm",
+                  minHeight: "297mm",
+                  maxWidth: "210mm",
+                  transform: `scale(${zoomLevel})`,
                 }}
               >
-                {!state.resumeEditingMode && pageBreaks}
-                <TEMPLATE_REGISTRY
-                  resumeData={state.resumeData}
-                  resumeSettings={state.resumeSettings}
-                  openForms={openForms}
-                  templateName={state.resumeSettings?.template ?? "professional"}
-                />
+                <div
+                  ref={checkHeightRef}
+                  style={{
+                    position: "relative",
+                    fontSize: `${state.resumeSettings?.fontSize ?? 14}px`,
+                    fontFamily: state.resumeSettings?.fontFamily ?? "Lato",
+                    padding: "28px",
+                    lineHeight: `${state.resumeSettings?.lineHeight ?? "1.4"}em`,
+                  }}
+                >
+                  {!state.resumeEditingMode && pageBreaks}
+                  <TEMPLATE_REGISTRY
+                    resumeData={state.resumeData}
+                    resumeSettings={state.resumeSettings}
+                    openForms={openForms}
+                    templateName={state.resumeSettings?.template ?? "professional"}
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        <ScrollBar orientation="horizontal" />
-        <ScrollBar orientation="vertical" />
-      </ScrollArea>
+            <ScrollBar orientation="horizontal" />
+            <ScrollBar orientation="vertical" />
+          </ScrollArea>
+        </div>
       )}
       <Forms
         isOpen={isFormsOpen}
