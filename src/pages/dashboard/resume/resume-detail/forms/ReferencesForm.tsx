@@ -1,12 +1,12 @@
 import React, { useState } from "react"
-import { Button } from "../../../../components/ui/button"
-import { Input } from "../../../../components/ui/input"
-import { Label } from "../../../../components/ui/label"
-import { Textarea } from "../../../../components/ui/textarea"
+import { Button } from "../../../../../components/ui/button"
+import { Input } from "../../../../../components/ui/input"
+import { Label } from "../../../../../components/ui/label"
+import { Textarea } from "../../../../../components/ui/textarea"
 import { Plus, Trash2 } from "lucide-react"
-import { ResumeSectionKey } from "../../types/constants"
-import type { Reference } from "../../types/resume"
-import { useResume } from "../../../../hooks/useResume"
+import { ResumeSectionKey } from "../../../types/constants"
+import type { Reference } from "../../../types/resume"
+import { useResume } from "../../../../../hooks/useResume"
 
 
 const ReferencesForm = ({ onClose }: { onClose: () => void }) => {

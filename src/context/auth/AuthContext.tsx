@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 import { manageLocalStorage } from "../../lib/localstorage";
-import { API_URL, CREDIT_COSTS } from "../../lib/constants";
+import { CREDIT_COSTS } from "../../lib/constants";
+import axiosInstance from "../../api/axios";
 
 type User = {
     id: string;
@@ -71,53 +72,53 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
             // if token is found, validate it
             try {
-                const res = await fetch(`${API_URL}/auth/validate`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                const data = await res.json();
+                const res = await axiosInstance.get('/auth/validate');
+                const data = res.data;
 
                 if (data.success) {
-                    // Token is valid
+                    // Token is valid (or was refreshed by interceptor)
                     setUser(data.user);
                     setAuthStates({
                         isAuthenticated: true,
                         isLoading: false,
                         error: null
                     });
-                } else if (data.message === 'Token expired') {
-                    // Try to refresh token
-                    const refreshRes = await fetch(`${API_URL}/auth/refresh`, {
-                        method: 'GET',
-                        headers: { 'Content-Type': 'application/json' },
-                        credentials: 'include'
-                    });
-                    const refreshData = await refreshRes.json();
-                    
-                    if (refreshRes.ok && refreshData.success) {
-                        manageLocalStorage.set('token', refreshData.token);
-                        setUser(refreshData.user);
-                        setAuthStates({
-                            isAuthenticated: true,
-                            isLoading: false,
-                            error: null
-                        });
-                    } else {
-                        console.log("Refresh failed");
-                        // Refresh failed
-                        resetUserState();
-                    }
                 } else {
                     console.log("Validation failed");
                     // Other validation errors
                     resetUserState();
                 }
-            } catch (error) {
+            } catch (error: unknown) {
+                // Axios interceptor handles auth-related 400/401 errors globally (removes token and redirects)
+                // Check if error has response (not a network error)
+                if (error && typeof error === 'object' && 'response' in error) {
+                    const axiosError = error as { response?: { status?: number; config?: { url?: string } } };
+                    const status = axiosError.response?.status;
+                    const requestUrl = axiosError.response?.config?.url || '';
+                    
+                    // If 401, interceptor will try to refresh token automatically
+                    // If refresh fails, interceptor redirects to /signin
+                    // If 400 from /auth/validate, interceptor redirects to /signin
+                    // In both cases, page is redirecting, so just reset state (though redirect happens first)
+                    if (status === 401 || (status === 400 && requestUrl.includes('/auth/validate'))) {
+                        resetUserState();
+                        return;
+                    }
+                    
+                    // Other 400 errors (not auth-related) - don't logout, just reset state
+                    if (status === 400) {
+                        setUser(null);
+                        setAuthStates({
+                            isAuthenticated: false,
+                            isLoading: false,
+                            error: 'Validation failed. Please try again.'
+                        });
+                        return;
+                    }
+                }
+                
+                // Handle network errors (no response) - don't remove token for network issues
                 console.error('Token validation error:', error);
-                manageLocalStorage.remove('token');
                 setUser(null);
                 setAuthStates({
                     isAuthenticated: false,

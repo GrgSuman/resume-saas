@@ -2,16 +2,16 @@ import { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router";
 import { Button } from "../../../components/ui/button";
 import {
-  PanelLeft,
+  Menu,
   ChevronDown,
   X,
   Plus,
   FileText,
-  // Mail,
+  Mail,
   // Settings,
-  // Home,
+  Home,
+  MessageSquare,
 } from "lucide-react";
-import { HelpCircle } from "lucide-react";
 import { CreditCard } from "lucide-react";
 import {
   DropdownMenu,
@@ -27,9 +27,9 @@ import { manageLocalStorage } from "../../../lib/localstorage";
 import { cn } from "../../../lib/utils";
 
 const navItems = [
-  // { href: "/dashboard", label: "Dashboard", icon: Home },
+  { href: "/dashboard", label: "Dashboard", icon: Home },
   { href: "/dashboard/resume", label: "Resumes", icon: FileText },
-  // { href: "/dashboard/cover-letter", label: "Cover Letters", icon: Mail },
+  { href: "/dashboard/cover-letter", label: "Cover Letters", icon: Mail },
   // { href: "/dashboard/preferences", label: "Preferences", icon: Settings },
 ];
 
@@ -115,10 +115,10 @@ const BaseDashboardLayout = () => {
                 <FileText className="mr-2 h-4 w-4" />
                 Resume
               </DropdownMenuItem>
-              {/* <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/dashboard/cover-letter", { state: { openCreateModal: true } })}>
                 <Mail className="mr-2 h-4 w-4" />
                 Cover Letter
-              </DropdownMenuItem> */}
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -161,26 +161,26 @@ const BaseDashboardLayout = () => {
             size="sm"
             onClick={() => setIsSidebarOpen((v) => !v)}
           >
-            <PanelLeft className="h-4 w-4" />
+            <Menu className="h-4 w-4" />
           </Button>
           <div className="flex items-center justify-end w-full gap-3">
             <Button
-              variant="secondary"
+              variant="outline"
               size="sm"
-              onClick={() => window.open("https://clonecv.com/blogs", "_blank")}
-              className="text-slate-800 hidden lg:flex font-medium hover:text-slate-900 hover:bg-slate-100"
+              onClick={() => window.open("https://docs.google.com/forms/d/e/1FAIpQLSeA2tZS8ukqiGWVCFIGN-pOPZJ-krue3EM44vwZ47MiToU3wA/viewform?usp=preview", "_blank")}
+              className="text-slate-800 hidden lg:flex bg-white font-medium hover:bg-slate-50 shadow-none"
             >
-              <HelpCircle className="mr-0.5 mt-0.5 h-4 w-4" />
-              Tutorials
+              <MessageSquare className="mr-0.5 mt-0.5 h-4 w-4" />
+              Feedback
             </Button>
             <Button
               variant="outline"
               size="sm"
-              onClick={()=>navigate("/dashboard/credits")}
-              className=" text-slate-800 bg-white font-medium hover:bg-slate-50"
+              onClick={()=>navigate("/dashboard/pricing")}
+              className="text-slate-800 bg-white font-medium hover:bg-slate-50 shadow-none"
             >
               <CreditCard className="mr-0.5 mt-0.5 h-4 w-4" />
-              Upgrade
+              Upgrade Plan
             </Button>
 
             <DropdownMenu>
@@ -188,7 +188,7 @@ const BaseDashboardLayout = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="flex items-center gap-1 bg-white hover:bg-slate-50 transition-all duration-200 cursor-pointer focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                  className="flex items-center gap-1 bg-white hover:bg-slate-50 transition-all duration-200 cursor-pointer focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none"
                 >
                   <div className="w-6 h-6 bg-[#7060fc] rounded-full flex items-center justify-center overflow-hidden">
                     {user?.picture ? (
@@ -273,11 +273,11 @@ const BaseDashboardLayout = () => {
 
                 <DropdownMenuItem asChild>
                   <Link
-                    to="/dashboard/credits"
+                    to="/dashboard/pricing"
                     className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 font-medium transition-colors cursor-pointer"
                   >
                     <CreditCard className="h-4 w-4" />
-                    Buy Credits
+                    Upgrade Plan
                   </Link>
                 </DropdownMenuItem>
 

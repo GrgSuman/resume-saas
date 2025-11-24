@@ -4,8 +4,8 @@ import {
   DialogContent,
   DialogTitle,
   DialogDescription,
-} from "../../../../components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components/ui/tabs";
+} from "../../../../../components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
 import {
   User,
   Briefcase,
@@ -24,8 +24,8 @@ import ProjectsForm from "./ProjectsForm";
 import CertificationsForm from "./CertificationsForm";
 import ReferencesForm from "./ReferencesForm";
 import CustomSectionsForm from "./CustomSectionsForm";
-import { ScrollArea, ScrollBar } from "../../../../components/ui/scroll-area";
-import { ResumeSectionKey } from "../../types/constants";
+import { ScrollArea, ScrollBar } from "../../../../../components/ui/scroll-area";
+import { ResumeSectionKey } from "../../../types/constants";
 
 interface FormsProps {
   isOpen: boolean;

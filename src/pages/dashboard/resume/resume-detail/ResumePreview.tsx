@@ -1,23 +1,25 @@
 import { useEffect, useRef, useState } from "react";
-import { ScrollArea, ScrollBar } from "../../../components/ui/scroll-area";
-import { useResume } from "../../../hooks/useResume";
+import { ScrollArea, ScrollBar } from "../../../../components/ui/scroll-area";
+import { useResume } from "../../../../hooks/useResume";
 import Forms from "./forms/Forms";
-import { ResumeSectionKey } from "../types/constants";
+import { ResumeSectionKey } from "../../types/constants";
 import TEMPLATE_REGISTRY from "./templates/TemplateRegistry";
 import ResumeWritingLoader from "./ResumeWritingLoader";
-import { manageLocalStorage } from "../../../lib/localstorage";
-import axiosInstance from "../../../api/axios";
-import { Button } from "../../../components/ui/button";
-import { ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
+import { manageLocalStorage } from "../../../../lib/localstorage";
+import axiosInstance from "../../../../api/axios";
 
 
-const ResumePreview = () => {
-  const { state,dispatch } = useResume();
+interface ResumePreviewProps {
+  zoomLevel: number;
+}
+
+const ResumePreview = ({ zoomLevel }: ResumePreviewProps) => {
+  const { state, dispatch } = useResume();
   const checkHeightRef = useRef<HTMLDivElement>(null); //checking the height of the page
   const [height, setHeight] = useState(0); //height of the page
   const [isFormsOpen, setIsFormsOpen] = useState(false);
   const [showSkeleton, setShowSkeleton] = useState(false);
-  const [zoomLevel, setZoomLevel] = useState(0.92); // Default zoom level
+  const [isSmallDevice, setIsSmallDevice] = useState(false);
   
   const [sectionKey, setSectionKey] = useState<
     (typeof ResumeSectionKey)[keyof typeof ResumeSectionKey]
@@ -69,6 +71,20 @@ const ResumePreview = () => {
     }
   };
 
+  // Check device size on mount and resize
+  useEffect(() => {
+    const handleResize = () => {
+      // Check if small device (less than 1024px, which is xl breakpoint)
+      setIsSmallDevice(window.innerWidth < 1024);
+    };
+
+    // Initial check
+    setIsSmallDevice(window.innerWidth < 1024);
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Calculate how many page breaks we need (account for viewer padding)
   const viewerPadding = 45;
   const pageHeightInViewer = 1123 + viewerPadding * 2;
@@ -111,17 +127,6 @@ const ResumePreview = () => {
     setIsFormsOpen(true);
   };
 
-  const handleZoomIn = () => {
-    setZoomLevel((prev) => Math.min(prev + 0.1, 2.0));
-  };
-
-  const handleZoomOut = () => {
-    setZoomLevel((prev) => Math.max(prev - 0.1, 0.5));
-  };
-
-  const handleResetZoom = () => {
-    setZoomLevel(0.92);
-  };
 
 
   return (
@@ -130,45 +135,8 @@ const ResumePreview = () => {
         <ResumeWritingLoader />
       ) : (
         <div className="relative w-full h-full">
-          {/* Zoom Controls */}
-          <div className="absolute top-2 right-4 z-50 flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-lg shadow-sm p-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleZoomOut}
-              disabled={zoomLevel <= 0.5}
-              className="h-8 w-8"
-              title="Zoom Out"
-            >
-              <ZoomOut className="h-4 w-4" />
-            </Button>
-            <span className="text-sm font-medium min-w-[60px] text-center">
-              {Math.round(zoomLevel * 100)}%
-            </span>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleZoomIn}
-              disabled={zoomLevel >= 2.0}
-              className="h-8 w-8"
-              title="Zoom In"
-            >
-              <ZoomIn className="h-4 w-4" />
-            </Button>
-            <div className="h-6 w-px bg-border mx-1" />
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleResetZoom}
-              className="h-8 w-8"
-              title="Reset Zoom"
-            >
-              <RotateCcw className="h-4 w-4" />
-            </Button>
-          </div>
-
           <ScrollArea className="w-full h-full">
-            <div className="flex justify-center items-center px-4 py-2">
+            <div className="flex justify-center items-start px-4 py-15" style={{ minHeight: '100%' }}>
               <div
                 className={`bg-background
              transition-all ${
@@ -181,6 +149,7 @@ const ResumePreview = () => {
                   minHeight: "297mm",
                   maxWidth: "210mm",
                   transform: `scale(${zoomLevel})`,
+                  transformOrigin: isSmallDevice ? "left top" : "center top",
                 }}
               >
                 <div

@@ -1,7 +1,7 @@
-import type { ResumeData, ResumeSettings } from '../../types/resume'
-import { ResumeSectionKey } from '../../types/constants'
-import {useResume} from  '../../../../hooks/useResume'
-import { Button } from '../../../../components/ui/button'
+import type { ResumeData, ResumeSettings } from '../../../types/resume'
+import { ResumeSectionKey } from '../../../types/constants'
+import {useResume} from  '../../../../../hooks/useResume'
+import { Button } from '../../../../../components/ui/button'
 
 const ProfessionalTemplate = ({resumeData, resumeSettings, openForms }: {resumeData: ResumeData, resumeSettings: ResumeSettings, openForms: (sectionKey: typeof ResumeSectionKey[keyof typeof ResumeSectionKey]) => void}) => {
   const data = resumeData

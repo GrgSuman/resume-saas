@@ -1,5 +1,5 @@
 import ProfessionalTemplate from './ProfessionalTemplate';
-import type { ResumeData, ResumeSettings } from '../../types/resume';
+import type { ResumeData, ResumeSettings } from '../../../types/resume';
 import ModernTemplate from './ModernTemplate';
 // import CreativeTemplate from './CreativeTemplate';
 

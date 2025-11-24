@@ -43,73 +43,59 @@ const Login = () => {
   };
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-b from-blue-100 via-blue-50/60 to-amber-50/30 min-h-screen">
-      {/* Blue-dominant gradient with top center focus */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        {/* Base gradient layers - more blue dominant */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-200/40 via-blue-100/20 to-amber-100/25" />
-
-        {/* Radial gradient orbs - blue at top center */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_10%,rgba(59,130,246,0.35)_0%,rgba(59,130,246,0.15)_40%,rgba(59,130,246,0.05)_70%,transparent_85%),radial-gradient(ellipse_at_20%_180%,rgba(37,99,235,0.25)_0%,rgba(37,99,235,0.08)_45%,transparent_75%),radial-gradient(ellipse_at_85%_200%,rgba(251,191,36,0.2)_0%,rgba(251,191,36,0.06)_50%,transparent_80%)]" />
-
-        {/* Floating accent orbs - blue dominance */}
-        <div className="absolute -top-32 left-1/2 -translate-x-1/2 h-[48rem] w-[48rem] rounded-full bg-gradient-to-br from-blue-300/20 to-blue-400/10 blur-3xl" />
-        <div className="absolute top-1/4 -left-24 h-[32rem] w-[32rem] rounded-full bg-gradient-to-br from-blue-200/15 to-indigo-300/8 blur-3xl" />
-        <div className="absolute bottom-1/3 -right-16 h-[28rem] w-[28rem] rounded-full bg-gradient-to-br from-amber-200/12 to-yellow-300/6 blur-3xl animate-pulse" />
-      </div>
-
-      <div className="flex items-center justify-center px-6 min-h-screen">
-        <div className="max-w-md w-full">
+    <div className="min-h-[80vh] flex flex-col">
+      <div className="flex-1 flex items-center justify-center px-6 py-16">
+        <div className="max-w-2xl w-full">
           {/* Login Card */}
-          <div className="bg-white/90 backdrop-blur  p-8 rounded-xl shadow-xl">
-            <div className="text-center mb-8">
-              <h1 className="text-4xl font-bold text-gray-800 mb-4">
-                Welcome to CloneCV
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 px-10 py-12 md:px-16 md:py-14">
+            <div className="text-center mb-10 space-y-4">
+              <p className="text-sm uppercase text-slate-500">
+                CloneCV
+              </p>
+              <h1 className="text-4xl font-semibold text-slate-900">
+                Sign in to keep building
               </h1>
-              <p className="text-lg text-gray-600">
-                Sign in to continue building your resume
+              <p className="text-base md:text-lg text-slate-600">
+                Continue your AI-assisted resume and cover letter workflow.
               </p>
             </div>
 
-            {/* Google Login Button - Wrapped for styling */}
-            <div className="flex justify-center mb-8">
-              <div className="transform transition-all duration-200 ">
-                <GoogleLogin
-                  onSuccess={handleSuccess}
-                  onError={() => console.log("Login Failed")}
-                  theme="filled_blue"
-                  size="large"
-                  text="signin_with"
-                  shape="pill"
-                />
-              </div>
+            {/* Google Login Button */}
+            <div className="flex justify-center mb-6">
+              <GoogleLogin
+                onSuccess={handleSuccess}
+                onError={() => console.log("Login Failed")}
+                theme="filled_blue"
+                size="large"
+                text="signin_with"
+                shape="pill"
+              />
             </div>
 
             {/* Footer */}
-            <div className="text-center mt-8 border-t-2 border-gray-200 pt-6">
-              <p className="text-sm text-gray-600">
-                Don't have an account? No problem just continue with google
-                above
+            <div className="text-center pt-6 border-t border-slate-200">
+              <p className="text-sm text-slate-600">
+                No account yet? Continue with Google to get instant access.
               </p>
             </div>
           </div>
 
           {/* Terms */}
-          <div className="text-center mt-8">
-            <p className="text-xs text-gray-600">
+          <div className="text-center mt-6">
+            <p className="text-xs text-slate-600">
               By signing in, you agree to our{" "}
               <a
-                href="#"
-                className="underline font-medium hover:text-[#7060fc] transition-colors"
+                href="/terms"
+                className="text-[#7060fc] hover:underline font-medium transition-colors"
               >
-                TERMS
+                Terms
               </a>{" "}
               and{" "}
               <a
-                href="#"
-                className="underline font-medium hover:text-[#7060fc] transition-colors"
+                href="/privacy"
+                className="text-[#7060fc] hover:underline font-medium transition-colors"
               >
-                PRIVACY
+                Privacy Policy
               </a>
             </p>
           </div>

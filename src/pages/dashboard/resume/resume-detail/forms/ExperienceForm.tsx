@@ -1,18 +1,17 @@
-
 import React, { useState } from "react"
-import { Button } from "../../../../components/ui/button"
-import { Input } from "../../../../components/ui/input"
-import { Label } from "../../../../components/ui/label"
-import { Textarea } from "../../../../components/ui/textarea"
+import { Button } from "../../../../../components/ui/button"
+import { Input } from "../../../../../components/ui/input"
+import { Label } from "../../../../../components/ui/label"
+import { Textarea } from "../../../../../components/ui/textarea"
 import { Plus, Trash2 } from "lucide-react"
-import { ResumeSectionKey } from "../../types/constants"
-import type { Project } from "../../types/resume"
-import { useResume } from "../../../../hooks/useResume"
+import type { Experience } from "../../../types/resume"
+import { useResume } from "../../../../../hooks/useResume"
+import { ResumeSectionKey } from "../../../types/constants"
 
-const ProjectsForm = ({ onClose }: { onClose: () => void }) => {
+const ExperienceForm = ({ onClose }: { onClose: () => void }) => {
   const { state, dispatch } = useResume()
-  const [formData, setFormData] = useState<Project[]>(state.resumeData.projects || [])
-  const [sectionLabel, setSectionLabel] = useState(state.resumeSettings.sections?.find(section => section.key === ResumeSectionKey.PROJECTS)?.label)
+  const [formData, setFormData] = useState<Experience[]>(state.resumeData.experience)
+  const [sectionLabel, setSectionLabel] = useState(state.resumeSettings.sections?.find(section => section.key === ResumeSectionKey.EXPERIENCE)?.label)
   const [hasChanges, setHasChanges] = useState(false)
   const [errors, setErrors] = useState<{[key: string]: string}>({})
 
@@ -36,11 +35,17 @@ const ProjectsForm = ({ onClose }: { onClose: () => void }) => {
   const validateForm = () => {
     const newErrors: {[key: string]: string} = {}
     
-    formData.forEach((project, index) => {
-      if (!project.name?.trim()) {
-        newErrors[`${index}-name`] = 'Project name is required'
+    formData.forEach((job, index) => {
+      if (!job.role?.trim()) {
+        newErrors[`${index}-role`] = 'Job title is required'
       }
-      if (!project.achievements?.length || project.achievements.every(achievement => !achievement.trim())) {
+      if (!job.company?.trim()) {
+        newErrors[`${index}-company`] = 'Company is required'
+      }
+      if (!job.dateRange?.trim()) {
+        newErrors[`${index}-dateRange`] = 'Date range is required'
+      }
+      if (!job.achievements?.length || job.achievements.every(a => !a.trim())) {
         newErrors[`${index}-achievements`] = 'At least one achievement is required'
       }
     })
@@ -56,10 +61,10 @@ const ProjectsForm = ({ onClose }: { onClose: () => void }) => {
     
     dispatch({ 
       type: 'UPDATE_RESUME_DATA', 
-      payload: { projects: formData } 
+      payload: { experience: formData } 
     })
     if (sectionLabel) {
-      dispatch({ type: 'UPDATE_RESUME_SETTINGS', payload: { sections: state.resumeSettings.sections?.map(section => section.key === ResumeSectionKey.PROJECTS ? { ...section, label: sectionLabel } : section) } })
+      dispatch({ type: 'UPDATE_RESUME_SETTINGS', payload: { sections: state.resumeSettings.sections?.map(section => section.key === ResumeSectionKey.EXPERIENCE ? { ...section, label: sectionLabel } : section) } })
     }
     setHasChanges(false)
     onClose()
@@ -74,18 +79,47 @@ const ProjectsForm = ({ onClose }: { onClose: () => void }) => {
     setSectionLabel(e.target.value)
   }
 
-  const handleAddAchievement = (projectIndex: number) => {
+  const handleAddExperience = () => {
+    const newExperience: Experience = {
+      role: "",
+      company: "",
+      dateRange: "",
+      location: "",
+      achievements: []
+    }
+    setFormData(prev => [...prev, newExperience])
+    setHasChanges(true)
+    
+    // Scroll to the newly added form after a short delay
+    setTimeout(() => {
+      const newFormIndex = formData.length // This will be the index of the newly added form
+      const newFormElement = document.querySelector(`[data-experience-index="${newFormIndex}"]`)
+      if (newFormElement) {
+        newFormElement.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        })
+      }
+    }, 100)
+  }
+
+  const handleDeleteExperience = (index: number) => {
+    setFormData(prev => prev.filter((_, i) => i !== index))
+    setHasChanges(true)
+  }
+
+  const handleAddAchievement = (experienceIndex: number) => {
     setFormData(prev => prev.map((item, i) => 
-      i === projectIndex 
+      i === experienceIndex 
         ? { ...item, achievements: [...(item.achievements || []), ""] }
         : item
     ))
     setHasChanges(true)
   }
 
-  const handleUpdateAchievement = (projectIndex: number, achievementIndex: number, value: string) => {
+  const handleUpdateAchievement = (experienceIndex: number, achievementIndex: number, value: string) => {
     setFormData(prev => prev.map((item, i) => 
-      i === projectIndex 
+      i === experienceIndex 
         ? { 
             ...item, 
             achievements: item.achievements?.map((achievement, aIndex) => 
@@ -97,9 +131,9 @@ const ProjectsForm = ({ onClose }: { onClose: () => void }) => {
     setHasChanges(true)
   }
 
-  const handleDeleteAchievement = (projectIndex: number, achievementIndex: number) => {
+  const handleDeleteAchievement = (experienceIndex: number, achievementIndex: number) => {
     setFormData(prev => prev.map((item, i) => 
-      i === projectIndex 
+      i === experienceIndex 
         ? { 
             ...item, 
             achievements: item.achievements?.filter((_, aIndex) => aIndex !== achievementIndex) || []
@@ -109,41 +143,18 @@ const ProjectsForm = ({ onClose }: { onClose: () => void }) => {
     setHasChanges(true)
   }
 
-  const handleAddProject = () => {
-    const newProject = {
-      name: "",
-      link: "",
-      achievements: []
-    }
-    setFormData(prev => [...prev, newProject])
-    setHasChanges(true)
-    
-    // Scroll to the newly added project form
-    setTimeout(() => {
-      const newProjectElement = document.querySelector(`[data-project-index="${formData.length}"]`)
-      if (newProjectElement) {
-        newProjectElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      }
-    }, 100)
-  }
-
-  const handleDeleteProject = (index: number) => {
-    setFormData(prev => prev.filter((_, i) => i !== index))
-    setHasChanges(true)
-  }
-
   return (
     <div className="relative">
       <div className="space-y-6 pb-20">
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold mb-1">Projects</h3>
-            <p className="text-sm text-muted-foreground">Showcase your personal and professional projects</p>
+            <h3 className="text-lg font-semibold mb-1">Work Experience</h3>
+            <p className="text-sm text-muted-foreground">Add your professional work history and achievements</p>
           </div>
-          <Button size="sm" variant="outline" onClick={handleAddProject}>
+          <Button size="sm" variant="outline" onClick={handleAddExperience}>
             <Plus className="h-4 w-4 mr-2" />
-            Add Project
+            Add Experience
           </Button>
         </div>
 
@@ -153,20 +164,20 @@ const ProjectsForm = ({ onClose }: { onClose: () => void }) => {
             value={sectionLabel}
             onChange={handleSectionLabelChange}
             className="h-10"
-            placeholder="e.g., Projects, Portfolio, Key Projects"
+            placeholder="e.g., Work Experience, Professional Experience"
           />
         </div>
       </div>
 
-      {formData.map((project, index) => (
-        <div key={index} className="space-y-4 p-4 border rounded-lg bg-card" data-project-index={index}>
+      {formData.map((job, index) => (
+        <div key={index} data-experience-index={index} className="space-y-4 p-4 border rounded-lg bg-card">
           <div className="flex items-center justify-between">
-            <h4 className="text-base font-medium">Project #{index + 1}</h4>
+            <h4 className="text-base font-medium">Experience #{index + 1}</h4>
             <Button 
               size="sm" 
               variant="ghost" 
               className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
-              onClick={() => handleDeleteProject(index)}
+              onClick={() => handleDeleteExperience(index)}
             >
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -174,31 +185,58 @@ const ProjectsForm = ({ onClose }: { onClose: () => void }) => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Project Name *</Label>
+              <Label className="text-sm font-medium">Job Title *</Label>
               <Input
-                value={project.name}
-                onChange={(e) => handleInputChange(index, 'name', e.target.value)}
-                className={`h-10 ${errors[`${index}-name`] ? 'border-red-500 focus:border-red-500' : ''}`}
-                placeholder="e.g., E-commerce Platform"
+                value={job.role}
+                onChange={(e) => handleInputChange(index, 'role', e.target.value)}
+                className={`h-10 ${errors[`${index}-role`] ? 'border-red-500 focus:border-red-500' : ''}`}
+                placeholder="e.g., Senior Software Engineer"
               />
-              {errors[`${index}-name`] && (
-                <p className="text-sm text-red-500">{errors[`${index}-name`]}</p>
+              {errors[`${index}-role`] && (
+                <p className="text-sm text-red-500">{errors[`${index}-role`]}</p>
               )}
             </div>
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Project Link</Label>
+              <Label className="text-sm font-medium">Company *</Label>
               <Input
-                value={project.link || ""}
-                onChange={(e) => handleInputChange(index, 'link', e.target.value)}
+                value={job.company}
+                onChange={(e) => handleInputChange(index, 'company', e.target.value)}
+                className={`h-10 ${errors[`${index}-company`] ? 'border-red-500 focus:border-red-500' : ''}`}
+                placeholder="e.g., Tech Company Inc."
+              />
+              {errors[`${index}-company`] && (
+                <p className="text-sm text-red-500">{errors[`${index}-company`]}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Date Range *</Label>
+              <Input
+                value={job.dateRange}
+                onChange={(e) => handleInputChange(index, 'dateRange', e.target.value)}
+                className={`h-10 ${errors[`${index}-dateRange`] ? 'border-red-500 focus:border-red-500' : ''}`}
+                placeholder="e.g., Jan 2021 - Present"
+              />
+              {errors[`${index}-dateRange`] && (
+                <p className="text-sm text-red-500">{errors[`${index}-dateRange`]}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Location</Label>
+              <Input
+                value={job.location || ""}
+                onChange={(e) => handleInputChange(index, 'location', e.target.value)}
                 className="h-10"
-                placeholder="https://project-demo.com"
+                placeholder="e.g., San Francisco, CA"
               />
             </div>
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label className="text-sm font-medium">Description & Achievements *</Label>
+              <Label className="text-sm font-medium">Key Achievements *</Label>
               <Button
                 type="button"
                 size="sm"
@@ -212,7 +250,7 @@ const ProjectsForm = ({ onClose }: { onClose: () => void }) => {
             </div>
             
             <div className="space-y-2">
-              {project.achievements?.map((achievement, achievementIndex) => (
+              {job.achievements?.map((achievement, achievementIndex) => (
                 <div key={achievementIndex} className="group relative">
                   <div className="flex items-start gap-2 p-2 rounded-md hover:bg-muted/50 transition-colors">
                     <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -237,7 +275,7 @@ const ProjectsForm = ({ onClose }: { onClose: () => void }) => {
                 </div>
               )) || []}
               
-              {(!project.achievements || project.achievements.length === 0) && (
+              {(!job.achievements || job.achievements.length === 0) && (
                 <div className="text-center py-4 text-muted-foreground text-sm">
                   No achievements added yet. Click "Add Achievement" to get started.
                 </div>
@@ -273,9 +311,7 @@ const ProjectsForm = ({ onClose }: { onClose: () => void }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ProjectsForm
-
-
+export default ExperienceForm;

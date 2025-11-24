@@ -8,8 +8,7 @@ import { useLocation, useNavigate, useSearchParams } from "react-router";
 import ResumeCardUI from "./ResumeCardUI";
 import { toast } from "react-toastify";
 import axios from "axios";
-import ResumeDialog from "../resume-detail/ResumeDialog";
-// import { useAuth } from "../../../hooks/useAuth";
+import NewResumeDialog from "./NewResumeDialog";
 
 const ResumeList = () => {
   const [isNewResumeOpen, setIsNewResumeOpen] = useState(false);
@@ -17,13 +16,8 @@ const ResumeList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-  // const { deductCredits } = useAuth();
 
-  const {
-    data: resumeData,
-    isLoading,
-    isError,
-  } = useQuery({
+  const {data: resumeData, isLoading, isError} = useQuery({
     queryKey: ["resumes"],
     queryFn: () => axiosInstance.get("/resume/user"),
   });
@@ -59,7 +53,7 @@ const ResumeList = () => {
 
   // Create new resume mutation
   const createResumeMutation = useMutation({
-    mutationFn: async ({ resumeName, jobTitle }: { resumeName: string; jobTitle?: string }) => {
+    mutationFn: async ({resumeName,jobTitle}: {resumeName: string, jobTitle?: string}) => {
       const response = await axiosInstance.post("/resume", {
         title: resumeName,
         jobTitle: jobTitle || "",
@@ -67,10 +61,10 @@ const ResumeList = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      toast.success("Resume created successfully!");
+      // toast.success("Resume created successfully!");
       queryClient.invalidateQueries({ queryKey: ["resumes"] });
       // deductCredits("CREATE_RESUME");
-    
+
       setIsNewResumeOpen(false);
       navigate(`/dashboard/resume/${data.resume.id}`);
     },
@@ -164,87 +158,53 @@ const ResumeList = () => {
           </div>
         )}
 
-        {/* Empty State */}
-        {!isLoading && !isError && resumes.length === 0 && (
-          <div className="w-[360px] h-[220px]">
-            <div className="bg-gradient-to-br from-slate-50 to-gray-100 rounded-xl border border-slate-200 p-8">
-              <div className="flex flex-col">
-                {/* Icon */}
-                <div className="mb-6">
-                  <div className="h-12 w-12 rounded-full bg-white shadow-sm flex items-center justify-center border border-slate-200">
-                    <Plus className="h-6 w-6 text-slate-600" />
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="max-w-sm">
-                  <h2 className="text-xl font-semibold text-slate-900 mb-3">
-                    No resumes yet
-                  </h2>
-                  <p className="text-slate-600 text-sm mb-6 leading-relaxed">
-                    Create your first professional resume quickly and easily.
-                    You can edit or duplicate it anytime.
-                  </p>
-
-                  {/* CTA Button */}
-                  <Button
-                    onClick={() => setIsNewResumeOpen(true)}
-                    size="sm"
-                    className="px-6 py-2 text-sm font-medium"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create Your First Resume
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Resume Grid */}
         {!isLoading && (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {/* New Resume */}
-
-            {resumes.length !== 0 && (
-              <div
-                onClick={() => setIsNewResumeOpen(true)}
-                className="group relative cursor-pointer rounded-2xl bg-white border-2 border-dashed border-slate-300 hover:border-slate-400 transition-all duration-300 hover:scale-105 p-6 flex flex-col h-[220px] hover:bg-slate-50/50"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
-                    <Plus className="h-6 w-6 text-slate-600" />
-                  </div>
-                </div>
-
-                {/* Title */}
-                <div className="mb-4">
-                  <h3 className="font-semibold text-lg text-slate-900 line-clamp-2 leading-tight">
-                    Create New Resume
-                  </h3>
-                </div>
-
-                {/* Date Info */}
-                <div className="mt-auto">
-                  <p className="text-sm text-slate-600 font-medium">
-                    Start building your resume
-                  </p>
+            <div
+              onClick={() => setIsNewResumeOpen(true)}
+              className="group relative cursor-pointer rounded-2xl bg-white border-2 border-dashed border-slate-300 hover:border-slate-400 transition-all duration-300 hover:scale-105 p-6 flex flex-col h-[220px] hover:bg-slate-50/50"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
+                  <Plus className="h-6 w-6 text-slate-600" />
                 </div>
               </div>
-            )}
+
+              {/* Title */}
+              <div className="mb-4">
+                <h3 className="font-semibold text-lg text-slate-900 line-clamp-2 leading-tight">
+                  Create New Resume
+                </h3>
+              </div>
+
+              {/* Date Info */}
+              <div className="mt-auto">
+                <p className="text-sm text-slate-600 font-medium">
+                  Start building your resume
+                </p>
+              </div>
+            </div>
 
             {/* Existing Resumes */}
             {resumes.length > 0 &&
               resumes.map(
-                (resume: { id: string; title: string; updatedAt: string,bgColor:string,emoji:string }) => (
+                (resume: {
+                  id: string;
+                  title: string;
+                  createdAt: string;
+                  bgColor: string;
+                  emoji: string;
+                }) => (
                   <ResumeCardUI
                     key={resume.id}
                     resume={{
                       id: resume.id,
                       title: resume.title,
-                      updatedAt: resume.updatedAt,
-                      bgColor:resume.bgColor,
-                      emoji:resume.emoji
+                      createdAt: resume.createdAt,
+                      bgColor: resume.bgColor,
+                      emoji: resume.emoji,
                     }}
                   />
                 )
@@ -253,7 +213,7 @@ const ResumeList = () => {
         )}
 
         {/* New Resume Form Modal */}
-        <ResumeDialog
+        <NewResumeDialog
           open={isNewResumeOpen}
           onOpenChange={setIsNewResumeOpen}
           onSubmit={handleCreateResume}

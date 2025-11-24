@@ -1,73 +1,131 @@
-import { useRef, useState } from "react";
-import Settings from "./Settings";
+import { useRef, useState, useEffect } from "react";
 import ResumePreview from "./ResumePreview";
+import SettingsNew from "./SettingsNew";
+import DownloadingUI from "./DownloadingUI";
 import Chat from "./Chat";
-import {
-  ArrowLeft,
-  Settings as SettingsIcon,
-  MessageSquare,
-  X,
-} from "lucide-react";
-import { Button } from "../../../components/ui/button";
-import { useResume } from "../../../hooks/useResume";
+import {MessageSquare,X} from "lucide-react";
+import { Button } from "../../../../components/ui/button";
+import { useResume } from "../../../../hooks/useResume";
 import LoadingResumeDetail from "./LoadingResumeDetail";
 import TEMPLATE_REGISTRY from "./templates/TemplateRegistry";
 
 const ResumeDetail = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(0.92);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const { state } = useResume();
   const htmlRef = useRef<HTMLDivElement>(null);
+
+  // Auto-calculate zoom based on screen size
+  const calculateAutoZoom = () => {
+    if (!containerRef.current) return null;
+
+    const container = containerRef.current;
+    // Account for padding (px-4 = 16px on each side = 32px total)
+    const containerWidth = container.clientWidth - 32;
+
+    // A4 dimensions in pixels (210mm = 794px at 96 DPI)
+    const resumeWidth = 794;
+
+    // Calculate zoom based on width only, max 100%, min 50%
+    const zoomX = containerWidth / resumeWidth;
+    const calculatedZoom = Math.max(0.5, Math.min(zoomX, 1.0));
+
+    return calculatedZoom;
+  };
+
+  useEffect(() => {
+    // Use a debounced resize handler to avoid too many calculations
+    let timeoutId: NodeJS.Timeout;
+    
+    const handleResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        const calculatedZoom = calculateAutoZoom();
+        if (calculatedZoom !== null) {
+          setZoomLevel(calculatedZoom);
+        }
+      }, 150); // Debounce resize events
+    };
+
+    // Initial calculation after a short delay to ensure DOM is ready
+    const initialTimeout = setTimeout(() => {
+      const calculatedZoom = calculateAutoZoom();
+      if (calculatedZoom !== null) {
+        setZoomLevel(calculatedZoom);
+      }
+    }, 100);
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      clearTimeout(timeoutId);
+      clearTimeout(initialTimeout);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  const handleZoomIn = () => {
+    setZoomLevel((prev) => Math.min(prev + 0.1, 1.0));
+  };
+
+  const handleZoomOut = () => {
+    setZoomLevel((prev) => Math.max(prev - 0.1, 0.5));
+  };
+
+  const handleResetZoom = () => {
+    const resetZoom = calculateAutoZoom() || 0.92;
+    setZoomLevel(resetZoom);
+  };
   return (
     <>
+      {/* Downloading UI Overlay */}
+      {state?.resumeDownloading && <DownloadingUI />}
+      
       {state === null || state.resumeLoading ? (
         <LoadingResumeDetail />
       ) : (
         <>
           <div className="h-screen flex flex-col xl:flex-row overflow-hidden">
             {/* Desktop Layout */}
-            <div className="hidden xl:flex w-full h-full">
-              <Settings htmlRef={htmlRef} />
-
-              <div className="flex-1 bg-[#f9f8f7] overflow-hidden relative">
-                <ResumePreview/>
+            <div className="hidden xl:flex w-full relative">
+              <div className="flex-1 bg-[#f5f5f5] overflow-hidden relative flex flex-col" ref={containerRef}>
+                <div className="absolute top-2 left-2 right-2 z-50">
+                  <SettingsNew
+                    htmlRef={htmlRef}
+                    zoomLevel={zoomLevel}
+                    onZoomIn={handleZoomIn}
+                    onZoomOut={handleZoomOut}
+                    onResetZoom={handleResetZoom}
+                  />
+                </div>
+                <div className="flex-1 overflow-hidden pt-16">
+                  <ResumePreview zoomLevel={zoomLevel} />
+                </div>
               </div>
 
-              <div className="w-96 flex overflow-hidden flex-col shadow-xl">
+              <div className="w-[420px] flex overflow-hidden flex-col shadow-xl">
                 <Chat />
               </div>
             </div>
 
             {/* Mobile/Tablet Layout */}
             <div className="xl:hidden flex flex-col h-full relative">
-              {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
-                <div className="flex items-center gap-3">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => window.history.back()}
-                  >
-                    <ArrowLeft className="h-4 w-4" /> Back
-                  </Button>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsSettingsOpen(true)}
-                    className="gap-2"
-                  >
-                    <SettingsIcon className="h-4 w-4" />
-                    Settings
-                  </Button>
-                </div>
-              </div>
-
               {/* Preview - Always Visible */}
-              <div className="flex-1 overflow-hidden bg-[#f9f8f7]">
-                <ResumePreview/>
+              <div className="flex-1 overflow-hidden bg-[#f5f5f5] flex flex-col" ref={containerRef}>
+                <div className="absolute top-2 left-2 right-2 z-50">
+                  <SettingsNew
+                    htmlRef={htmlRef}
+                    zoomLevel={zoomLevel}
+                    onZoomIn={handleZoomIn}
+                    onZoomOut={handleZoomOut}
+                    onResetZoom={handleResetZoom}
+                  />
+                </div>
+                <div className="flex-1 overflow-hidden pt-16">
+                  <ResumePreview zoomLevel={zoomLevel} />
+                </div>
               </div>
 
               {/* Chat FAB */}
@@ -83,10 +141,10 @@ const ResumeDetail = () => {
 
               {/* Settings Drawer */}
               {isSettingsOpen && (
-                <div className="fixed inset-0 z-[9999] flex items-stretch">
+                <div className="fixed inset-0 z-[99] flex items-stretch">
                   {/* Backdrop */}
                   <div 
-                    className="flex-1 bg-black/50 backdrop-blur-sm"
+                    className="flex-1 bg-black/50"
                     onClick={() => setIsSettingsOpen(false)}
                   />
                   {/* Drawer */}
@@ -102,10 +160,6 @@ const ResumeDetail = () => {
                         <X className="h-4 w-4" />
                       </Button>
                     </div>
-                    {/* Content */}
-                    <div className="flex-1 overflow-y-auto">
-                      <Settings htmlRef={htmlRef} />
-                    </div>
                   </div>
                 </div>
               )}
@@ -115,7 +169,7 @@ const ResumeDetail = () => {
                 <div className="fixed inset-0 z-[9999] flex items-stretch">
                   {/* Backdrop */}
                   <div 
-                    className="flex-1 bg-black/50 backdrop-blur-sm"
+                    className="flex-1 bg-black/50"
                     onClick={() => setIsChatOpen(false)}
                   />
                   {/* Drawer */}

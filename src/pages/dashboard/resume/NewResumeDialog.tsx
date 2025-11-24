@@ -19,7 +19,7 @@ interface NewResumeFormProps {
   isError?: boolean;
 }
 
-export default function ResumeDialog({
+export default function NewResumeDialog({
   open,
   onOpenChange,
   onSubmit,

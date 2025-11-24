@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { 
   User, 
-  CreditCard, 
+  // CreditCard, 
   // Brain
 } from "lucide-react";
 import MyDetails from "./MyDetails";
-import BillingHistory from "./BillingHistory";
+// import BillingHistory from "./BillingHistory";
 // import AISettings from "./AISettings";
 import axiosInstance from "../../api/axios";
 import { useQuery } from "@tanstack/react-query";
@@ -34,7 +34,7 @@ const UserDetails = () => {
 
   const tabs = [
     { id: "profile", label: "My Profile", icon: User },
-    { id: "credits", label: "My Usage & Credits", icon: CreditCard },
+    // { id: "credits", label: "My Usage & Credits", icon: CreditCard },
     // { id: "settings", label: "AI & Preferences", icon: Brain },
   ];
 
@@ -42,8 +42,8 @@ const UserDetails = () => {
     switch (activeTab) {
       case "profile":
         return <MyDetails user={user} />
-      case "credits":
-        return <BillingHistory user={user} />
+      // case "credits":
+      //   return <BillingHistory user={user} />
       // case "settings":
       //   return <AISettings />
       default:

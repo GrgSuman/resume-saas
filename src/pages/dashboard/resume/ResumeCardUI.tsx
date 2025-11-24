@@ -16,7 +16,7 @@ interface ResumeCardUIProps {
   resume: {
     id: string;
     title: string;
-    updatedAt: string;
+    createdAt: string;
     bgColor?:string;
     emoji?:string
   };
@@ -172,7 +172,7 @@ const ResumeCardUI = ({ resume }: ResumeCardUIProps) => {
         {/* Date Info */}
         <div className="mt-auto">
           <p className="text-sm text-slate-600 font-medium">
-            Last opened {new Date(resume.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+            {new Date(resume.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
           </p>
         </div>
       </div>
