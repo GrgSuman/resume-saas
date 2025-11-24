@@ -1,13 +1,13 @@
 
 import React from "react"
-import { Input } from "../../../../components/ui/input"
-import { Label } from "../../../../components/ui/label"
-import { Textarea } from "../../../../components/ui/textarea"
-import { Button } from "../../../../components/ui/button"
+import { Input } from "../../../../../components/ui/input"
+import { Label } from "../../../../../components/ui/label"
+import { Textarea } from "../../../../../components/ui/textarea"
+import { Button } from "../../../../../components/ui/button"
 import { useState } from "react"
-import type { PersonalInfo } from "../../types/resume"
-import { ResumeSectionKey } from "../../types/constants"
-import { useResume } from "../../../../hooks/useResume"
+import type { PersonalInfo } from "../../../types/resume"
+import { ResumeSectionKey } from "../../../types/constants"
+import { useResume } from "../../../../../hooks/useResume"
 
 const PersonalInfoForm = ({ onClose }: { onClose: () => void }) => {
   const { state, dispatch } = useResume()

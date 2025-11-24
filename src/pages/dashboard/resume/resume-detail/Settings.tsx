@@ -1,39 +1,34 @@
-"use client";
 import React, { useState, useCallback, useMemo } from "react";
 import { flushSync } from "react-dom";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { Button } from "../../../components/ui/button";
-import { Input } from "../../../components/ui/input";
-import { Label } from "../../../components/ui/label";
+import { Button } from "../../../../components/ui/button";
+import { Input } from "../../../../components/ui/input";
+import { Label } from "../../../../components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../../components/ui/select";
-import { Slider } from "../../../components/ui/slider";
+} from "../../../../components/ui/select";
+import { Slider } from "../../../../components/ui/slider";
 import {
-  ArrowLeft,
   GripVertical,
   Download,
   FileText,
   ChevronLeft,
   Eye,
   EyeOff,
-  Edit3,
-  Settings as SettingsIcon,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router";
-import { ScrollArea } from "../../../components/ui/scroll-area";
-import { Switch } from "../../../components/ui/switch";
-import { useResume } from "../../../hooks/useResume";
-import { cn } from "../../../lib/utils";
-import { ResumeSectionKey } from "../types/constants";
-import { TEMPLATES, FONT_FAMILIES } from "../types/constants";
-import type { Section } from "../types/resume";
-import axiosInstance from "../../../api/axios";
+import { useNavigate } from "react-router";
+import { ScrollArea } from "../../../../components/ui/scroll-area";
+import { useResume } from "../../../../hooks/useResume";
+import { cn } from "../../../../lib/utils";
+import { ResumeSectionKey } from "../../types/constants";
+import { TEMPLATES, FONT_FAMILIES } from "../../types/constants";
+import type { Section } from "../../types/resume";
+import axiosInstance from "../../../../api/axios";
 import axios from "axios";
 import { toast } from "react-toastify";
 import DownloadingUI from "./DownloadingUI";
@@ -123,16 +118,23 @@ const DraggableSectionItem = ({
 
 const Settings = ({
   htmlRef,
+  isOpen,
+  onClose,
 }: {
   htmlRef: React.RefObject<HTMLDivElement | null>;
+  isOpen?: boolean;
+  onClose?: () => void;
 }) => {
   const { state, dispatch } = useResume();
   const [settingsOpen, setSettingsOpen] = useState(true);
   const [isEditingName, setIsEditingName] = useState(false);
+  
+  // Use external state if provided, otherwise use internal state
+  const isSettingsOpen = isOpen !== undefined ? isOpen : settingsOpen;
+  const handleClose = onClose || (() => setSettingsOpen(false));
 
   // Use context state directly
   const resumeName = state.resumeTitle;
-  const editMode = state.resumeEditingMode ?? false;
   const selectedTemplate = state.resumeSettings?.template || "classic";
   const fontFamily = state.resumeSettings?.fontFamily || "lato";
   const fontSize = parseInt(state.resumeSettings?.fontSize) ?? 14;
@@ -220,7 +222,7 @@ const Settings = ({
   };
 
   const handleExport = async () => {
-    const previousEditMode = editMode;
+    const previousEditMode = state.resumeEditingMode ?? false;
 
     // Force turn off edit mode and flush DOM updates before reading HTML
     flushSync(() => {
@@ -288,18 +290,8 @@ const Settings = ({
     [sections]
   );
 
-  if (!settingsOpen) {
-    return (
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={() => setSettingsOpen(true)}
-        className="h-9 w-9 m-2"
-        title="Open settings"
-      >
-        <SettingsIcon className="h-4 w-4" />
-      </Button>
-    );
+  if (!isSettingsOpen) {
+    return null;
   }
 
   return (
@@ -310,16 +302,10 @@ const Settings = ({
       )}
       
       <DndProvider backend={HTML5Backend}>
-        <div className="w-full xl:w-80 flex flex-col h-full border-r bg-background">
+        <div className="w-full xl:w-80 flex flex-col h-full border-r bg-background z-[60]">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b bg-background">
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            {/* Back button - hidden on mobile */}
-            <Button asChild variant="ghost" size="icon" title="Go back" className="hidden xl:flex">
-              <Link to="/dashboard">
-                <ArrowLeft className="h-3.5 w-3.5" />
-              </Link>
-            </Button>
 
             <div className="flex-1 min-w-0">
               {isEditingName ? (
@@ -351,10 +337,10 @@ const Settings = ({
 
           {/* Close button - hidden on mobile */}
           <Button
-            variant="outline"
+            variant="secondary"
             size="icon"
             className="h-7 w-7 shrink-0 hover:bg-accent hidden xl:flex"
-            onClick={() => setSettingsOpen(false)}
+            onClick={handleClose}
             title="Close settings"
           >
             <ChevronLeft className="h-3.5 w-3.5" />
@@ -365,27 +351,6 @@ const Settings = ({
         <div className="flex-1 overflow-hidden">
           <ScrollArea className="h-full">
             <div className="p-4 space-y-6">
-              {/* Edit Mode Toggle */}
-              <div className="flex items-center justify-between p-3 bg-card rounded-lg border">
-                <div className="flex items-center gap-3">
-                  <div className="p-1.5 bg-primary/10 rounded">
-                    <Edit3 className="h-3.5 w-3.5 text-primary" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium">Edit Mode</span>
-                    <span className="text-xs text-muted-foreground">
-                      {editMode ? "Editing enabled" : "Preview mode"}
-                    </span>
-                  </div>
-                </div>
-                <Switch
-                  checked={editMode}
-                  onCheckedChange={() =>
-                    dispatch({ type: "SET_EDITING_MODE", payload: !editMode })
-                  }
-                />
-              </div>
-
               {/* Template Selection */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">

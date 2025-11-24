@@ -1,6 +1,6 @@
 'use client'
 
-import { Skeleton } from "../../../components/ui/skeleton"
+import { Skeleton } from "../../../../components/ui/skeleton"
 import { Loader2 } from "lucide-react"
 
 const ResumeWritingLoader = () => {

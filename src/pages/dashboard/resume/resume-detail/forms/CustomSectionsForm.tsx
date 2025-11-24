@@ -1,14 +1,14 @@
 "use client"
 import React, { useState } from "react"
-import { useResume } from "../../../../hooks/useResume"
-import { Button } from "../../../../components/ui/button"
-import { Input } from "../../../../components/ui/input"
-import { Label } from "../../../../components/ui/label"
-import { Textarea } from "../../../../components/ui/textarea"
+import { useResume } from "../../../../../hooks/useResume"
+import { Button } from "../../../../../components/ui/button"
+import { Input } from "../../../../../components/ui/input"
+import { Label } from "../../../../../components/ui/label"
+import { Textarea } from "../../../../../components/ui/textarea"
 import { Plus, Trash2 } from "lucide-react"
-import { ResumeSectionKey } from "../../types/constants"
-import type { CustomSection } from "../../types/resume"
-import { Switch } from "../../../../components/ui/switch"
+import { ResumeSectionKey } from "../../../types/constants"
+import type { CustomSection } from "../../../types/resume"
+import { Switch } from "../../../../../components/ui/switch"
 
 const CustomSectionsForm = ({ onClose }: { onClose: () => void }) => {
   const { state, dispatch } = useResume()

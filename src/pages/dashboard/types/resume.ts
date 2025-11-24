@@ -8,8 +8,9 @@ export type ResumeMetaData = {
     resumeEditingMode:boolean
     resumeError:string | null
     resumeLoading:boolean
-    resumeTitle:string
     jobDescription:string
+    resumeTitle:string
+    isResumeInitialized:boolean
 }
 
 // Resume Settings Type
@@ -18,7 +19,6 @@ export type ResumeSettings = {
     fontFamily: string
     lineHeight: string //1.2-1.8
     template: string //classic, modern, minimal, etc.
-    resumeTitle?: string //eg. "John Doe's Resume", "Jane Smith's Resume", etc.
     sections:Section[],
 }
 

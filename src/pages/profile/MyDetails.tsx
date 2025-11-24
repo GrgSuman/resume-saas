@@ -90,7 +90,7 @@ const MyDetails = ({ user }: { user: UserDetails }) => {
             <div className="flex flex-col sm:flex-row items-center gap-3">
               <div className="flex items-center gap-2 px-3 py-1 bg-[#7060fc] text-white rounded-full text-sm">
                 <CreditCard className="h-4 w-4" />
-                <span className="font-medium">{user?.credits || 0} Credits</span>
+                Free Plan
               </div>
               <div className="flex items-center gap-2 px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm">
                 <Calendar className="h-4 w-4" />

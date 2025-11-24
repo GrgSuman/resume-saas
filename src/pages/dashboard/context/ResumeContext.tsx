@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useReducer,  useRef,  type Dispatch } from "react";
+import React, { createContext, useEffect, useReducer,  type Dispatch } from "react";
 import type { ResumeMetaData, ResumeSettings, ResumeData } from "../types/resume";
 import { useNavigate, useParams } from "react-router";
 import axiosInstance from "../../../api/axios";
@@ -12,8 +12,9 @@ const initialState: ResumeMetaData={
     resumeEditingMode: false,
     resumeError: null,
     resumeLoading: true,
-    resumeTitle: defaultResumeData.resumeTitle,
     jobDescription: '',
+    resumeTitle: '',
+    isResumeInitialized:false
 }
 
 // Action Types
@@ -74,10 +75,10 @@ const resumeReducer = (state: ResumeMetaData | null, action: ResumeAction) => {
             return { ...state, resumeTitle: action.payload.resumeTitle, resumeData: action.payload.resumeData, resumeSettings: action.payload.resumeSettings, jobDescription: action.payload.jobDescription };
 
         case 'UPDATE_RESUME_DATA':
-            return { ...state,resumeData: { ...state.resumeData, ...action.payload } };
+            return { ...state,resumeData: { ...state.resumeData, ...action.payload }, isResumeInitialized: true };
 
         case 'UPDATE_RESUME_SETTINGS':
-            return { ...state, resumeSettings: { ...state.resumeSettings, ...action.payload } };
+            return { ...state, resumeSettings: { ...state.resumeSettings, ...action.payload }, isResumeInitialized: true };
 
         default:
             return state;
@@ -109,7 +110,6 @@ export const ResumeProvider: React.FC<{children: React.ReactNode}> = ({ children
                 }
             }
             finally{
-                hasInitialized.current = true;
                 dispatch({type: 'SET_LOADING', payload: false});
             }
         }
@@ -118,11 +118,12 @@ export const ResumeProvider: React.FC<{children: React.ReactNode}> = ({ children
         }
     }, [id, navigate])
 
-    const hasInitialized = useRef(false);
 
-    // update resume
+    // // update resume
     useEffect(() => {
-        if (!id || !hasInitialized.current) return
+        if (!id) return
+
+        if(!state.isResumeInitialized) return;
 
         //Set up debounce
         const debounceTimer = setTimeout(() => {
@@ -131,7 +132,7 @@ export const ResumeProvider: React.FC<{children: React.ReactNode}> = ({ children
 
         //cleanup previous timeout when dependencies change
         return () => clearTimeout(debounceTimer);
-    }, [state?.resumeData, state?.resumeSettings, id,state?.resumeTitle, state?.jobDescription])
+    }, [state?.resumeData, state?.resumeSettings, id,state?.resumeTitle, state?.jobDescription, state?.isResumeInitialized])
 
 
     const updateResume = async (id: string, resumeData?: ResumeData, resumeSettings?: ResumeSettings, title?: string | null, jobDescription?: string | null) => {

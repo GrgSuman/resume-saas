@@ -1,6 +1,6 @@
 const DownloadingUI = () => {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4">
       <div className="bg-white rounded-2xl p-8 max-w-sm w-full shadow-2xl border border-gray-200">
         <h3 className="text-xl font-semibold text-gray-900 mb-2 tracking-tight text-center">
           Generating your resume...

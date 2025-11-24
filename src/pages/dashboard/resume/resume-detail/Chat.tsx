@@ -3,13 +3,13 @@
 import type React from "react"
 import { useState, useEffect, useRef, memo } from "react"
 import { ArrowUp, AtSign, Lightbulb, X, FileText, Loader2 } from "lucide-react"
-import { ScrollArea } from "../../../components/ui/scroll-area"
-import { Button } from "../../../components/ui/button"
-import { Textarea } from "../../../components/ui/textarea"
-import { Label } from "../../../components/ui/label"
-import { useResume } from "../../../hooks/useResume"
+import { ScrollArea } from "../../../../components/ui/scroll-area"
+import { Button } from "../../../../components/ui/button"
+import { Textarea } from "../../../../components/ui/textarea"
+import { Label } from "../../../../components/ui/label"
+import { useResume } from "../../../../hooks/useResume"
 import { useParams } from "react-router"
-import axiosInstance from "../../../api/axios"
+import axiosInstance from "../../../../api/axios"
 import axios from "axios"
 import { toast } from "react-toastify"
 import ReactMarkdown from "react-markdown"
@@ -28,7 +28,7 @@ const Message = memo(({ msg }: { msg: MessageItem }) => (
           : "bg-gradient-to-br from-gray-900 to-gray-800 text-white border border-gray-700/50"
       }`}
     >
-      <div className="prose prose-sm max-w-none dark:prose-invert [&>*]:m-0 [&>p]:mb-1 [&>ul]:my-1 [&>ol]:my-1 [&>li]:m-0">
+      <div className="prose-sm max-w-none">
         <ReactMarkdown>{msg.text}</ReactMarkdown>
       </div>
     </div>

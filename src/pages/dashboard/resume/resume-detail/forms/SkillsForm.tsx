@@ -1,12 +1,12 @@
 
 import React, { useState } from "react"
-import { Button } from "../../../../components/ui/button"
-import { Input } from "../../../../components/ui/input"
-import { Label } from "../../../../components/ui/label"
+import { Button } from "../../../../../components/ui/button"
+import { Input } from "../../../../../components/ui/input"
+import { Label } from "../../../../../components/ui/label"
 import { Plus, Trash2 } from "lucide-react"
-import type { SkillCategory } from "../../types/resume"
-import { useResume } from "../../../../hooks/useResume"
-import { ResumeSectionKey } from "../../types/constants"
+import type { SkillCategory } from "../../../types/resume"
+import { useResume } from "../../../../../hooks/useResume"
+import { ResumeSectionKey } from "../../../types/constants"
 
 const SkillsForm = ({ onClose }: { onClose: () => void }) => {
   const { state, dispatch } = useResume()
