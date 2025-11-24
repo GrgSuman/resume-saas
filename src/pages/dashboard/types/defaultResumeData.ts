@@ -2,6 +2,7 @@ import { ResumeSectionKey } from "./constants";
 import type { ResumeMetaData } from "./resume";
 
 export const defaultResumeData: ResumeMetaData = {
+    isResumeInitialized: false,
     resumeTitle: "Alex Chen's Resume",
     jobDescription: "Full Stack MERN Developer",
     resumeError: null,
@@ -11,7 +12,6 @@ export const defaultResumeData: ResumeMetaData = {
         fontFamily: "lato",
         lineHeight: "1.4",
         template: "classic",
-        resumeTitle: "Alex Chen's Resume",
         sections: [
             { key: ResumeSectionKey.PERSONAL_INFO, label: "ProfessionalSummary", order: 1, visible: true },
             { key: ResumeSectionKey.EXPERIENCE, label: "Experience", order: 2, visible: true },
