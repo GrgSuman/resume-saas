@@ -1,22 +1,25 @@
-import { useRef, useState, useEffect, useCallback } from "react";
+import {
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+  type ReactNode,
+  type TouchEvent as ReactTouchEvent,
+  type MouseEvent as ReactMouseEvent,
+} from "react";
 import ResumePreview from "./ResumePreview";
 import SettingsNew from "./SettingsNew";
 import DownloadingUI from "./DownloadingUI";
 import Chat from "./Chat";
-import { MessageSquare, ChevronDown } from "lucide-react";
-import { Button } from "../../../../components/ui/button";
 import { useResume } from "../../../../hooks/useResume";
 import LoadingResumeDetail from "./LoadingResumeDetail";
 import TEMPLATE_REGISTRY from "./templates/TemplateRegistry";
-import { cn } from "../../../../lib/utils";
 
 const ResumeDetail = () => {
-  const [isChatOpen, setIsChatOpen] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(0.92);
 
   const { state } = useResume();
   const htmlRef = useRef<HTMLDivElement>(null);
-  const resumeContainerRef = useRef<HTMLDivElement>(null);
 
   // ------------------------------------------------------------------
   // Zoom Logic
@@ -41,20 +44,14 @@ const ResumeDetail = () => {
     setZoomLevel(calculateAutoZoom());
   }, [calculateAutoZoom]);
 
-  // Recalculate zoom when window resizes OR when chat opens/closes (changing container size)
+  // Recalculate zoom when window resizes
   useEffect(() => {
-    // We set a timeout to allow the CSS transition (300ms) to finish 
-    // before measuring the new width
-    const timer = setTimeout(() => {
-      handleResetZoom();
-    }, 350);
-
+    handleResetZoom();
     window.addEventListener("resize", handleResetZoom);
     return () => {
       window.removeEventListener("resize", handleResetZoom);
-      clearTimeout(timer);
     };
-  }, [handleResetZoom, isChatOpen]);
+  }, [handleResetZoom]);
 
   return (
     <>
@@ -65,26 +62,13 @@ const ResumeDetail = () => {
         <LoadingResumeDetail />
       ) : (
         <>
-          {/* Main Layout Container
-             Uses 100dvh (Dynamic Viewport Height) for better mobile browser support 
-          */}
-          <div className="h-[100dvh] flex flex-col xl:flex-row overflow-hidden bg-[#f5f5f5]">
+          {/* Main Layout Container*/}
+          <div className="h-[100vh] flex flex-col xl:flex-row overflow-hidden bg-[#f5f5f5]">
             
-            {/* SECTION 1: RESUME PREVIEW
-               Desktop: Left side, Flex-1
-               Mobile: Top side. Height changes from 100% -> 45% when chat opens.
-            */}
-            <div 
-              className={cn(
-                "relative flex flex-col transition-all duration-300 ease-in-out",
-                // Desktop styles
-                "xl:flex-1 xl:h-auto",
-                // Mobile styles: Shrink to 45% if chat is open, else 100%
-                isChatOpen ? "h-[45%]" : "h-full"
-              )}
-            >
+            {/* SECTION 1: RESUME PREVIEW*/}
+            <div className="relative flex flex-col flex-1 min-h-0 transition-all duration-300 ease-in-out">
               {/* Settings Toolbar */}
-              <div className="absolute top-2 left-2 right-2 z-50">
+              <div className="absolute top-2 left-2 right-2 z-20">
                 <SettingsNew
                   htmlRef={htmlRef}
                   zoomLevel={zoomLevel}
@@ -95,61 +79,20 @@ const ResumeDetail = () => {
               </div>
 
               {/* The actual Resume Preview Area */}
-              <div 
-                ref={resumeContainerRef}
-                className="flex-1 overflow-hidden pt-16 flex justify-center bg-[#f5f5f5]"
-              >
+              <div className="flex-1 overflow-hidden pt-16 flex justify-center bg-[#f5f5f5]">
                 <ResumePreview zoomLevel={zoomLevel} />
               </div>
 
-              {/* Floating Chat Button (Mobile Only) - Only visible when Chat is CLOSED */}
-              {!isChatOpen && (
-                <div className="xl:hidden absolute bottom-6 right-6 z-50">
-                   <Button
-                    onClick={() => setIsChatOpen(true)}
-                    size="icon"
-                    className="h-14 w-14 rounded-full shadow-lg"
-                    title="Open AI Chat"
-                  >
-                    <MessageSquare className="h-6 w-6" />
-                  </Button>
-                </div>
-              )}
             </div>
 
-            {/* SECTION 2: CHAT AREA
-               Desktop: Right side, Fixed width 420px
-               Mobile: Bottom side. Height changes from 0 -> 55% when open.
-            */}
-            <div 
-              className={cn(
-                "flex flex-col bg-white z-40 transition-all duration-300 ease-in-out overflow-hidden",
-                "xl:w-[420px] xl:h-full", 
-                isChatOpen ? "h-[55%] border-t border-gray-200" : "h-0"
-              )}
-            >
-              <div className="xl:hidden flex items-center justify-between px-4 py-2 bg-gray-50 border-b">
-                <div
-                  className="flex-1 flex justify-center"
-                  onClick={() => setIsChatOpen(false)}
-                >
-                  <div className="w-12 h-1.5 bg-gray-300 rounded-full cursor-pointer hover:bg-gray-200 transition-colors" />
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 flex-shrink-0"
-                  onClick={() => setIsChatOpen(false)}
-                >
-                  <ChevronDown className="h-5 w-5 text-gray-500" />
-                </Button>
-              </div>
+            {/* SECTION 2: CHAT AREA*/}
+            {/* <div className=" bg-white transition-all duration-300 ease-in-out overflow-hidden xl:w-[420px] w-full">
+              <Chat />
+            </div> */}
 
-              <div className="flex-1 flex flex-col overflow-hidden">
-                <Chat />
-              </div>
-            </div>
-
+            <DraggableBottomSheet>
+              <Chat/>
+            </DraggableBottomSheet>
 
             {/* Hidden Print Section - Required for PDF Generation */}
             <section ref={htmlRef} className="hidden">
@@ -183,3 +126,102 @@ const ResumeDetail = () => {
 };
 
 export default ResumeDetail;
+
+
+export function DraggableBottomSheet({ children }: { children: ReactNode }) {
+  const [height, setHeight] = useState(70); // percentage
+  const [isDragging, setIsDragging] = useState(false);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const startY = useRef(0);
+  const startHeight = useRef(0);
+
+  const handleMove = useCallback(
+    (clientY: number) => {
+      if (!isDragging || !containerRef.current) return;
+
+      const windowHeight = window.innerHeight;
+      const deltaY = startY.current - clientY;
+      const deltaPercent = (deltaY / windowHeight) * 100;
+      const newHeight = Math.min(
+        Math.max(startHeight.current + deltaPercent, 20),
+        90
+      );
+
+      setHeight(newHeight);
+    },
+    [isDragging]
+  );
+
+  const handleEnd = useCallback(() => {
+    setIsDragging(false);
+    // Snap to 50% if close
+    if (Math.abs(height - 50) < 10) {
+      setHeight(50);
+    }
+  }, [height]);
+
+  const handleTouchStart = (e: ReactTouchEvent<HTMLDivElement>) => {
+    setIsDragging(true);
+    startY.current = e.touches[0].clientY;
+    startHeight.current = height;
+  };
+
+  const handleMouseDown = (e: ReactMouseEvent<HTMLDivElement>) => {
+    setIsDragging(true);
+    startY.current = e.clientY;
+    startHeight.current = height;
+  };
+
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const onMouseMove = (event: MouseEvent) => handleMove(event.clientY);
+    const onTouchMove = (event: TouchEvent) =>
+      handleMove(event.touches[0].clientY);
+
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", handleEnd);
+    document.addEventListener("touchmove", onTouchMove);
+    document.addEventListener("touchend", handleEnd);
+
+    return () => {
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", handleEnd);
+      document.removeEventListener("touchmove", onTouchMove);
+      document.removeEventListener("touchend", handleEnd);
+    };
+  }, [handleEnd, handleMove, isDragging]);
+
+  return (
+    <>
+      {/* Desktop view (xl and above) - static sidebar */}
+      <div className="hidden xl:block xl:w-[420px] w-full h-full bg-white">
+        {children}
+      </div>
+
+      {/* Mobile/Tablet view (below xl) - draggable bottom sheet */}
+      <div
+        ref={containerRef}
+        className="xl:hidden fixed bottom-0 left-0 right-0 bg-white shadow-2xl rounded-t-3xl transition-shadow duration-200 z-50"
+        style={{ 
+          height: `${height}vh`,
+          touchAction: 'none'
+        }}
+      >
+        {/* Drag Handle */}
+        <div
+          className="absolute top-0 left-0 right-0 flex items-center justify-center py-3 cursor-grab active:cursor-grabbing"
+          onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
+        >
+          <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
+        </div>
+
+        {/* Chat Content */}
+        <div className="pt-10 h-full w-full overflow-hidden">
+          {children}
+        </div>
+      </div>
+    </>
+  );
+}

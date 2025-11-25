@@ -305,7 +305,7 @@ const SettingsNew = ({
                 }
                 className="scale-90"
               />
-              <span className="text-sm font-medium text-muted-foreground whitespace-nowrap hover:text-foreground transition-colors hidden sm:inline">
+              <span className="text-sm font-medium text-muted-foreground whitespace-nowrap hover:text-foreground transition-colors inline">
                 {editMode ? "Editing" : "Viewing"}
               </span>
             </div>
