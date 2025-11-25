@@ -16,6 +16,10 @@ axiosInstance.interceptors.request.use((config) => {
   if (token) {
     config.headers['Authorization'] = `Bearer ${token}`;
   }
+  // Don't override Content-Type if FormData is being used (for file uploads)
+  if (config.data instanceof FormData) {
+    delete config.headers['Content-Type']; // Let axios set it automatically with boundary
+  }
   return config;
 }, (error) => Promise.reject(error));
 
