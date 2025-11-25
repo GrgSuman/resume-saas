@@ -37,18 +37,13 @@ export default function CoverLetterDialog({ open, onOpenChange, onSubmit, isCrea
   const [roleFocus, setRoleFocus] = useState("")
   const [standoutMoment, setStandoutMoment] = useState("")
   const [tone, setTone] = useState("professional")
+  const [loadingStage, setLoadingStage] = useState<string>("")
   
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const jobDescriptionWordCount = jobDescription.trim()
-    ? jobDescription.trim().split(/\s+/).length
-    : 0
+  const jobDescriptionWordCount = jobDescription.trim()? jobDescription.trim().split(/\s+/).length: 0
 
-    const {
-      data: resumeData,
-      isLoading,
-      isError,
-    } = useQuery({
+    const {data: resumeData, isLoading, isError} = useQuery({
       queryKey: ["resumes"],
       queryFn: () => axiosInstance.get("/resume/user"),
     });
@@ -65,8 +60,44 @@ export default function CoverLetterDialog({ open, onOpenChange, onSubmit, isCrea
       setRoleFocus("")
       setStandoutMoment("")
       setTone("professional")
+      setLoadingStage("")
     }
   }, [open])
+  
+  // Simulate loading stages when file is being uploaded
+  useEffect(() => {
+    if (!isCreating) {
+      setLoadingStage("")
+      return
+    }
+    
+    // Only show stages if a file is being uploaded
+    if (selectedResume === "upload" && resumeFile) {
+      const stages = [
+        { stage: "uploading", text: "Uploading file..." },
+        { stage: "analyzing", text: "Analyzing content..." },
+        { stage: "extracting", text: "Extracting data..." },
+      ]
+      
+      // Start with first stage
+      setLoadingStage(stages[0].stage)
+      
+      let currentIndex = 1
+      const interval = setInterval(() => {
+        if (currentIndex < stages.length && isCreating) {
+          setLoadingStage(stages[currentIndex].stage)
+          currentIndex++
+        } else {
+          clearInterval(interval)
+        }
+      }, 2000) // Change stage every 2 seconds
+      
+      return () => clearInterval(interval)
+    } else {
+      // If no file upload, just show "Creating..."
+      setLoadingStage("")
+    }
+  }, [isCreating, selectedResume, resumeFile])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -86,6 +117,11 @@ export default function CoverLetterDialog({ open, onOpenChange, onSubmit, isCrea
   const handleSubmit = () => {
     if (!name.trim() || !selectedResume || !jobDescription.trim()) return
     if (selectedResume === "upload" && !resumeFile) return
+  
+    // Set loading stage if file is being uploaded
+    if (selectedResume === "upload" && resumeFile) {
+      setLoadingStage("uploading")
+    }
   
     onSubmit({
       name: name.trim(),
@@ -393,7 +429,13 @@ export default function CoverLetterDialog({ open, onOpenChange, onSubmit, isCrea
                 {isCreating ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Creating...
+                    <span className="transition-all duration-300">
+                      {loadingStage === "uploading" && "Uploading file..."}
+                      {loadingStage === "analyzing" && "Analyzing content..."}
+                      {loadingStage === "extracting" && "Extracting data..."}
+                      {loadingStage === "generating" && "Generating cover letter..."}
+                      {!loadingStage && "Creating..."}
+                    </span>
                   </>
                 ) : (
                   "Create cover letter"

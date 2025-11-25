@@ -116,15 +116,29 @@ export default function App() {
         tone: string;
       };
     }) => {
-      const response = await axiosInstance.post("/cover-letter", {
-        name: data.name,
-        resumeId: data.resumeId,
-        jobDescription: data.jobDescription,
-        resumeFile: data.resumeFile,
-        personalization: {
-          roleFocus: data?.personalization?.roleFocus || "",
-          standoutMoment: data?.personalization?.standoutMoment || "",
-          tone: data?.personalization?.tone || "",
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append("name", data.name);
+      formData.append("resumeId", data.resumeId);
+      formData.append("jobDescription", data.jobDescription);
+      
+      // Append file if it exists
+      if (data.resumeFile) {
+        formData.append("resumeFile", data.resumeFile);
+      }
+      
+      // Append personalization data as JSON string
+      if (data.personalization) {
+        formData.append("personalization", JSON.stringify({
+          roleFocus: data.personalization.roleFocus || "",
+          standoutMoment: data.personalization.standoutMoment || "",
+          tone: data.personalization.tone || "",
+        }));
+      }
+
+      const response = await axiosInstance.post("/cover-letter", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
         },
       });
       return response.data;
@@ -146,8 +160,6 @@ export default function App() {
     const confirmed = window.confirm(
       `Are you sure you want to delete "${coverLetter.title}"? This action cannot be undone.`
     );
-    console.log(confirmed ? "Yes" : "No");
-    
     if (confirmed) {
       deleteCoverLetterMutation.mutate(coverLetter.id);
     }

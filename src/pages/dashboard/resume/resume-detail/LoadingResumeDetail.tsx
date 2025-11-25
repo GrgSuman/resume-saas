@@ -83,7 +83,7 @@ const LoadingResumeDetail = () => {
         </div>
 
         {/* Chat Panel */}
-        <div className="hidden xl:flex flex-col w-80 border-l border-gray-200 bg-white p-4 gap-4">
+        <div className="hidden xl:flex flex-col w-[420px] border-l border-gray-200 bg-white p-4 gap-4">
           <div className="flex items-center gap-2">
             <Skeleton className="h-6 w-6 rounded-full" />
             <Skeleton className="h-4 w-32" />
