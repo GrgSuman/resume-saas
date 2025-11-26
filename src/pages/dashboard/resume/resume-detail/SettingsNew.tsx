@@ -213,7 +213,7 @@ const SettingsNew = ({
             
              <Button variant="ghost" size="sm" onClick={() => setIsManageSectionsOpen(true)} className="h-9 gap-2 text-muted-foreground font-medium hover:text-foreground">
                 <ArrowDownUp className="h-4 w-4" /> 
-                Sections
+                <span className="hidden lg:inline">Sections</span>
             </Button>
         </div>
 
@@ -245,7 +245,7 @@ const SettingsNew = ({
                     )}
                 >
                     <Eye className="h-3.5 w-3.5" />
-                    <span className="hidden xl:inline">View</span>
+                    <span className="hidden lg:inline">View</span>
                 </div>
                 <div
                     className={cn(
@@ -256,7 +256,7 @@ const SettingsNew = ({
                     )}
                 >
                     <Edit3 className="h-3.5 w-3.5" />
-                    <span className="hidden xl:inline">Edit</span>
+                    <span className="hidden lg:inline">Edit</span>
                 </div>
              </div>
 
@@ -281,7 +281,7 @@ const SettingsNew = ({
                 <SheetTrigger asChild>
                     <Button variant="outline" size="sm" className="h-9 gap-2 border-muted-foreground/20 font-semibold text-muted-foreground">
                         <Settings2 className="h-4 w-4" />
-                        Design
+                        <span className="hidden sm:inline">Design</span>
                     </Button>
                 </SheetTrigger>
                 <SheetContent side="bottom" className="rounded-t-2xl px-6 pb-8 pt-6">
@@ -360,7 +360,7 @@ const SettingsNew = ({
                      )}
                  >
                      <Eye className="h-3.5 w-3.5" />
-                     <span>View</span>
+                     <span className="hidden sm:inline">View</span>
                  </div>
                  <div
                      className={cn(
@@ -371,7 +371,7 @@ const SettingsNew = ({
                      )}
                  >
                      <Edit3 className="h-3.5 w-3.5" />
-                     <span>Edit</span>
+                     <span className="hidden sm:inline">Edit</span>
                  </div>
              </div>
 
