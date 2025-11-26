@@ -36,7 +36,6 @@ const navItems = [
 const BaseDashboardLayout = () => {
   const { user, setUser, setAuthStates } = useAuth();
   const navigate = useNavigate();
-
   const handleLogout = () => {
     manageLocalStorage.remove("token");
     setUser(null);
