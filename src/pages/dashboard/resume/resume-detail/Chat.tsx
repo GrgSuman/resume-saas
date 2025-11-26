@@ -11,7 +11,7 @@ import axiosInstance from "../../../../api/axios";
 import axios from "axios";
 import { toast } from "react-toastify";
 import ReactMarkdown from "react-markdown";
-import './MarkdownStyle.css';
+import "./MarkdownStyle.css";
 
 interface MessageItem {
   role: "model" | "user";
@@ -19,9 +19,19 @@ interface MessageItem {
 }
 
 const Message = memo(({ msg }: { msg: MessageItem }) => (
-  <div className={`flex leading-relaxed ${msg.role === "user" ? "justify-end" : "justify-start"} mb-4`}>
-    <div className={`rounded-xl text-sm ${msg.role === "model" ? " text-gray-800" : "bg-secondary p-3 px-4"}`}>
-      <div className="markdown-body">
+  <div
+    className={`flex leading-relaxed ${
+      msg.role === "user" ? "justify-end" : "justify-start"
+    } mb-2 lg:mb-4`}
+  >
+    <div
+      className={`rounded-xl text-sm ${
+        msg.role === "model"
+          ? "text-gray-800 p-2 lg:p-3"
+          : "bg-secondary p-2 px-3 lg:p-3 lg:px-4"
+      }`}
+    >
+      <div className="markdown-body text-[14px] lg:text-[16px]">
         <ReactMarkdown>{msg.text}</ReactMarkdown>
       </div>
     </div>
@@ -32,22 +42,39 @@ const Chat = () => {
   const [messages, setMessages] = useState<MessageItem[]>([]);
   const [message, setMessage] = useState("");
   const { state, dispatch } = useResume();
-  const [jobDescription, setJobDescription] = useState(state.jobDescription || "");
+  const [jobDescription, setJobDescription] = useState(
+    state.jobDescription || ""
+  );
   const [showJobModal, setShowJobModal] = useState(false);
   const [chatLoading, setChatLoading] = useState(true);
   const [msgSending, setMsgSending] = useState(false);
   const endRef = useRef<HTMLDivElement | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "auto" });
   }, [messages]);
+
+  useEffect(() => {
+    const updateTextareaHeight = () => {
+      if (textareaRef.current) {
+        const isXL = window.innerWidth >= 1280;
+        textareaRef.current.style.height = isXL ? "50px" : "45px";
+      }
+    };
+    updateTextareaHeight();
+    window.addEventListener("resize", updateTextareaHeight);
+    return () => window.removeEventListener("resize", updateTextareaHeight);
+  }, []);
 
   const { id } = useParams<{ id: string }>();
 
   useEffect(() => {
     const getConversation = async () => {
       try {
-        const response = await axiosInstance.get(`/resumegpt/conversation/${id}`);
+        const response = await axiosInstance.get(
+          `/resumegpt/conversation/${id}`
+        );
         const msgHistory = response.data.conversation.map(
           (message: { role: string; text: string }) => ({
             role: message.role as "model" | "user",
@@ -57,28 +84,34 @@ const Chat = () => {
         setMessages(msgHistory);
       } catch (error) {
         if (axios.isAxiosError(error)) {
-          toast.error(error?.response?.data?.message, {
-            position: "top-right",
-          });
+          toast.error(
+            error?.response?.data?.message || "Error loading conversation",
+            {
+              position: "top-right",
+            }
+          );
         }
       } finally {
         setChatLoading(false);
       }
     };
-    if (id) {
-      getConversation();
-    }
+    if (id) getConversation();
   }, [id]);
 
   const handleSend = async () => {
-    setMsgSending(true);
     if (!message.trim()) return;
 
     setMessages((prev) => [...prev, { role: "user", text: message }]);
     setMessage("");
+    if (textareaRef.current) {
+      const isXL = window.innerWidth >= 1280;
+      textareaRef.current.style.height = isXL ? "50px" : "45px";
+    }
+    setMsgSending(true);
 
     try {
-      const response = await axiosInstance.post(`/resumegpt/conversation/${id}`,
+      const response = await axiosInstance.post(
+        `/resumegpt/conversation/${id}`,
         {
           userPrompt: message,
           resumeId: id,
@@ -87,6 +120,7 @@ const Chat = () => {
           resumeSettings: state.resumeSettings,
         }
       );
+
       setMessages((prev) => [
         ...prev,
         { role: "model", text: response.data.response.message },
@@ -95,15 +129,11 @@ const Chat = () => {
       if (response.data?.response?.resumeChanges?.hasChanges) {
         const finalPayload = response.data.response.resumeUpdates;
         for (const key in finalPayload) {
-          if (finalPayload[key] === null) {
-            delete finalPayload[key];
-          }
+          if (finalPayload[key] === null) delete finalPayload[key];
         }
-        dispatch({
-          type: "UPDATE_RESUME_DATA",
-          payload: finalPayload,
-        });
+        dispatch({ type: "UPDATE_RESUME_DATA", payload: finalPayload });
       }
+
       if (response.data?.response?.settingsChanges?.hasChanges) {
         dispatch({
           type: "UPDATE_RESUME_SETTINGS",
@@ -111,7 +141,6 @@ const Chat = () => {
         });
       }
     } catch (error) {
-      // console.log("error", error)
       if (axios.isAxiosError(error)) {
         toast.error("Something went wrong. Please try again.", {
           position: "top-right",
@@ -139,24 +168,22 @@ const Chat = () => {
     <>
       {/* Job Description Modal */}
       {showJobModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-100 p-4">
-          <div className="bg-background rounded-lg border max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col shadow-lg">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-2 lg:p-4">
+          <div className="bg-background rounded-lg border max-w-lg w-full max-h-[85vh] overflow-hidden flex flex-col shadow-lg">
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b bg-muted/50">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-primary/10 rounded flex items-center justify-center">
+            <div className="flex items-center justify-between p-4 border-b bg-muted/50">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 bg-primary/10 rounded flex items-center justify-center">
                   <FileText className="w-4 h-4 text-primary" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold">
-                    {state.jobDescription !== "" &&
-                    state.jobDescription !== null
+                  <h2 className="text-md font-semibold">
+                    {state.jobDescription
                       ? "Edit Job Description"
                       : "Add Job Description"}
                   </h2>
-                  <p className="text-sm text-muted-foreground">
-                    {state.jobDescription !== "" &&
-                    state.jobDescription !== null
+                  <p className="text-xs text-muted-foreground">
+                    {state.jobDescription
                       ? "Update the job description content"
                       : "Paste the job description to get tailored resume advice"}
                   </p>
@@ -166,85 +193,84 @@ const Chat = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowJobModal(false)}
-                className="h-8 w-8 p-0"
+                className="h-7 w-7 p-0"
               >
                 <X className="w-4 h-4" />
               </Button>
             </div>
 
             {/* Content */}
-            <div className="flex-1 p-6 overflow-y-auto">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="job-description" className="text-sm font-medium"> 
-                    Job Description
-                  </Label>
-                  <Textarea
-                    id="job-description"
-                    value={jobDescription}
-                    onChange={(e) => setJobDescription(e.target.value)}
-                    placeholder="Paste the job description here... Include requirements, responsibilities, and any specific skills mentioned."
-                    className="h-[250px] overflow-y-auto resize-none"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    The AI will analyze this job description and provide
-                    specific recommendations for your resume.
-                  </p>
-                </div>
-              </div>
+            <div className="flex-1 p-3 lg:p-6 overflow-y-auto">
+              <Label htmlFor="job-description" className="text-sm font-medium">
+                Job Description
+              </Label>
+              <Textarea
+                id="job-description"
+                value={jobDescription}
+                onChange={(e) => setJobDescription(e.target.value)}
+                placeholder="Paste the job description here..."
+                className="h-[180px] lg:h-[250px] overflow-y-auto resize-none text-sm lg:text-base"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                The AI will analyze this job description and provide specific
+                recommendations for your resume.
+              </p>
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-end gap-3 p-6 border-t bg-muted/50">
-              <Button variant="outline" onClick={() => setShowJobModal(false)}>
+            <div className="flex items-center justify-end gap-2 p-3 lg:p-6 border-t bg-muted/50">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowJobModal(false)}
+              >
                 Cancel
               </Button>
-
-              {state.jobDescription !== "" && state.jobDescription !== null ? (
-                <Button
-                  onClick={() => {
-                    setShowJobModal(false);
-                    if (jobDescription.trim() !== state.jobDescription) {
-                      dispatch({
-                        type: "SET_JOB_DESCRIPTION",
-                        payload: jobDescription.trim(),
-                      });
-                    }
-                  }}
-                >
-                  Update Job Description
-                </Button>
-              ) : (
-                <Button onClick={handleAddJobDescription} disabled={!jobDescription.trim()}>
-                  Add Job Description
-                </Button>
-              )}
+              <Button
+                onClick={
+                  state.jobDescription
+                    ? () => {
+                        setShowJobModal(false);
+                        if (jobDescription.trim() !== state.jobDescription)
+                          dispatch({
+                            type: "SET_JOB_DESCRIPTION",
+                            payload: jobDescription.trim(),
+                          });
+                      }
+                    : handleAddJobDescription
+                }
+                disabled={!jobDescription.trim()}
+              >
+                {state.jobDescription
+                  ? "Update Job Description"
+                  : "Add Job Description"}
+              </Button>
             </div>
           </div>
         </div>
       )}
 
       {/* Chat Container */}
-      <div className="flex flex-col h-full bg-gradient-to-br from-gray-50 via-white to-gray-50 border-l border-gray-200">
+      <div className="flex flex-col h-full bg-gradient-to-br from-gray-50 via-white to-gray-50 border-l lg:border-gray-200">
         {/* Header */}
-        <div className="h-14 flex items-center justify-between px-4 border-b bg-white/60 backdrop-blur-md">
-          {/* Title */}
-          <div className="flex items-center gap-2">
-            <h2 className=" font-semibold text-gray-900">Resume Assistant</h2>
-          </div>
-
-          {/* JD button */}
+        <div className="h-12 lg:h-14 flex items-center justify-between px-3 lg:px-4 border-b bg-white/80 backdrop-blur-md">
+          <h2 className="text-sm lg:text-lg font-semibold text-gray-900">
+            Resume Assistant
+          </h2>
           <Button
             onClick={() => setShowJobModal(true)}
             variant="ghost"
             size="sm"
-            className={`
-            flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-md
-            transition
-            ${state.jobDescription ? "text-green-700 bg-green-50 hover:bg-green-100 border border-green-200" : "text-gray-600 hover:bg-gray-100 border border-gray-200"}
-          `}>
+            className={`flex items-center gap-1 text-[11px] lg:text-xs px-2.5 py-1 lg:px-3 lg:py-1.5 rounded-md transition ${
+              state.jobDescription
+                ? "text-green-700 bg-green-50 hover:bg-green-100 border border-green-200"
+                : "text-gray-600 hover:bg-gray-100 border border-gray-200"
+            }`}
+          >
             <AtSign className="w-3 h-3" />
-            {state.jobDescription ? "Edit Job Description" : "Add Job Description"}
+            {state.jobDescription
+              ? "Edit Job Description"
+              : "Add Job Description"}
           </Button>
         </div>
 
@@ -252,40 +278,43 @@ const Chat = () => {
         <div className="flex-1 overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-50/30">
           {chatLoading ? (
             <div className="flex justify-center items-center h-full">
-              <div className="text-center space-y-3">
-                <div className="flex items-center justify-center gap-2">
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                      style={{animationDelay: "0ms", animationDuration: "1.4s"}}
-                    />
-                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                      style={{animationDelay: "0.2s", animationDuration: "1.4s"}}
-                    />
-                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                      style={{animationDelay: "0.4s", animationDuration: "1.4s"}}
-                    />
-                  </div>
+              <div className="text-center space-y-2">
+                <div className="flex items-center justify-center gap-1">
+                  <span
+                    className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                    style={{ animationDelay: "0ms" }}
+                  />
+                  <span
+                    className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                    style={{ animationDelay: "0.2s" }}
+                  />
+                  <span
+                    className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                    style={{ animationDelay: "0.4s" }}
+                  />
                 </div>
-                <div className="text-gray-500 text-sm font-medium">
+                <p className="text-gray-500 text-sm font-medium">
                   Loading conversation...
-                </div>
-                <div className="text-gray-400 text-xs">
-                  Please wait a moment
-                </div>
+                </p>
+                <p className="text-gray-400 text-xs">Please wait a moment</p>
               </div>
             </div>
           ) : (
             <ScrollArea className="h-full">
-              <div className="p-6 space-y-3">
+              <div className="p-3 lg:p-6 space-y-2 lg:space-y-3">
                 {messages.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-center text-gray-500 py-12">
-                    <div className="w-20 h-20 rounded overflow-hidden mb-4">
-                      <img src="/avatar.png" alt="AI Assistant" className="w-full h-full object-contain" />
+                    <div className="w-16 h-16 rounded overflow-hidden mb-2 lg:mb-4">
+                      <img
+                        src="/avatar.png"
+                        alt="AI Assistant"
+                        className="w-full h-full object-contain"
+                      />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    <h3 className="text-base lg:text-lg font-semibold text-gray-900 mb-1 lg:mb-2">
                       How can I help with your resume?
                     </h3>
-                    <p className="text-sm text-gray-500 max-w-md">
+                    <p className="text-xs lg:text-sm text-gray-500 max-w-md">
                       Get feedback on your resume, optimize for job
                       descriptions, or improve your content.
                     </p>
@@ -296,20 +325,12 @@ const Chat = () => {
                       <Message key={idx} msg={msg} />
                     ))}
                     {msgSending && (
-                      <div className="flex justify-start mb-4 animate-fade-in">
-                        <div className="rounded-xl px-5 py-3 text-gray-700 transition-all">
-                          <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-1.5">
-                              <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                                style={{animationDelay: "0ms", animationDuration: "1.4s"}}
-                              />
-                              <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                                style={{animationDelay: "0.2s", animationDuration: "1.4s"}}
-                              />
-                              <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                                style={{animationDelay: "0.4s", animationDuration: "1.4s"}}
-                              />
-                            </div>
+                      <div className="flex justify-start mb-2 lg:mb-4 animate-fade-in">
+                        <div className="rounded-xl px-4 py-2 text-gray-700 transition-all">
+                          <div className="flex items-center gap-1">
+                            <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+                            <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+                            <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
                           </div>
                         </div>
                       </div>
@@ -323,39 +344,59 @@ const Chat = () => {
         </div>
 
         {/* Input Area */}
-        <div className="p-4 backdrop-blur-sm flex flex-col gap-2 relative bg-white z-20">
-            {/* 3. The Whitish Gradient Fade (This sits on top of the scroll area) */}
-            <div className="xl:block hidden absolute -top-10 left-0 right-0 h-10 bg-gradient-to-t from-white to-transparent pointer-events-none" />
-
-          <h3 className="text-sm font-medium text-gray-900 mb-2 xl:block hidden ">Suggestions:</h3>
-          <div className="flex-wrap gap-2 mb-2 cursor-pointer xl:flex hidden">
-            {["Improve grammar", "Add more details", "Add more education", "Add more experience"].map((suggestion) => (
-              <div key={suggestion} className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
-                <span className="text-gray-800">{suggestion}</span>
-              </div>
+        <div className="p-2 lg:p-4 backdrop-blur-sm flex flex-col gap-1 lg:gap-2 relative bg-white z-20">
+          <div className="block absolute -top-10 left-0 right-0 h-10 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+          <div className="flex-wrap gap-1.5 mb-1 hidden lg:flex">
+            {[
+              "Improve grammar",
+              "Add more details",
+              "Add more education",
+              "Add more experience",
+            ].map((s) => (
+              <button
+                key={s}
+                onClick={() => setMessage(s)}
+                className="bg-gray-50 hover:bg-gray-100 text-gray-600 hover:text-gray-700 px-2 py-0.5 rounded-md text-xs transition-colors border border-gray-200/50"
+              >
+                {s}
+              </button>
             ))}
           </div>
-
           <div className="relative">
-            <div className={`relative border rounded-xl bg-white focus-within:ring-1 focus-within:ring-gray-800`}>
-              <div className="p-3 pb-14">
+            <div className="relative border rounded-2xl bg-white shadow-sm focus-within:ring-2 focus-within:ring-gray-900/20 focus-within:border-gray-300 transition-all">
+              <div className="p-2.5 sm:p-3 lg:p-4 xl:p-5">
                 <textarea
+                  ref={textareaRef}
                   value={message}
-                  onChange={(e) => setMessage(e.target.value)}
+                  onChange={(e) => {
+                    setMessage(e.target.value);
+                    if (textareaRef.current) {
+                      const isXL = window.innerWidth >= 1280;
+                      const minHeight = isXL ? 70 : 45;
+                      textareaRef.current.style.height = "auto";
+                      textareaRef.current.style.height = `${Math.max(
+                        minHeight,
+                        Math.min(textareaRef.current.scrollHeight, 140)
+                      )}px`;
+                    }
+                  }}
                   onKeyDown={handleKeyPress}
                   placeholder="Ask anything about your resume..."
-                  className="w-full text-[16px] resize-none focus:outline-none bg-transparent transition-all duration-200"
-                  rows={2}
-                  style={{ height: "40px" }}
+                  className="w-full text-[16px] resize-none focus:outline-none bg-transparent placeholder:text-gray-400 leading-relaxed min-h-[45px] xl:min-h-[60px]"
+                  rows={1}
+                  style={{
+                    maxHeight: "140px",
+                  }}
                 />
               </div>
-              <button onClick={handleSend} disabled={!message.trim() || msgSending} className="absolute bottom-3 right-3 p-3 bg-black text-white rounded-full hover:bg-black/80 disabled:opacity-40 disabled:cursor-not-allowed transition shadow-sm">
-                {msgSending ? (
-                  <Loader2 className="w-4 h-4 animate-spin " />
-                ) : (
-                  <ArrowUp className="w-4 h-4" />
-                )}
-              </button>
+              <Button
+                size="icon"
+                onClick={handleSend}
+                disabled={!message.trim() || msgSending}
+                className="absolute bottom-2.5 right-2.5 sm:bottom-3 sm:right-3 lg:bottom-4 lg:right-4 xl:bottom-5 xl:right-5 rounded-full"
+              >
+                {msgSending ? <Loader2 className="w-4 h-4 animate-spin"/> : <ArrowUp className="w-4 h-4"/>}
+              </Button>
             </div>
           </div>
         </div>
