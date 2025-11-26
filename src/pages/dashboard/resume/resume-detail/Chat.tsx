@@ -19,13 +19,8 @@ interface MessageItem {
 }
 
 const Message = memo(({ msg }: { msg: MessageItem }) => (
-  <div
-    className={`flex leading-relaxed ${
-      msg.role === "user" ? "justify-end" : "justify-start"
-    } mb-2 lg:mb-4`}
-  >
-    <div
-      className={`rounded-xl text-sm ${
+  <div className={`flex leading-relaxed ${msg.role === "user" ? "justify-end" : "justify-start"} mb-2 lg:mb-4`}>
+    <div className={`rounded-xl text-sm ${
         msg.role === "model"
           ? "text-gray-800 p-2 lg:p-3"
           : "bg-secondary p-2 px-3 lg:p-3 lg:px-4"
@@ -356,7 +351,7 @@ const Chat = () => {
               <button
                 key={s}
                 onClick={() => setMessage(s)}
-                className="bg-gray-50 hover:bg-gray-100 text-gray-600 hover:text-gray-700 px-2 py-0.5 rounded-md text-xs transition-colors border border-gray-200/50"
+                className="bg-gray-50 hover:bg-gray-100 text-gray-600 hover:text-gray-700 px-2.5 py-1 rounded-md text-xs transition-colors border border-gray-200/50"
               >
                 {s}
               </button>

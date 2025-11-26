@@ -35,6 +35,8 @@ const navItems = [
 
 const BaseDashboardLayout = () => {
   const { user, setUser, setAuthStates } = useAuth();
+  const navigate = useNavigate();
+
   const handleLogout = () => {
     manageLocalStorage.remove("token");
     setUser(null);
@@ -43,11 +45,12 @@ const BaseDashboardLayout = () => {
       isLoading: false,
       error: null,
     });
+    navigate("/signin");
   };
+  
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
   const pathname = location.pathname;
-  const navigate = useNavigate();
 
   // Open by default on desktop, closed on mobile
   useEffect(() => {
@@ -111,11 +114,11 @@ const BaseDashboardLayout = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56 z-[70]">
-              <DropdownMenuItem onClick={() => navigate("/dashboard/resume", { state: { openCreateModal: true } })}>
+              <DropdownMenuItem onClick={() => {navigate("/dashboard/resume", { state: { openCreateModal: true } }); setIsSidebarOpen(false)}}>
                 <FileText className="mr-2 h-4 w-4" />
                 Resume
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate("/dashboard/cover-letter", { state: { openCreateModal: true } })}>
+              <DropdownMenuItem onClick={() => {navigate("/dashboard/cover-letter", { state: { openCreateModal: true } }); setIsSidebarOpen(false)}}>
                 <Mail className="mr-2 h-4 w-4" />
                 Cover Letter
               </DropdownMenuItem>
@@ -137,6 +140,7 @@ const BaseDashboardLayout = () => {
                       "cursor-pointer",
                       isActive && "bg-[#e5e5e5] text-neutral-900"
                     )}
+                    onClick={() => setIsSidebarOpen(false)}
                   >
                     <Icon className={cn("h-4 w-4 mr-2")} />
                     {item.label}

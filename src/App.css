@@ -140,3 +140,17 @@
   border-radius: 4px;
 }
 
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+
+/* forces pointer events to work if Radix gets stuck */
+body:not([data-scroll-locked]) {
+  pointer-events: auto !important;
+}
