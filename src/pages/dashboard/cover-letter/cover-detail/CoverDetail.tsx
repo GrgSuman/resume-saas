@@ -6,23 +6,12 @@ import {
   Copy, 
   RefreshCw, 
   AlignLeft,
+  Palette,
 } from "lucide-react";
 import { Button } from "../../../../components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../../../components/ui/select";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "../../../../components/ui/select";
 import { Textarea } from "../../../../components/ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../../../../components/ui/dialog";
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from "../../../../components/ui/dialog";
 
 const quickActions = [
   {
@@ -36,6 +25,12 @@ const quickActions = [
     icon: AlignLeft,
     label: "Shorter Version",
     helper: "Make it concise",
+  },
+  {
+    id: "tone",
+    icon: Palette,
+    label: "Tone",
+    helper: "Select the tone that matches your personality",
   },
 ];
 
