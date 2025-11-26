@@ -35,6 +35,7 @@ const navItems = [
 
 const BaseDashboardLayout = () => {
   const { user, setUser, setAuthStates } = useAuth();
+  const navigate = useNavigate();
   const handleLogout = () => {
     manageLocalStorage.remove("token");
     setUser(null);
@@ -43,11 +44,12 @@ const BaseDashboardLayout = () => {
       isLoading: false,
       error: null,
     });
+    navigate("/signin");
   };
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
   const pathname = location.pathname;
-  const navigate = useNavigate();
+  
 
   // Open by default on desktop, closed on mobile
   useEffect(() => {
