@@ -1,11 +1,7 @@
-"use client"
-
-import type React from "react"
-
-import { useState } from "react"
-import { useNavigate } from "react-router"
-import { flushSync } from "react-dom"
-import { toast } from "react-toastify"
+import { useState } from "react";
+import { useNavigate } from "react-router";
+import { flushSync } from "react-dom";
+import { toast } from "react-toastify";
 import {
   ZoomIn,
   ZoomOut,
@@ -15,365 +11,382 @@ import {
   ArrowLeft,
   Download,
   ArrowDownUp,
-  SlidersHorizontal,
-} from "lucide-react"
+  LayoutTemplate,
+  Type,
+  Monitor,
+  Settings2,
+  Edit3,
+  Eye
+} from "lucide-react";
 
 // UI Components
-import { Button } from "../../../../components/ui/button"
-import { Switch } from "../../../../components/ui/switch"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/select"
+import { Button } from "../../../../components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../../components/ui/select";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "../../../../components/ui/sheet"
+} from "../../../../components/ui/sheet";
 
 // Local Components & Hooks
-import ManageSections from "./ManageSections"
-import { useResume } from "../../../../hooks/useResume"
-import { TEMPLATES, FONT_FAMILIES } from "../../types/constants"
-import axiosInstance from "../../../../api/axios"
+import ManageSections from "./ManageSections";
+import { useResume } from "../../../../hooks/useResume";
+import { TEMPLATES, FONT_FAMILIES } from "../../types/constants";
+import axiosInstance from "../../../../api/axios";
+import { cn } from "../../../../lib/utils"; // Assuming you have a cn utility, if not remove wrapping cn()
 
 interface SettingsNewProps {
-  htmlRef: React.RefObject<HTMLDivElement | null>
-  zoomLevel: number
-  onZoomIn: () => void
-  onZoomOut: () => void
-  onResetZoom: () => void
+  htmlRef: React.RefObject<HTMLDivElement | null>;
+  zoomLevel: number;
+  onZoomIn: () => void;
+  onZoomOut: () => void;
+  onResetZoom: () => void;
 }
 
-const SettingsNew = ({ htmlRef, zoomLevel, onZoomIn, onZoomOut, onResetZoom }: SettingsNewProps) => {
-  const { state, dispatch } = useResume()
-  const navigate = useNavigate()
-  const editMode = state.resumeEditingMode ?? false
+const SettingsNew = ({
+  htmlRef,
+  zoomLevel,
+  onZoomIn,
+  onZoomOut,
+  onResetZoom,
+}: SettingsNewProps) => {
+  const { state, dispatch } = useResume();
+  const navigate = useNavigate();
+  const editMode = state.resumeEditingMode ?? false;
 
   // Mobile Sheet State
-  const [isManageSectionsOpen, setIsManageSectionsOpen] = useState(false)
-  const [isMobileSettingsOpen, setIsMobileSettingsOpen] = useState(false)
+  const [isManageSectionsOpen, setIsManageSectionsOpen] = useState(false);
+  const [isMobileSettingsOpen, setIsMobileSettingsOpen] = useState(false);
 
   // Resume Settings Data
-  const selectedTemplate = state.resumeSettings?.template || "professional"
-  const fontFamily = state.resumeSettings?.fontFamily || "Lato"
-  const lineHeight = Number.parseFloat(state.resumeSettings?.lineHeight ?? "1.4")
-  const resumeName = state.resumeTitle || "Resume"
+  const selectedTemplate = state.resumeSettings?.template || "professional";
+  const fontFamily = state.resumeSettings?.fontFamily || "Lato";
+  const lineHeight = parseFloat(state.resumeSettings?.lineHeight ?? "1.4");
+  const resumeName = state.resumeTitle || "Resume";
 
   // --- Handlers ---
   const handleTemplateChange = (value: string) => {
-    dispatch({ type: "UPDATE_RESUME_SETTINGS", payload: { template: value } })
-  }
+    dispatch({ type: "UPDATE_RESUME_SETTINGS", payload: { template: value } });
+  };
   const handleFontFamilyChange = (value: string) => {
-    dispatch({ type: "UPDATE_RESUME_SETTINGS", payload: { fontFamily: value } })
-  }
+    dispatch({ type: "UPDATE_RESUME_SETTINGS", payload: { fontFamily: value } });
+  };
   const handleLineHeightIncrease = () => {
-    const newLineHeight = Math.min(Number((lineHeight + 0.1).toFixed(2)), 2.0)
-    dispatch({ type: "UPDATE_RESUME_SETTINGS", payload: { lineHeight: String(newLineHeight) } })
-  }
+    const newLineHeight = Math.min(Number((lineHeight + 0.1).toFixed(2)), 2.0);
+    dispatch({ type: "UPDATE_RESUME_SETTINGS", payload: { lineHeight: String(newLineHeight) } });
+  };
   const handleLineHeightDecrease = () => {
-    const newLineHeight = Math.max(Number((lineHeight - 0.1).toFixed(2)), 1.0)
-    dispatch({ type: "UPDATE_RESUME_SETTINGS", payload: { lineHeight: String(newLineHeight) } })
-  }
+    const newLineHeight = Math.max(Number((lineHeight - 0.1).toFixed(2)), 1.0);
+    dispatch({ type: "UPDATE_RESUME_SETTINGS", payload: { lineHeight: String(newLineHeight) } });
+  };
 
   const handleExport = async () => {
-    const previousEditMode = state.resumeEditingMode ?? false
-    flushSync(() => {
-      dispatch({ type: "SET_EDITING_MODE", payload: false })
-    })
-    await new Promise((resolve) => requestAnimationFrame(() => resolve(null)))
+    const previousEditMode = state.resumeEditingMode ?? false;
+    flushSync(() => { dispatch({ type: "SET_EDITING_MODE", payload: false }); });
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
 
     if (htmlRef.current) {
-      const htmlContent = htmlRef.current.innerHTML
+      const htmlContent = htmlRef.current.innerHTML;
       try {
-        dispatch({ type: "SET_DOWNLOADING", payload: true })
+        dispatch({ type: "SET_DOWNLOADING", payload: true });
         const response = await axiosInstance.post(
           "/generate-pdf",
           { htmlContent, marginStatus: true, resumeName: resumeName },
-          { responseType: "blob" },
-        )
-        const blob = new Blob([response.data], { type: "application/pdf" })
-        const url = window.URL.createObjectURL(blob)
-        const a = document.createElement("a")
-        a.href = url
-        a.download = `${resumeName}.pdf`
-        a.click()
-        window.URL.revokeObjectURL(url)
+          { responseType: "blob" }
+        );
+        const blob = new Blob([response.data], { type: "application/pdf" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${resumeName}.pdf`;
+        a.click();
+        window.URL.revokeObjectURL(url);
       } catch (error) {
-        console.error(error)
-        toast.error("Failed to download PDF")
+        console.error(error);
+        toast.error("Failed to download PDF");
       } finally {
-        flushSync(() => {
-          dispatch({ type: "SET_EDITING_MODE", payload: previousEditMode })
-        })
-        dispatch({ type: "SET_DOWNLOADING", payload: false })
+        flushSync(() => { dispatch({ type: "SET_EDITING_MODE", payload: previousEditMode }); });
+        dispatch({ type: "SET_DOWNLOADING", payload: false });
       }
     }
+  };
+
+  const toggleEditMode = () => {
+      dispatch({ type: "SET_EDITING_MODE", payload: !editMode });
   }
 
-  const renderDesignControls = () => (
-    <div className="space-y-6 px-2">
-      {/* Template Section */}
-      <div className="space-y-2.5">
-        <label className="text-sm font-bold text-foreground block">Template</label>
-        <Select value={selectedTemplate} onValueChange={handleTemplateChange}>
-          <SelectTrigger className="w-full h-10 bg-muted/40 border-muted hover:bg-muted/60 transition-colors">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {TEMPLATES.map((t) => (
-              <SelectItem key={t.id} value={t.id}>
-                {t.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+  // --- UI Components ---
 
-      {/* Typography Section */}
-      <div className="space-y-2.5">
-        <label className="text-sm font-bold text-foreground block">Typography</label>
-        <div className="space-y-3">
-          <div>
-            <p className="text-xs font-medium text-muted-foreground mb-1.5">Font Family</p>
-            <Select value={fontFamily} onValueChange={handleFontFamilyChange}>
-              <SelectTrigger className="w-full h-10 bg-muted/40 border-muted hover:bg-muted/60 transition-colors">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {FONT_FAMILIES.map((f) => (
-                  <SelectItem key={f.value} value={f.value}>
-                    {f.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+  const VerticalSeparator = () => (
+    <div className="h-6 w-[1px] bg-border/60 mx-1 hidden md:block" />
+  );
 
-          <div>
-            <p className="text-xs font-medium text-muted-foreground mb-1.5">Line Height</p>
-            <div className="flex items-center gap-2 border border-muted bg-muted/40 rounded-lg p-1.5">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 hover:bg-muted/80 transition-colors"
-                onClick={handleLineHeightDecrease}
-                disabled={lineHeight <= 1.0}
-              >
-                <Minus className="h-4 w-4" />
-              </Button>
-              <span className="text-sm font-semibold w-12 text-center tabular-nums">{lineHeight.toFixed(1)}</span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 hover:bg-muted/80 transition-colors"
-                onClick={handleLineHeightIncrease}
-                disabled={lineHeight >= 2.0}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+  const TemplateSelector = ({ mobile = false }) => (
+    <Select value={selectedTemplate} onValueChange={handleTemplateChange}>
+      <SelectTrigger className={cn("h-9 border-muted-foreground/20 bg-transparent font-medium", mobile ? "w-full" : "w-[140px] border-0 hover:bg-muted/50 focus:ring-0")}>
+        <div className="flex items-center gap-2">
+           {!mobile && <LayoutTemplate className="h-4 w-4 text-muted-foreground" />}
+           <SelectValue />
         </div>
-      </div>
+      </SelectTrigger>
+      <SelectContent>
+        {TEMPLATES.map((t) => (<SelectItem key={t.id} value={t.id} className="font-medium">{t.name}</SelectItem>))}
+      </SelectContent>
+    </Select>
+  );
 
-      {/* View Scale Section */}
-      <div className="space-y-2.5">
-        <label className="text-sm font-bold text-foreground block">View Scale</label>
-        <div className="flex items-center gap-1.5 border border-muted bg-muted/40 rounded-lg p-1.5">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 hover:bg-muted/80 transition-colors"
-            onClick={onZoomOut}
-            disabled={zoomLevel <= 0.5}
-          >
-            <ZoomOut className="h-4 w-4" />
-          </Button>
-          <span className="text-sm font-semibold tabular-nums flex-1 text-center">{Math.round(zoomLevel * 100)}%</span>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 hover:bg-muted/80 transition-colors"
-            onClick={onZoomIn}
-            disabled={zoomLevel >= 1.0}
-          >
-            <ZoomIn className="h-4 w-4" />
-          </Button>
-          <div className="h-5 w-px bg-border mx-1" />
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 hover:bg-muted/80 transition-colors"
-            onClick={onResetZoom}
-          >
-            <RotateCcw className="h-3.5 w-3.5" />
-          </Button>
+  const FontSelector = ({ mobile = false }) => (
+    <Select value={fontFamily} onValueChange={handleFontFamilyChange}>
+      <SelectTrigger className={cn("h-9 border-muted-foreground/20 bg-transparent font-medium", mobile ? "w-full" : "w-[130px] border-0 hover:bg-muted/50 focus:ring-0")}>
+         <div className="flex items-center gap-2">
+           {!mobile && <Type className="h-4 w-4 text-muted-foreground" />}
+           <SelectValue />
         </div>
-      </div>
+      </SelectTrigger>
+      <SelectContent>
+        {FONT_FAMILIES.map((f) => (<SelectItem key={f.value} value={f.value} className="font-medium">{f.label}</SelectItem>))}
+      </SelectContent>
+    </Select>
+  );
+
+  const LineHeightControls = () => (
+    <div className="flex items-center bg-muted/30 rounded-md border border-border/40 h-9">
+        <Button variant="ghost" size="icon" onClick={handleLineHeightDecrease} className="h-8 w-8 hover:bg-background rounded-l-md" disabled={lineHeight <= 1.0}>
+            <Minus className="h-3.5 w-3.5" />
+        </Button>
+        <div className="w-10 text-center text-xs font-semibold tabular-nums text-foreground">
+            {lineHeight.toFixed(1)}
+        </div>
+        <Button variant="ghost" size="icon" onClick={handleLineHeightIncrease} className="h-8 w-8 hover:bg-background rounded-r-md" disabled={lineHeight >= 2.0}>
+            <Plus className="h-3.5 w-3.5" />
+        </Button>
     </div>
-  )
+  );
+
+  const ZoomControls = () => (
+      <div className="flex items-center bg-muted/30 rounded-md border border-border/40 h-9 p-0.5">
+        <Button variant="ghost" size="icon" onClick={onZoomOut} className="h-8 w-8 hover:bg-background rounded-sm" disabled={zoomLevel <= 0.5}>
+            <ZoomOut className="h-3.5 w-3.5" />
+        </Button>
+        <div className="w-12 text-center text-xs font-semibold tabular-nums text-foreground">
+            {Math.round(zoomLevel * 100)}%
+        </div>
+        <Button variant="ghost" size="icon" onClick={onZoomIn} className="h-8 w-8 hover:bg-background rounded-sm" disabled={zoomLevel >= 1.0}>
+            <ZoomIn className="h-3.5 w-3.5" />
+        </Button>
+      </div>
+  );
+
+  // --- Render ---
 
   return (
-    <div className="w-full bg-white/95 backdrop-blur-sm rounded-lg shadow-sm border border-border/40">
+    <div className="w-full bg-background/95 backdrop-blur-md rounded-xl border border-border/60 sticky top-2 z-50">
+      
       {/* -------------------- */}
-      {/* DESKTOP VIEW         */}
+      {/* DESKTOP TOOLBAR      */}
       {/* -------------------- */}
-      <div className="hidden md:flex items-center justify-between px-4 py-2.5 gap-2">
-        {/* Left Group */}
+      <div className="hidden md:flex items-center justify-between px-4 py-2.5">
+        
+        {/* Left: Design Tools */}
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="h-8 w-8 hover:bg-muted/60">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <div className="h-4 w-px bg-border/50" />
-
-          <Select value={selectedTemplate} onValueChange={handleTemplateChange}>
-            <SelectTrigger className="h-8 w-[140px] text-xs border-0 shadow-none bg-transparent hover:bg-muted/40 transition-colors">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {TEMPLATES.map((t) => (
-                <SelectItem key={t.id} value={t.id}>
-                  {t.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={fontFamily} onValueChange={handleFontFamilyChange}>
-            <SelectTrigger className="h-8 w-[120px] text-xs border-0 shadow-none bg-transparent hover:bg-muted/40 transition-colors">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {FONT_FAMILIES.map((f) => (
-                <SelectItem key={f.value} value={f.value}>
-                  {f.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <div className="flex items-center gap-1 bg-muted/30 rounded px-1.5 py-0.5">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleLineHeightDecrease}
-              className="h-7 w-7 hover:bg-muted/60"
-            >
-              <Minus className="h-3.5 w-3.5" />
+            <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="h-9 w-9 text-muted-foreground hover:text-foreground mr-1">
+                <ArrowLeft className="h-4 w-4" />
             </Button>
-            <span className="text-xs font-semibold w-7 text-center">{lineHeight.toFixed(1)}</span>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleLineHeightIncrease}
-              className="h-7 w-7 hover:bg-muted/60"
-            >
-              <Plus className="h-3.5 w-3.5" />
+            
+            <VerticalSeparator />
+
+            <div className="flex items-center gap-1">
+                <TemplateSelector />
+                <FontSelector />
+                <LineHeightControls />
+            </div>
+
+            <VerticalSeparator />
+            
+             <Button variant="ghost" size="sm" onClick={() => setIsManageSectionsOpen(true)} className="h-9 gap-2 text-muted-foreground font-medium hover:text-foreground">
+                <ArrowDownUp className="h-4 w-4" /> 
+                Sections
             </Button>
-          </div>
-
-          <div className="h-4 w-px bg-border/50" />
-
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsManageSectionsOpen(true)}
-            className="h-8 gap-2 text-muted-foreground hover:bg-muted/40 transition-colors"
-          >
-            <ArrowDownUp className="h-4 w-4" /> <span className="text-xs font-medium">Sections</span>
-          </Button>
         </div>
 
-        {/* Right Group */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 bg-muted/30 rounded px-1.5 py-0.5">
-            <Button variant="ghost" size="icon" onClick={onZoomOut} className="h-7 w-7 hover:bg-muted/60">
-              <ZoomOut className="h-3.5 w-3.5" />
-            </Button>
-            <span className="text-xs font-semibold w-9 text-center">{Math.round(zoomLevel * 100)}%</span>
-            <Button variant="ghost" size="icon" onClick={onZoomIn} className="h-7 w-7 hover:bg-muted/60">
-              <ZoomIn className="h-3.5 w-3.5" />
-            </Button>
-          </div>
+        {/* Right: View & Actions */}
+        <div className="flex items-center gap-3">
+             <ZoomControls />
+             
+             <VerticalSeparator />
 
-          <div className="h-4 w-px bg-border/50" />
-          <div
-            className="flex items-center gap-2 cursor-pointer hover:bg-muted/40 rounded px-2 py-1 transition-colors"
-            onClick={() => dispatch({ type: "SET_EDITING_MODE", payload: !editMode })}
-          >
-            <Switch checked={editMode} className="scale-75" />
-            <span className="text-xs font-medium text-muted-foreground">{editMode ? "Editing" : "View"}</span>
-          </div>
+             <div 
+                className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg border border-border/50 cursor-pointer hover:bg-muted/70 transition-colors group"
+                onClick={toggleEditMode}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleEditMode();
+                    }
+                }}
+                title={editMode ? "Switch to View mode" : "Switch to Edit mode"}
+             >
+                <div
+                    className={cn(
+                        "flex items-center gap-1.5 px-2.5 py-1.5 rounded-md transition-all duration-200 text-xs font-medium pointer-events-none",
+                        !editMode 
+                            ? "bg-background shadow-sm text-foreground" 
+                            : "text-muted-foreground"
+                    )}
+                >
+                    <Eye className="h-3.5 w-3.5" />
+                    <span className="hidden xl:inline">View</span>
+                </div>
+                <div
+                    className={cn(
+                        "flex items-center gap-1.5 px-2.5 py-1.5 rounded-md transition-all duration-200 text-xs font-medium pointer-events-none",
+                        editMode 
+                            ? "bg-background shadow-sm text-foreground" 
+                            : "text-muted-foreground"
+                    )}
+                >
+                    <Edit3 className="h-3.5 w-3.5" />
+                    <span className="hidden xl:inline">Edit</span>
+                </div>
+             </div>
 
-          <Button onClick={handleExport} size="sm" className="h-8 gap-2 px-3 font-medium">
-            <Download className="h-4 w-4" /> <span className="hidden lg:inline text-xs">Download</span>
-          </Button>
+             <Button onClick={handleExport} size="sm" className="h-9 gap-2 px-4 shadow-sm font-semibold">
+                <Download className="h-4 w-4" /> 
+                <span className="hidden lg:inline">Download</span>
+            </Button>
         </div>
       </div>
 
       {/* -------------------- */}
-      {/* MOBILE VIEW          */}
+      {/* MOBILE NAVBAR        */}
       {/* -------------------- */}
-      <div className="flex md:hidden items-center justify-between px-3 py-2.5 gap-4">
-        {/* Left Side: Navigation + Tools */}
-        <div className="flex items-center">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="h-8 w-8 hover:bg-muted/60">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
+      <div className="flex md:hidden items-center justify-between px-4 py-3">
+         <div className="flex items-center gap-3">
+            <Button variant="outline" size="icon" onClick={() => navigate(-1)} className="h-9 w-9 border-muted-foreground/20">
+                <ArrowLeft className="h-4 w-4" />
+            </Button>
+            
+            {/* Mobile Settings Sheet */}
+            <Sheet open={isMobileSettingsOpen} onOpenChange={setIsMobileSettingsOpen}>
+                <SheetTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-9 gap-2 border-muted-foreground/20 font-semibold text-muted-foreground">
+                        <Settings2 className="h-4 w-4" />
+                        Design
+                    </Button>
+                </SheetTrigger>
+                <SheetContent side="bottom" className="rounded-t-2xl px-6 pb-8 pt-6">
+                    <SheetHeader className="mb-6 text-left">
+                        <SheetTitle className="text-xl font-bold">Resume Appearance</SheetTitle>
+                    </SheetHeader>
 
-          {/* Appearance Settings Sheet */}
-          <Sheet open={isMobileSettingsOpen} onOpenChange={setIsMobileSettingsOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted/60 mx-2">
-                <SlidersHorizontal className="h-4 w-4" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="bottom" className="rounded-t-2xl max-h-[75vh]">
-              <SheetHeader className="pb-4 border-b border-border/40">
-                <SheetTitle className="text-base font-bold">Appearance Settings</SheetTitle>
-                <SheetDescription className="text-xs text-muted-foreground">
-                  Customize your resume template, fonts, spacing and zoom level.
-                </SheetDescription>
-              </SheetHeader>
+                    <div className="space-y-6">
+                        {/* Section 1: Template */}
+                        <div className="space-y-3">
+                            <label className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+                                <LayoutTemplate className="h-4 w-4" /> Template
+                            </label>
+                            <TemplateSelector mobile />
+                        </div>
 
-              {/* Sheet Content with proper padding */}
-              <div className="px-1 py-2 overflow-y-auto">{renderDesignControls()}</div>
-            </SheetContent>
-          </Sheet>
+                        {/* Section 2: Typography Grid */}
+                        <div className="grid grid-cols-2 gap-4">
+                             <div className="space-y-3">
+                                <label className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+                                    <Type className="h-4 w-4" /> Font
+                                </label>
+                                <FontSelector mobile />
+                             </div>
+                             <div className="space-y-3">
+                                <label className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+                                    Spacing
+                                </label>
+                                <LineHeightControls />
+                             </div>
+                        </div>
 
-          {/* Sections Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsManageSectionsOpen(true)}
-            className="h-8 w-8 hover:bg-muted/60"
-            title="Manage Sections"
-          >
-            <ArrowDownUp className="h-4 w-4" />
-          </Button>
-        </div>
+                         {/* Section 3: View & Zoom */}
+                         <div className="space-y-3">
+                                <label className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+                                    <Monitor className="h-4 w-4" /> View Scale
+                                </label>
+                                <div className="flex items-center justify-between">
+                                    <ZoomControls />
+                                    <Button variant="outline" size="icon" onClick={onResetZoom} className="h-9 w-9" title="Reset Zoom">
+                                        <RotateCcw className="h-3.5 w-3.5" />
+                                    </Button>
+                                </div>
+                        </div>
+                    </div>
+                </SheetContent>
+            </Sheet>
 
-        {/* Right Side: Actions */}
-        <div className="flex items-center gap-2">
-          <div
-            className="flex items-center gap-2 cursor-pointer hover:bg-muted/40 rounded px-2 py-1 transition-colors"
-            onClick={() => dispatch({ type: "SET_EDITING_MODE", payload: !editMode })}
-          >
-            <span className="text-xs font-medium text-muted-foreground">{editMode ? "Editing" : "View"}</span>
-            <Switch checked={editMode} className="scale-75" />
-          </div>
+            <Button variant="outline" size="icon" onClick={() => setIsManageSectionsOpen(true)} className="h-9 w-9 border-muted-foreground/20">
+               <ArrowDownUp className="h-4 w-4" />
+            </Button>
+         </div>
 
-          <Button size="icon" onClick={handleExport} className="h-8 w-8 font-medium">
-            <Download className="h-4 w-4" />
-          </Button>
-        </div>
+         {/* Mobile Right Actions */}
+         <div className="flex items-center gap-3">
+             {/* Toggle Edit/View */}
+             <div 
+                className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg border border-border/50 cursor-pointer hover:bg-muted/70 transition-colors"
+                onClick={toggleEditMode}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleEditMode();
+                    }
+                }}
+                title={editMode ? "Switch to View mode" : "Switch to Edit mode"}
+             >
+                 <div
+                     className={cn(
+                         "flex items-center gap-1.5 px-2.5 py-1.5 rounded-md transition-all duration-200 text-xs font-medium pointer-events-none",
+                         !editMode 
+                             ? "bg-background shadow-sm text-foreground" 
+                             : "text-muted-foreground"
+                     )}
+                 >
+                     <Eye className="h-3.5 w-3.5" />
+                     <span>View</span>
+                 </div>
+                 <div
+                     className={cn(
+                         "flex items-center gap-1.5 px-2.5 py-1.5 rounded-md transition-all duration-200 text-xs font-medium pointer-events-none",
+                         editMode 
+                             ? "bg-background shadow-sm text-foreground" 
+                             : "text-muted-foreground"
+                     )}
+                 >
+                     <Edit3 className="h-3.5 w-3.5" />
+                     <span>Edit</span>
+                 </div>
+             </div>
+
+            <Button onClick={handleExport} size="icon" className="h-9 w-9 shadow-sm">
+                <Download className="h-4 w-4" />
+            </Button>
+         </div>
       </div>
 
-      {/* Shared Dialog for Managing Sections */}
-      <ManageSections open={isManageSectionsOpen} onOpenChange={setIsManageSectionsOpen} />
+      <ManageSections
+        open={isManageSectionsOpen}
+        onOpenChange={setIsManageSectionsOpen}
+      />
     </div>
-  )
-}
+  );
+};
 
-export default SettingsNew
+export default SettingsNew;

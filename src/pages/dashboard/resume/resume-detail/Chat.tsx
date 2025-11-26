@@ -363,7 +363,7 @@ const Chat = () => {
             ))}
           </div>
           <div className="relative">
-            <div className="relative border rounded-2xl bg-white shadow-sm focus-within:ring-2 focus-within:ring-gray-900/20 focus-within:border-gray-300 transition-all">
+            <div className="relative border border-gray-300 rounded-2xl bg-white focus-within:ring-2 focus-within:ring-gray-900/30 transition-all">
               <div className="p-2.5 sm:p-3 lg:p-4 xl:p-5">
                 <textarea
                   ref={textareaRef}
