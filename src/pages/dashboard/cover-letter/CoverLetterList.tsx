@@ -111,8 +111,8 @@ export default function App() {
       jobDescription: string;
       resumeFile?: File;
       personalization?: {
-        roleFocus: string;
-        standoutMoment: string;
+        excitement: string;
+        achievement: string;
         tone: string;
       };
     }) => {
@@ -130,8 +130,8 @@ export default function App() {
       // Append personalization data as JSON string
       if (data.personalization) {
         formData.append("personalization", JSON.stringify({
-          roleFocus: data.personalization.roleFocus || "",
-          standoutMoment: data.personalization.standoutMoment || "",
+          excitement: data.personalization.excitement || "",
+          achievement: data.personalization.achievement || "",
           tone: data.personalization.tone || "",
         }));
       }
@@ -206,7 +206,7 @@ export default function App() {
           {Array.from({ length: 8 }).map((_, i) => (
             <div
               key={i}
-              className="flex flex-col gap-3 rounded-xl sm:rounded-2xl border border-slate-200 bg-white/70 p-3 sm:p-4 md:flex-row md:items-center md:justify-between"
+              className="flex flex-row items-center gap-3 rounded-xl sm:rounded-2xl border border-slate-200 bg-white/70 p-3 sm:p-4"
             >
               <div className="flex flex-1 items-center gap-2 sm:gap-3 min-w-0">
                 <Skeleton className="w-9 h-9 sm:w-10 sm:h-10 rounded-md flex-shrink-0" />
@@ -215,7 +215,7 @@ export default function App() {
                   <Skeleton className="h-3 w-24 sm:w-32" />
                 </div>
               </div>
-              <div className="flex items-center gap-2 sm:gap-2 self-end sm:self-auto">
+              <div className="flex items-center gap-2 flex-shrink-0">
                 <Skeleton className="h-8 w-8 sm:h-9 sm:w-9 rounded-md" />
                 <Skeleton className="h-8 w-8 rounded-md" />
               </div>
@@ -273,7 +273,7 @@ export default function App() {
           {coverLetters.map((coverLetter: CoverLetter) => (
             <div
               key={coverLetter.id}
-              className="flex flex-col gap-3 rounded-xl sm:rounded-2xl border border-slate-200 bg-white/70 p-3 sm:p-4 transition hover:border-slate-300 hover:bg-white md:flex-row md:items-center md:justify-between"
+              className="flex flex-row items-center gap-3 rounded-xl sm:rounded-2xl border border-slate-200 bg-white/70 p-3 sm:p-4 transition hover:border-slate-300 hover:bg-white"
             >
               <Link
                 to={`/dashboard/cover-letter/${coverLetter.id}`}
@@ -303,7 +303,7 @@ export default function App() {
                 </div>
               </Link>
 
-              <div className="flex items-center gap-2 sm:gap-2 self-end sm:self-auto">
+              <div className="flex items-center gap-2 flex-shrink-0">
                 <Button
                   variant="outline"
                   size="sm"
