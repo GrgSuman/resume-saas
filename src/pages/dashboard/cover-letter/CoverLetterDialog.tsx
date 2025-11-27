@@ -18,8 +18,8 @@ interface CoverLetterDialogProps {
     jobDescription: string
     resumeFile?: File
     personalization?: {
-      roleFocus: string
-      standoutMoment: string
+      excitement: string
+      achievement: string
       tone: string
     }
   }) => void
@@ -34,8 +34,8 @@ export default function CoverLetterDialog({ open, onOpenChange, onSubmit, isCrea
   const [resumeFile, setResumeFile] = useState<File | null>(null)
   
   // Personalization fields
-  const [roleFocus, setRoleFocus] = useState("")
-  const [standoutMoment, setStandoutMoment] = useState("")
+  const [excitement, setExcitement] = useState("")
+  const [achievement, setAchievement] = useState("")
   const [tone, setTone] = useState("professional")
   const [loadingStage, setLoadingStage] = useState<string>("")
   
@@ -57,8 +57,8 @@ export default function CoverLetterDialog({ open, onOpenChange, onSubmit, isCrea
       setSelectedResume("")
       setJobDescription("")
       setResumeFile(null)
-      setRoleFocus("")
-      setStandoutMoment("")
+      setExcitement("")
+      setAchievement("")
       setTone("professional")
       setLoadingStage("")
     }
@@ -129,8 +129,8 @@ export default function CoverLetterDialog({ open, onOpenChange, onSubmit, isCrea
       jobDescription: jobDescription.trim(),
       resumeFile: resumeFile || undefined,
       personalization: {
-        roleFocus: roleFocus.trim(),
-        standoutMoment: standoutMoment.trim(),
+        excitement: excitement.trim(),
+        achievement: achievement.trim(),
         tone,
       }
     })
@@ -312,7 +312,7 @@ export default function CoverLetterDialog({ open, onOpenChange, onSubmit, isCrea
                     overflow-hidden
                   ">
                     <Textarea
-                      value={jobDescription}
+                      value={jobDescription || ""}
                       onChange={(e) => setJobDescription(e.target.value)}
                       placeholder="Paste the job description here..."
                       className="
@@ -360,8 +360,8 @@ export default function CoverLetterDialog({ open, onOpenChange, onSubmit, isCrea
                     id="roleFocus"
                     className="h-20 resize-none overflow-y-auto bg-slate-50 focus:bg-white transition-colors"
                     placeholder="e.g. I've been following your sustainability initiative for years and want to contribute to scaling your carbon tracking platform..."
-                    value={roleFocus}
-                    onChange={(e) => setRoleFocus(e.target.value)}
+                    value={excitement}
+                    onChange={(e) => setExcitement(e.target.value)}
                     disabled={isCreating}
                   />
                 </div>
@@ -380,8 +380,8 @@ export default function CoverLetterDialog({ open, onOpenChange, onSubmit, isCrea
                     id="standoutMoment"
                     className="h-20 resize-none overflow-y-auto bg-slate-50 focus:bg-white transition-colors"
                     placeholder="e.g. The resume says I increased sales by 20%, but I did it during a hiring freeze while mentoring two junior team members..."
-                    value={standoutMoment}
-                    onChange={(e) => setStandoutMoment(e.target.value)}
+                    value={achievement}
+                    onChange={(e) => setAchievement(e.target.value)}
                     disabled={isCreating}
                   />
                 </div>
@@ -397,15 +397,31 @@ export default function CoverLetterDialog({ open, onOpenChange, onSubmit, isCrea
                     </p>
                   </div>
                   <Select value={tone} onValueChange={setTone} disabled={isCreating}>
-                    <SelectTrigger className="h-10 text-sm">
+                    <SelectTrigger className="h-10 text-sm w-full">
                       <SelectValue placeholder="Choose a tone" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="professional">Professional & polished</SelectItem>
-                      <SelectItem value="raw">Raw & authentic</SelectItem>
-                      <SelectItem value="bold">Bold & confident</SelectItem>
-                      <SelectItem value="enthusiastic">High energy</SelectItem>
-                      <SelectItem value="analytical">Analytical & precise</SelectItem>
+                    <SelectItem
+                    value="professional"
+                    className="focus:bg-slate-50"
+                  >
+                    Professional
+                  </SelectItem>
+                  <SelectItem value="modern" className="focus:bg-slate-50">
+                    Modern & Direct
+                  </SelectItem>
+                  <SelectItem value="persuasive" className="focus:bg-slate-50">
+                    Confident
+                  </SelectItem>
+                  <SelectItem
+                    value="enthusiastic"
+                    className="focus:bg-slate-50"
+                  >
+                    Enthusiastic
+                  </SelectItem>
+                  <SelectItem value="empathetic" className="focus:bg-slate-50">
+                    Warm & Empathetic
+                  </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

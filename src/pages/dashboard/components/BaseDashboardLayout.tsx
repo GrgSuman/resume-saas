@@ -114,11 +114,14 @@ const BaseDashboardLayout = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56 z-[70]">
-              <DropdownMenuItem onClick={() => {navigate("/dashboard/resume", { state: { openCreateModal: true } }); setIsSidebarOpen(false)}}>
+              <DropdownMenuItem onClick={() => {
+                navigate("/dashboard/resume", { state: { openCreateModal: true } }); 
+                if (window.innerWidth < 1024) setIsSidebarOpen(false);
+              }}>
                 <FileText className="mr-2 h-4 w-4" />
                 Resume
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => {navigate("/dashboard/cover-letter", { state: { openCreateModal: true } }); setIsSidebarOpen(false)}}>
+              <DropdownMenuItem onClick={() => {navigate("/dashboard/cover-letter", { state: { openCreateModal: true } }); if (window.innerWidth < 1024) setIsSidebarOpen(false);}}>
                 <Mail className="mr-2 h-4 w-4" />
                 Cover Letter
               </DropdownMenuItem>
@@ -140,7 +143,9 @@ const BaseDashboardLayout = () => {
                       "cursor-pointer",
                       isActive && "bg-[#e5e5e5] text-neutral-900"
                     )}
-                    onClick={() => setIsSidebarOpen(false)}
+                    onClick={() =>{
+                      if (window.innerWidth < 1024) setIsSidebarOpen(false);
+                    }}
                   >
                     <Icon className={cn("h-4 w-4 mr-2")} />
                     {item.label}

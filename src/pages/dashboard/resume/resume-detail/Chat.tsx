@@ -343,15 +343,15 @@ const Chat = () => {
           <div className="block absolute -top-10 left-0 right-0 h-10 bg-gradient-to-t from-white to-transparent pointer-events-none" />
           <div className="flex-wrap gap-1.5 mb-1 hidden lg:flex">
             {[
-              "Improve grammar",
-              "Add more details",
-              "Add more education",
-              "Add more experience",
+              "Fix my grammar",
+              "Improve my skills",
+              "Review my resume",
+              "Optimize for job descriptions",
             ].map((s) => (
               <button
                 key={s}
                 onClick={() => setMessage(s)}
-                className="bg-gray-50 hover:bg-gray-100 text-gray-600 hover:text-gray-700 px-2.5 py-1 rounded-md text-xs transition-colors border border-gray-200/50"
+                className="bg-gray-50 hover:bg-gray-100 text-gray-600 hover:text-gray-700 px-2.5 py-1 rounded-md text-xs font-medium transition-colors border border-gray-200/50"
               >
                 {s}
               </button>

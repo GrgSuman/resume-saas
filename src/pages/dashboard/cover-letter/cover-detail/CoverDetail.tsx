@@ -1,17 +1,22 @@
-import { useState, useRef } from "react";
-import { 
-  ArrowLeft, 
+import { useState, useEffect, useRef } from "react";
+import { ArrowLeft, 
   Download, 
-  Sparkles, 
-  Copy, 
-  RefreshCw, 
-  AlignLeft,
-  Palette,
-} from "lucide-react";
+  RefreshCw, AlignLeft, 
+  Copy } from "lucide-react";
 import { Button } from "../../../../components/ui/button";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "../../../../components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../../components/ui/select";
 import { Textarea } from "../../../../components/ui/textarea";
-import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from "../../../../components/ui/dialog";
+import { useNavigate, useParams } from "react-router";
+import axiosInstance from "../../../../api/axios";
+import { AxiosError } from "axios";
+import CoverLetterWritingLoader from "./CoverLetterWritingLoader";
+import { toast } from "react-toastify";
 
 const quickActions = [
   {
@@ -19,101 +24,271 @@ const quickActions = [
     icon: RefreshCw,
     label: "Regenerate",
     helper: "Try a new version",
+    instructions: "regenerate",
   },
   {
     id: "shorter",
     icon: AlignLeft,
     label: "Shorter Version",
     helper: "Make it concise",
-  },
-  {
-    id: "tone",
-    icon: Palette,
-    label: "Tone",
-    helper: "Select the tone that matches your personality",
+    instructions: "shorter",
   },
 ];
 
-const versions = [
-  {
-    id: "v1",
-    label: "V1",
-    content: `Dear Hiring Manager,
+interface VersionDetails {
+  id: string;
+  versionNumber: string;
+  excitement: string;
+  achievement: string;
+  tone: string;
+  generatedText: string;
+}
 
-**About Me:**
-Over the past three years, I've built scalable React systems that marry delightful frontend experiences with production-grade rigor. I would love to bring that focus to the Junior React Developer role.
+interface CoverLetterData {
+  id: number;
+  title: string;
+  content: string;
+  version: string;
+  currentVersionId: string;
+  versions: VersionDetails[];
+}
 
-**Key Achievements:**
-- Improved page speed by 38% on legacy portals
-- Shortened build times by 2x
-- Led a small team of developers to implement component libraries
-
-**Why Aurora Labs:**
-Your mentorship culture and rapid release cycles excite me. The recent "Horizon" release demonstrates your team's ability to turn user feedback into product magic. I thrive when I can partner closely with design, sweat the micro-interactions, and see ideas land in production.
-
-💡 Tip: Use numbers to show measurable impact in your achievements.
-
-Thank you for your time. I’d love to share how I can help Aurora launch frontends that feel effortless and intuitive.
-
-Sincerely,
-Amelia Carter`,
-  },
-  {
-    id: "v2",
-    label: "V2",
-    content: `Dear Hiring Manager,
-
-I’m excited about Aurora Labs’ mission to blend AI with thoughtful commerce experiences. In my current role at Northwind, I led a cross-functional team that built a shared React component library, reducing duplicate work by 45% and cutting design QA cycles in half.
-
-A favorite win: we shipped a site performance initiative that trimmed average load time from 3.2s to 1.8s, which contributed to a 9% lift in conversions for our enterprise storefront. Beyond the metrics, it reinforced how much I love pairing with design and focusing on those micro-interactions that make products feel premium.
-
-Aurora’s “Horizon” release resonated with me because it shows how quickly your team transforms customer feedback into product changes. I’d love to bring my mix of frontend craft and collaboration to keep that momentum going.
-
-Thank you for considering my application. I’d value the chance to share more and learn how I could support Aurora’s next chapter.`,
-  },
-];
+type SaveStatus = "idle" | "saving" | "saved" | "error";
 
 const CoverDetail = () => {
-  const [selectedVersionId, setSelectedVersionId] = useState(versions[0].id);
-  const [content, setContent] = useState(versions[0].content);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const [isPersonalizeOpen, setIsPersonalizeOpen] = useState(false);
-  const [personalizeForm, setPersonalizeForm] = useState({
-    roleFocus: "",
-    standoutMoment: "",
-    tone: "professional",
+  const { id } = useParams();
+  const [isCoverLetterLoading, setIsCoverLetterLoading] = useState(true);
+  const [isWriting, setIsWriting] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+  const [coverLetterData, setCoverLetterData] =
+    useState<CoverLetterData | null>(null);
+  const [versionDetails, setVersionDetails] = useState<VersionDetails>({
+    id: "",
+    versionNumber: "",
+    excitement: "",
+    achievement: "",
+    tone: "",
+    generatedText: "",
   });
-  // Tracks whether personalization data already exists (e.g., supplied during initial creation)
-  const [hasExistingPersonalization, setHasExistingPersonalization] = useState(false);
 
-  const handleCopy = () => {
-    if (contentRef.current) {
-      navigator.clipboard.writeText(contentRef.current.innerText);
+  const navigate = useNavigate();
+
+  const handleRegenerate = async (instructions?: string) => {
+    const data = {
+      coverLetterText:versionDetails?.generatedText,
+      instructions: instructions || "",
+      excitement: versionDetails?.excitement,
+      achievement: versionDetails?.achievement,
+      tone: versionDetails?.tone,
+    };
+
+    try {
+      setIsWriting(true);
+      const response = await axiosInstance.post(
+        `/cover-letter/${id}/write`,
+        data
+      );
+      setVersionDetails(response.data.newVersion);
+      setCoverLetterData(response.data.updatedCoverLetter);
+      toast.success("Cover letter regenerated successfully");
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        console.error(error);
+        toast.error("Failed to regenerate cover letter, try again later");
+      }
+    } finally {
+      setIsWriting(false);
     }
   };
 
-  const wordCount = content.trim().split(/\s+/).length;
+  useEffect(() => {
+    if (!id) return;
+    const fetchCoverLetter = async () => {
+      try {
+        const response = await axiosInstance.get(`/cover-letter/${id}`);
+        setCoverLetterData(response.data.coverLetter);
+
+        const versionDetail = response.data.coverLetter.versions?.find(
+          (x: VersionDetails) =>
+            x.id === response.data.coverLetter.currentVersionId
+        );
+        setVersionDetails(versionDetail);
+
+        if (response.data.coverLetter.status === "pending") {
+          setIsCoverLetterLoading(false);
+          setIsWriting(true);
+          const response = await axiosInstance.post(
+            `/cover-letter/${id}/write`,
+            {
+              excitement: versionDetail?.excitement,
+              achievement: versionDetail?.achievement,
+              tone: versionDetail?.tone,
+            }
+          );
+            setVersionDetails(response.data.newVersion);
+        }
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          if (error.response?.status === 404) {
+            toast.error("Cover letter not found");
+            return navigate("/dashboard");
+          }
+        }
+      } finally {
+        setIsCoverLetterLoading(false);
+        setIsWriting(false);
+      }
+    };
+
+    fetchCoverLetter();
+  }, [id, navigate]);
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, []);
+
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleContentChange = (content: string) => {
+    const currentVersionId = versionDetails.id;
+
+    setVersionDetails((prev) => ({
+      ...prev,
+      generatedText: content,
+    }));
+    setSaveStatus("saving");
+
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+
+    debounceRef.current = setTimeout(async () => {
+      if (!currentVersionId) {
+        setSaveStatus("error");
+        return;
+      }
+
+      try {
+        await axiosInstance.patch(
+          `/cover-letter/${id}/version/${currentVersionId}`,
+          {
+            generatedText: content,
+          }
+        );
+        setSaveStatus("saved");
+        setSavedAt(
+          new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        );
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to update cover letter");
+        setSaveStatus("error");
+      }
+    }, 800);
+  };
+
+  const handleVersionChange = (value: string) => {
+    const versionDetail = coverLetterData?.versions.find(
+      (v) => v.versionNumber === value
+    );
+    setVersionDetails(
+      versionDetail || {
+        id: "",
+        versionNumber: "",
+        excitement: "",
+        achievement: "",
+        tone: "",
+        generatedText: "",
+      }
+    );
+  };
+
+  const handleCopy = async () => {
+    if (versionDetails?.generatedText) {
+      try {
+        await navigator.clipboard.writeText(versionDetails.generatedText);
+        toast.success("Copied to clipboard!");
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to copy text");
+      }
+    }
+  };
+
+  const wordCount =
+    versionDetails && versionDetails.generatedText
+      ? versionDetails.generatedText.trim().split(/\s+/).length
+      : 0;
+
+  // Loading state
+  if (isCoverLetterLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 px-6 py-10">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-8">
+          <div className="h-8 w-40 rounded-full bg-slate-200 animate-pulse" />
+
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.6fr)]">
+            <div className="space-y-4">
+              <div className="h-6 w-64 rounded bg-slate-200 animate-pulse" />
+              <div className="h-[520px] rounded-xl border border-slate-200/50 bg-white shadow-sm animate-pulse" />
+            </div>
+
+            <div className="space-y-4">
+              <div className="h-6 w-48 rounded bg-slate-200 animate-pulse" />
+              <div className="space-y-3 rounded-xl border border-slate-200/50 bg-white p-4 shadow-sm">
+                <div className="h-4 w-32 rounded bg-slate-200 animate-pulse" />
+                <div className="h-16 rounded bg-slate-100 animate-pulse" />
+                <div className="h-16 rounded bg-slate-100 animate-pulse" />
+                <div className="h-10 rounded bg-slate-200 animate-pulse" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 relative">
+      {/* Global Writing Overlay */}
+      {isWriting && <CoverLetterWritingLoader />}
+
       {/* Header */}
-      <header className="border-b border-slate-200">
+      <header className="border-b border-slate-200/60 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <Button variant="ghost" size="sm" className="gap-2" onClick={() => window.history.back()}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+            onClick={() => window.history.back()}
+          >
             <ArrowLeft className="h-4 w-4" />
             Back
-            </Button>
+          </Button>
+
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="sm"
-              className="gap-2"
+              className="gap-2 transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               onClick={handleCopy}
             >
               <Copy className="h-4 w-4" />
               Copy
             </Button>
-            <Button size="sm" className="gap-2">
+
+            <Button
+              size="sm"
+              className="gap-2 bg-slate-900 hover:bg-slate-800 text-white transition-colors shadow-sm hover:shadow"
+            >
               <Download className="h-4 w-4" />
               Download
             </Button>
@@ -121,256 +296,199 @@ const CoverDetail = () => {
         </div>
       </header>
 
-      {/* Layout */}
-      <div className="mx-auto grid max-w-7xl gap-8 px-6 py-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(260px,0.6fr)]">
-        {/* Left column - Editable Document */}
+      {/* Main Layout */}
+      <div className="mx-auto grid max-w-7xl gap-8 px-6 py-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.6fr)]">
+        {/* Left Column - Editable Content */}
         <section className="space-y-6">
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-          <div>
-              <h1 className="text-2xl font-medium">
-                Junior React Developer Cover Letter
+            <div>
+              <h1 className="text-2xl font-semibold text-slate-900">
+                {coverLetterData?.title}
               </h1>
-              <p className="text-slate-500">{wordCount} words</p>
+              <div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
+                <span>{wordCount} words</span>
+                {saveStatus === "saved" && savedAt && (
+                  <span className="text-emerald-600">Last saved {savedAt}</span>
+                )}
+                {saveStatus === "error" && (
+                  <span className="text-rose-600">Save failed</span>
+                )}
+              </div>
             </div>
-            <div className="flex items-center gap-2 text-sm text-slate-600">
-              <label className="text-xs uppercase tracking-wide text-slate-500">
-                Version
-              </label>
+
+            <div className="flex items-center gap-3">
               <Select
-                value={selectedVersionId}
+                value={versionDetails?.versionNumber}
                 onValueChange={(value) => {
-                  const nextVersion = versions.find((v) => v.id === value);
-                  if (!nextVersion) return;
-                  setSelectedVersionId(nextVersion.id);
-                  setContent(nextVersion.content);
+                  handleVersionChange(value);
                 }}
               >
-                <SelectTrigger className="h-9 w-[140px]">
+                <SelectTrigger className="h-9 w-30 bg-white border-slate-300 hover:border-slate-400 transition-colors">
                   <SelectValue placeholder="Choose version" />
                 </SelectTrigger>
-                <SelectContent align="end">
-                  {versions.map((version) => (
-                    <SelectItem key={version.id} value={version.id}>
-                      {version.label}
+                <SelectContent
+                  align="end"
+                  className="bg-white border-slate-200"
+                >
+                  {coverLetterData?.versions.map((v) => (
+                    <SelectItem
+                      key={v.id}
+                      value={v.versionNumber}
+                      className="focus:bg-slate-50"
+                    >
+                      Version {v.versionNumber}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              </div>
             </div>
+          </div>
 
-          <div
-            ref={contentRef}
-            contentEditable
-            suppressContentEditableWarning
-            onInput={(e) => setContent(e.currentTarget.innerText)}
-            className="min-h-[500px] whitespace-pre-wrap rounded-lg border border-slate-200 bg-slate-50 p-8 leading-relaxed text-slate-900 focus:border-slate-300 focus:bg-white focus:outline-none"
-          >
-            {content}
+          <div className="relative">
+            <Textarea
+              value={versionDetails?.generatedText}
+              onChange={(e) => handleContentChange(e.target.value)}
+              className="min-h-[600px] whitespace-pre-wrap rounded-xl  bg-white p-4 leading-relaxed text-slate-900 resize-none transition-all duration-200 shadow-sm"
+              placeholder="Your cover letter content will appear here..."
+            />
           </div>
         </section>
 
-        {/* Right column - Sidebar */}
+        {/* Right Sidebar */}
         <aside className="space-y-6">
-          {/* Personalize CTA */}
-          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 space-y-3">
-            <h2 className="text-base font-semibold text-slate-800">
-              {hasExistingPersonalization ? "Personalization saved" : "Want it more personal?"}
+          {/* Quick Refinements */}
+          <div className="space-y-3">
+            <h2 className="text-sm font-semibold text-slate-800 uppercase tracking-wide">
+              Quick Refinements
             </h2>
-            <p className="text-sm text-slate-600">
-              {hasExistingPersonalization
-                ? "You already supplied extra context when creating this letter. Update it here if you’d like the regeneration to reflect new details."
-                : "Answer a few prompts so we can weave in extra context and tailor the tone before regenerating."}
-            </p>
-            <Button className="w-full gap-2" onClick={() => setIsPersonalizeOpen(true)}>
-              <Sparkles className="h-4 w-4" />
-              {hasExistingPersonalization ? "Edit personalization" : "Personalize & Regenerate"}
-            </Button>
-          </div>
-
-          {/* Quick refinements */}
-          <div className="space-y-2">
-            <p className="text-sm text-slate-600 font-medium">
-              Quick refinements
-            </p>
-            {quickActions.map((action) => {
-              const Icon = action.icon;
-              return (
-                <button
-                  key={action.label}
-                  type="button"
-                  onClick={() => alert("Coming soon")}
-                  className="flex w-full flex-col items-start gap-1 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
-                >
-                  <div className="flex items-center gap-2">
-                    <Icon className="h-4 w-4" />
-                    {action.label}
-                  </div>
-                  <p className="text-xs text-slate-500">{action.helper}</p>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Writing Tips */}
-          <div className="rounded-lg border border-slate-200 bg-white p-4 space-y-2">
-            <h2 className="text-base font-semibold text-slate-800">
-              Standout in 3 short moves
-            </h2>
-            <ul className="text-sm text-slate-700 space-y-1.5">
-              <li><span className="font-medium">Hook:</span> one line on why this company or mission matters to you.</li>
-              <li><span className="font-medium">Proof:</span> one quantified win that mirrors what they’re hiring for.</li>
-              <li><span className="font-medium">Close:</span> a confident ask to keep the conversation going.</li>
-            </ul>
-            <p className="text-xs text-slate-500">
-              Everything else? Keep it tight, mirror their tone, and tie your work to their goals.
-            </p>
-          </div>
-        </aside>
-      </div>
-
-      <Dialog open={isPersonalizeOpen} onOpenChange={setIsPersonalizeOpen}>
-        <DialogContent className="max-w-4xl sm:max-w-4xl w-full p-8">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-semibold">
-              Personalize your Cover Letter
-            </DialogTitle>
-          </DialogHeader>
-
-          <form
-            className="space-y-4"
-            onSubmit={(e) => {
-              e.preventDefault();
-              // TODO: Handle generation
-              setIsPersonalizeOpen(false);
-            }}
-          >
-            {/* QUESTION 1: THE HOOK */}
             <div className="space-y-2">
-              <div className="space-y-1">
-                <label
-                  htmlFor="roleFocus"
-                  className="text-sm font-medium text-slate-900"
-                >
-                  In one sentence, what genuinely excites you most about this
-                  specific role?
-                </label>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  This helps us find the "hook" for your opening paragraph so it
-                  doesn't sound generic.
-                </p>
-                  </div>
+              {quickActions.map((action) => {
+                const Icon = action.icon;
+                return (
+                  <button
+                    key={action.label}
+                    type="button"
+                    onClick={() => handleRegenerate(action.instructions)}
+                    disabled={isWriting}
+                    className="flex w-full flex-col items-start gap-1 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 transition-all duration-200 hover:border-slate-300 hover:bg-slate-50 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed group"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Icon className="h-4 w-4 text-slate-500 group-hover:text-slate-700 transition-colors" />
+                      <span className="font-medium">{action.label}</span>
+                    </div>
+                    <p className="text-xs text-slate-500">{action.helper}</p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Personalization Section */}
+          <div className="bg-white space-y-4 p-5 rounded-xl border border-slate-200 shadow-sm">
+            <div>
+              <h2 className="text-sm font-semibold text-slate-800 uppercase tracking-wide">
+                Personalization
+              </h2>
+              <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                Add context to make your cover letter more personalized and
+                impactful
+              </p>
+            </div>
+
+            {/* Excitement */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-900 flex items-center gap-1">
+              Why are you interested in this role?
+                <span className="text-slate-400 text-xs">(Optional)</span>
+              </label>
               <Textarea
-                id="roleFocus"
-                rows={4}
-                className="resize-none bg-slate-50 focus:bg-white transition-colors min-h-20 max-h-20"
-                placeholder="e.g. I've been following your sustainability initiative for years and want to contribute..."
-                value={personalizeForm.roleFocus}
+                rows={3}
+                className="resize-none bg-slate-50 border-slate-200 focus:bg-white transition-all duration-200 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                placeholder="eg. I like your company’s mission and the role matches what I enjoy doing"
+                value={versionDetails?.excitement || ""}
                 onChange={(e) =>
-                  setPersonalizeForm((prev) => ({
-                    ...prev,
-                    roleFocus: e.target.value,
-                  }))
+                  setVersionDetails({
+                    ...versionDetails,
+                    excitement: e.target.value,
+                  })
                 }
               />
             </div>
 
-            {/* QUESTION 2: THE PROOF */}
+            {/* Achievement */}
             <div className="space-y-2">
-              <div className="space-y-1">
-                <label
-                  htmlFor="standoutMoment"
-                  className="text-sm font-medium text-slate-900"
-                >
-                  Which specific achievement creates the best proof you can
-                  handle this job?
-                </label>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  Give us the "Director's Cut." Mention the context or struggle
-                  that isn't visible on your resume.
-                </p>
-               </div>
+              <label className="text-sm font-medium text-slate-900 flex items-center gap-1">
+              A achievement you’re proud of
+                <span className="text-slate-400 text-xs">(Optional)</span>
+              </label>
               <Textarea
-                id="standoutMoment"
-                rows={4}
-                className="resize-none bg-slate-50 focus:bg-white transition-colors min-h-20 max-h-20"
-                placeholder="e.g. The resume says I increased sales by 20%, but I did it during a hiring freeze..."
-                value={personalizeForm.standoutMoment}
+                rows={3}
+                className="resize-none bg-slate-50 border-slate-200 focus:bg-white transition-all duration-200 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                placeholder="eg. I improved a process, solved a problem, or delivered something valuable."
+                value={versionDetails?.achievement}
                 onChange={(e) =>
-                  setPersonalizeForm((prev) => ({
-                    ...prev,
-                    standoutMoment: e.target.value,
-                  }))
+                  setVersionDetails({
+                    ...versionDetails,
+                    achievement: e.target.value,
+                  })
                 }
               />
-        </div>
+            </div>
 
-            {/* QUESTION 3: THE VIBE */}
+            {/* Tone */}
             <div className="space-y-2">
-              <div className="space-y-1">
-                <label
-                  htmlFor="tone"
-                  className="text-sm font-medium text-slate-900"
-                >
-                  Select the tone that matches your personality
-                </label>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  This controls the sentence structure and vocabulary of the
-                  final letter.
-                </p>
-              </div>
+              <label className="text-sm font-medium text-slate-900">Tone</label>
               <Select
-                value={personalizeForm.tone}
+                value={versionDetails?.tone || ""}
                 onValueChange={(value) =>
-                  setPersonalizeForm((prev) => ({
-                    ...prev,
-                    tone: value,
-                  }))
+                  setVersionDetails({ ...versionDetails, tone: value })
                 }
               >
-                <SelectTrigger className="h-10 text-sm">
+                <SelectTrigger className="h-9 text-sm w-full bg-slate-50 border-slate-200 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
                   <SelectValue placeholder="Choose tone" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="professional">
-                    Professional & Polished (Safe & Standard)
+                <SelectContent className="bg-white border-slate-200">
+                  <SelectItem
+                    value="professional"
+                    className="focus:bg-slate-50"
+                  >
+                    Professional
                   </SelectItem>
-                  <SelectItem value="raw">
-                    Raw & Authentic (Human, Minimal Fluff)
+                  <SelectItem value="modern" className="focus:bg-slate-50">
+                    Modern & Direct
                   </SelectItem>
-                  <SelectItem value="bold">
-                    Bold & Confident (Direct, Leadership-Focused)
+                  <SelectItem value="persuasive" className="focus:bg-slate-50">
+                    Confident
                   </SelectItem>
-                  <SelectItem value="enthusiastic">
-                    High Energy (Passionate, Startup-Ready)
+                  <SelectItem
+                    value="enthusiastic"
+                    className="focus:bg-slate-50"
+                  >
+                    Enthusiastic
                   </SelectItem>
-                  <SelectItem value="analytical">
-                    Analytical & Precise (Data-Driven, Technical)
+                  <SelectItem value="empathetic" className="focus:bg-slate-50">
+                    Warm & Empathetic
                   </SelectItem>
                 </SelectContent>
               </Select>
-        </div>
+            </div>
 
-            <DialogFooter className="pt-4 gap-2 sm:gap-0">
+            <div className="pt-2">
               <Button
                 type="button"
-                variant="ghost"
-                onClick={() => setIsPersonalizeOpen(false)}
-                className="text-slate-500 hover:text-slate-900 mr-2"
+                onClick={() => handleRegenerate("personalize")}
+                disabled={isWriting}
+                className="w-full bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 text-white shadow-sm hover:shadow transition-all duration-200 gap-2 h-10 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Cancel
+                <RefreshCw
+                  className={`h-4 w-4 ${isWriting ? "animate-spin" : ""}`}
+                />
+                {isWriting ? "Regenerating..." : "Personalize and Regenerate"}
               </Button>
-              <Button
-                type="submit"
-                onClick={() => setHasExistingPersonalization(true)}
-                className="bg-slate-900 text-white hover:bg-slate-800 shadow-sm"
-              >
-                Regenerate Cover Letter
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+            </div>
+          </div>
+        </aside>
+      </div>
     </div>
   );
 };
