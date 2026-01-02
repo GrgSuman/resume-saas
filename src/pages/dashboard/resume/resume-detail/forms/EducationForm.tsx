@@ -77,14 +77,15 @@ const EducationForm = ({ onClose }: { onClose: () => void }) => {
   }
 
   const handleAddEducation = () => {
-    const newEducation = {
+    const newEducation: Education = {
+      order: formData.length + 1,
       degree: "",
       institution: "",
       dateRange: "",
-      gpa: "",
+      grade: "",
       description: ""
     }
-    setFormData(prev => [...prev, newEducation])
+    setFormData(prev => [...prev, { ...newEducation, order: prev.length + 1 }])
     setHasChanges(true)
     
     // Scroll to the newly added education form

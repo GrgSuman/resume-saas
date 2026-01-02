@@ -6,7 +6,7 @@ import { Label } from "../../../../../components/ui/label"
 import { Textarea } from "../../../../../components/ui/textarea"
 import { Plus, Trash2 } from "lucide-react"
 import { ResumeSectionKey } from "../../../types/constants"
-import type { Project } from "../../../types/resume"
+import type { AchievementItem, Project } from "../../../types/resume"
 import { useResume } from "../../../../../hooks/useResume"
 
 const ProjectsForm = ({ onClose }: { onClose: () => void }) => {
@@ -40,7 +40,7 @@ const ProjectsForm = ({ onClose }: { onClose: () => void }) => {
       if (!project.name?.trim()) {
         newErrors[`${index}-name`] = 'Project name is required'
       }
-      if (!project.achievements?.length || project.achievements.every(achievement => !achievement.trim())) {
+      if (!project.achievements?.length || project.achievements.every((achievement: AchievementItem) => !achievement.content.trim())) {
         newErrors[`${index}-achievements`] = 'At least one achievement is required'
       }
     })
@@ -77,7 +77,7 @@ const ProjectsForm = ({ onClose }: { onClose: () => void }) => {
   const handleAddAchievement = (projectIndex: number) => {
     setFormData(prev => prev.map((item, i) => 
       i === projectIndex 
-        ? { ...item, achievements: [...(item.achievements || []), ""] }
+        ? { ...item, achievements: [...(item.achievements || []), { order: item.achievements.length + 1, content: "" }] }
         : item
     ))
     setHasChanges(true)
@@ -88,8 +88,8 @@ const ProjectsForm = ({ onClose }: { onClose: () => void }) => {
       i === projectIndex 
         ? { 
             ...item, 
-            achievements: item.achievements?.map((achievement, aIndex) => 
-              aIndex === achievementIndex ? value : achievement
+            achievements: item.achievements.map((achievement, aIndex) => 
+              aIndex === achievementIndex ? { ...achievement, content: value } : achievement
             ) || []
           }
         : item
@@ -113,9 +113,9 @@ const ProjectsForm = ({ onClose }: { onClose: () => void }) => {
     const newProject = {
       name: "",
       link: "",
-      achievements: []
+      achievements: [{ order: 1, content: "" }]
     }
-    setFormData(prev => [...prev, newProject])
+    setFormData(prev => [...prev, { ...newProject, order: prev.length + 1 }])
     setHasChanges(true)
     
     // Scroll to the newly added project form
@@ -217,7 +217,7 @@ const ProjectsForm = ({ onClose }: { onClose: () => void }) => {
                   <div className="flex items-start gap-2 p-2 rounded-md hover:bg-muted/50 transition-colors">
                     <div className="flex items-center gap-2 flex-1 min-w-0">
                       <Textarea
-                        value={achievement}
+                        value={achievement.content}
                         onChange={(e) => handleUpdateAchievement(index, achievementIndex, e.target.value)}
                         className="flex-1 min-h-[40px] max-h-[100px] resize-none border-none bg-transparent p-0 text-sm leading-relaxed focus:outline-none focus:ring-0 shadow-none"
                         placeholder="Enter an achievement..."
@@ -237,7 +237,7 @@ const ProjectsForm = ({ onClose }: { onClose: () => void }) => {
                 </div>
               )) || []}
               
-              {(!project.achievements || project.achievements.length === 0) && (
+              {project.achievements.length === 0 && (
                 <div className="text-center py-4 text-muted-foreground text-sm">
                   No achievements added yet. Click "Add Achievement" to get started.
                 </div>

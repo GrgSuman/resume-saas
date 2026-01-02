@@ -1,28 +1,81 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "../../../api/axios";
 import { Button } from "../../../components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Briefcase } from "lucide-react";
 import { Skeleton } from "../../../components/ui/skeleton";
 import { useLocation, useNavigate, useSearchParams } from "react-router";
 import ResumeCardUI from "./ResumeCardUI";
 import { toast } from "react-toastify";
 import axios from "axios";
 import NewResumeDialog from "./NewResumeDialog";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "../../../components/ui/tabs";
 
 const ResumeList = () => {
   const [isNewResumeOpen, setIsNewResumeOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"main" | "tailored">("main");
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const {data: resumeData, isLoading, isError} = useQuery({
+  const {
+    data: resumeData,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["resumes"],
-    queryFn: () => axiosInstance.get("/resume/user"),
+    queryFn: () => axiosInstance.get("/resume/"),
   });
 
-  const resumes = resumeData?.data?.resume || [];
+  // Separate resumes into Main and Tailored
+  // Adjust the condition based on your API response structure
+  // Check for: jobId, jobSpaceId, isTailored, or any field that indicates it's from job space
+  const { mainResumes, tailoredResumes } = useMemo(() => {
+    const allResumes = resumeData?.data?.resumes || [];
+    const main: typeof allResumes = [];
+    const tailored: typeof allResumes = [];
+
+    allResumes.forEach(
+      (resume: {
+        id: string;
+        title: string;
+        createdAt: string;
+        bgColor: string;
+        emoji: string;
+        jobId?: string; // Uncomment if your API returns this
+        jobSpaceId?: string; // Uncomment if your API returns this
+        isTailored?: boolean; // Uncomment if your API returns this
+      }) => {
+        // Adjust this condition based on your actual API response
+        // Option 1: Check for jobId/jobSpaceId (most common)
+        const isTailored = resume.jobId || resume.jobSpaceId;
+
+        // Option 2: Check for isTailored flag
+        // const isTailored = resume.isTailored === true;
+
+        if (isTailored) {
+          tailored.push(resume);
+        } else {
+          main.push(resume);
+        }
+      }
+    );
+
+    // Sort by date (newest first)
+    const sortByDate = (a: (typeof allResumes)[0], b: (typeof allResumes)[0]) =>
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+
+    return {
+      mainResumes: main.sort(sortByDate),
+      tailoredResumes: tailored.sort(sortByDate),
+    };
+  }, [resumeData]);
 
   // Open "New Resume" modal when asked via route state or query
   useEffect(() => {
@@ -53,7 +106,13 @@ const ResumeList = () => {
 
   // Create new resume mutation
   const createResumeMutation = useMutation({
-    mutationFn: async ({resumeName,jobTitle}: {resumeName: string, jobTitle?: string}) => {
+    mutationFn: async ({
+      resumeName,
+      jobTitle,
+    }: {
+      resumeName: string;
+      jobTitle?: string;
+    }) => {
       const response = await axiosInstance.post("/resume", {
         title: resumeName,
         jobTitle: jobTitle || "",
@@ -90,12 +149,14 @@ const ResumeList = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-8">
-      <div className=" mx-auto space-y-10">
+    <div className="min-h-screen bg-background p-6 sm:p-8">
+      <div className="mx-auto space-y-8">
         {/* Header */}
         <div className="space-y-1">
-          <h1 className="text-2xl font-medium text-foreground">My Resumes</h1>
-          <p className="text-sm text-muted-foreground">
+          <h1 className="text-lg sm:text-xl font-semibold text-foreground">
+            My Resumes
+          </h1>
+          <p className="text-xs sm:text-sm text-muted-foreground">
             Create, manage, and customize your professional resumes
           </p>
         </div>
@@ -158,58 +219,145 @@ const ResumeList = () => {
           </div>
         )}
 
-        {/* Resume Grid */}
+        {/* Resume Tabs */}
         {!isLoading && (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {/* New Resume */}
-            <div
-              onClick={() => setIsNewResumeOpen(true)}
-              className="group relative cursor-pointer rounded-2xl bg-white border-2 border-dashed border-slate-300 hover:border-slate-400 transition-all duration-300 hover:scale-105 p-6 flex flex-col h-[220px] hover:bg-slate-50/50"
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
-                  <Plus className="h-6 w-6 text-slate-600" />
+          <Tabs
+            value={activeTab}
+            onValueChange={(value) =>
+              setActiveTab(value as "main" | "tailored")
+            }
+            className="space-y-5"
+          >
+            {/* Tabs Navigation */}
+            <TabsList className="bg-slate-100 p-1 rounded-md inline-flex">
+              <TabsTrigger
+                value="main"
+                className="text-base px-4 py-2.5 whitespace-nowrap data-[state=active]:bg-white data-[state=active]:shadow-sm"
+              >
+                Main Resume
+              </TabsTrigger>
+              <TabsTrigger
+                value="tailored"
+                className="text-base px-4 py-2.5 whitespace-nowrap data-[state=active]:bg-white data-[state=active]:shadow-sm"
+              >
+                Tailored Resume
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Main Resume Tab Content */}
+            <TabsContent value="main" className="mt-0 focus-visible:ring-0">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {/* New Resume Card */}
+                <div
+                  onClick={() => setIsNewResumeOpen(true)}
+                  className="group relative cursor-pointer rounded-2xl bg-white border-2 border-dashed border-slate-300 hover:border-slate-400 transition-all duration-300 hover:scale-105 p-6 flex flex-col h-[200px] hover:bg-slate-50/50"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
+                      <Plus className="h-6 w-6 text-slate-600" />
+                    </div>
+                  </div>
+                  <div className="mb-4">
+                    <h3 className="font-semibold text-lg text-slate-900 line-clamp-2 leading-tight">
+                      Create New Resume
+                    </h3>
+                  </div>
+                  <div className="mt-auto">
+                    <p className="text-sm text-slate-600 font-medium">
+                      Start building your resume
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              {/* Title */}
-              <div className="mb-4">
-                <h3 className="font-semibold text-lg text-slate-900 line-clamp-2 leading-tight">
-                  Create New Resume
-                </h3>
+                {/* Main Resumes */}
+                {mainResumes.length > 0 &&
+                  mainResumes.map(
+                    (resume: {
+                      id: string;
+                      title: string;
+                      createdAt: string;
+                      bgColor: string;
+                      emoji: string;
+                    }) => (
+                      <ResumeCardUI
+                        key={resume.id}
+                        resume={{
+                          id: resume.id,
+                          title: resume.title,
+                          createdAt: resume.createdAt,
+                          bgColor: resume.bgColor,
+                          emoji: resume.emoji,
+                        }}
+                      />
+                    )
+                  )}
               </div>
+            </TabsContent>
 
-              {/* Date Info */}
-              <div className="mt-auto">
-                <p className="text-sm text-slate-600 font-medium">
-                  Start building your resume
-                </p>
+            {/* Tailored Resume Tab Content */}
+            <TabsContent value="tailored" className="mt-0 focus-visible:ring-0">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {tailoredResumes.length > 0 ? (
+                  tailoredResumes.map(
+                    (resume: {
+                      id: string;
+                      title: string;
+                      createdAt: string;
+                      bgColor: string;
+                      emoji: string;
+                    }) => (
+                      <ResumeCardUI
+                        key={resume.id}
+                        resume={{
+                          id: resume.id,
+                          title: resume.title,
+                          createdAt: resume.createdAt,
+                          bgColor: resume.bgColor,
+                          emoji: resume.emoji,
+                        }}
+                      />
+                    )
+                  )
+                ) : (
+                  <div className="col-span-full">
+                    <div className="rounded-lg border border-slate-200 bg-white px-6 py-8">
+                      <div className="flex max-w-lg">
+                        {/* Content */}
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-slate-900">
+                            Job-tailored resumes will appear here
+                          </p>
+
+                          <p className="mt-1 text-sm text-slate-500 leading-relaxed">
+                            This section shows resumes that are generated for
+                            specific jobs. You can create them from{" "}
+                            <span className="font-medium text-slate-700">
+                              Job Space
+                            </span>
+                            or directly tailor a resume using the browser
+                            extension.
+                          </p>
+
+                          {/* Action */}
+                          <div className="mt-4">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => navigate("/dashboard/jobs")}
+                              className="gap-1.5"
+                            >
+                              <Briefcase className="h-4 w-4" />
+                              Go to Job Space
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
-
-            {/* Existing Resumes */}
-            {resumes.length > 0 &&
-              resumes.map(
-                (resume: {
-                  id: string;
-                  title: string;
-                  createdAt: string;
-                  bgColor: string;
-                  emoji: string;
-                }) => (
-                  <ResumeCardUI
-                    key={resume.id}
-                    resume={{
-                      id: resume.id,
-                      title: resume.title,
-                      createdAt: resume.createdAt,
-                      bgColor: resume.bgColor,
-                      emoji: resume.emoji,
-                    }}
-                  />
-                )
-              )}
-          </div>
+            </TabsContent>
+          </Tabs>
         )}
 
         {/* New Resume Form Modal */}

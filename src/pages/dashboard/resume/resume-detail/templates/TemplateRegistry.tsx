@@ -1,7 +1,7 @@
 import ProfessionalTemplate from './ProfessionalTemplate';
 import type { ResumeData, ResumeSettings } from '../../../types/resume';
 import ModernTemplate from './ModernTemplate';
-// import CreativeTemplate from './CreativeTemplate';
+import CreativeTemplate from './CreativeTemplate';
 
 // Define template props interface
 export interface TemplateProps {
@@ -18,6 +18,8 @@ const TEMPLATE_REGISTRY = ({resumeData, resumeSettings, openForms, templateName}
       return <ProfessionalTemplate resumeData={resumeData} resumeSettings={resumeSettings} openForms={openForms} />
     case 'modern':
       return <ModernTemplate resumeData={resumeData} resumeSettings={resumeSettings} openForms={openForms} />
+    case 'creative':
+      return <CreativeTemplate resumeData={resumeData} resumeSettings={resumeSettings} openForms={openForms} />
     default:
       return <ProfessionalTemplate resumeData={resumeData} resumeSettings={resumeSettings} openForms={openForms} />
   }

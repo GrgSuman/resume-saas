@@ -2,21 +2,19 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { flushSync } from "react-dom";
 import { toast } from "react-toastify";
-import {
-  ZoomIn,
+import {ZoomIn,Download,ArrowLeft,
   ZoomOut,
-  RotateCcw,
   Minus,
   Plus,
-  ArrowLeft,
-  Download,
   ArrowDownUp,
   LayoutTemplate,
   Type,
-  Monitor,
-  Settings2,
   Edit3,
   Eye,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify,
 } from "lucide-react";
 
 // UI Components
@@ -29,12 +27,16 @@ import {
   SelectValue,
 } from "../../../../components/ui/select";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "../../../../components/ui/sheet";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../../../../components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "../../../../components/ui/tooltip";
 
 // Local Components & Hooks
 import ManageSections from "./ManageSections";
@@ -56,15 +58,13 @@ const SettingsNew = ({
   zoomLevel,
   onZoomIn,
   onZoomOut,
-  onResetZoom,
 }: SettingsNewProps) => {
   const { state, dispatch } = useResume();
   const navigate = useNavigate();
   const editMode = state.resumeEditingMode ?? false;
 
-  // Mobile Sheet State
   const [isManageSectionsOpen, setIsManageSectionsOpen] = useState(false);
-  const [isMobileSettingsOpen, setIsMobileSettingsOpen] = useState(false);
+  const [isAlignmentDropdownOpen, setIsAlignmentDropdownOpen] = useState(false);
 
   // Resume Settings Data
   const selectedTemplate = state.resumeSettings?.template || "professional";
@@ -77,9 +77,11 @@ const SettingsNew = ({
   const handleTemplateChange = (value: string) => {
     dispatch({ type: "UPDATE_RESUME_SETTINGS", payload: { template: value } });
   };
+
   const handleFontFamilyChange = (value: string) => {
     dispatch({ type: "UPDATE_RESUME_SETTINGS", payload: { fontFamily: value } });
   };
+
   const handleLineHeightIncrease = () => {
     const newLineHeight = Math.min(Number((lineHeight + 0.1).toFixed(2)), 2.0);
     dispatch({
@@ -87,6 +89,7 @@ const SettingsNew = ({
       payload: { lineHeight: String(newLineHeight) },
     });
   };
+
   const handleLineHeightDecrease = () => {
     const newLineHeight = Math.max(Number((lineHeight - 0.1).toFixed(2)), 1.0);
     dispatch({
@@ -94,6 +97,7 @@ const SettingsNew = ({
       payload: { lineHeight: String(newLineHeight) },
     });
   };
+
   const handleFontSizeChange = (value: string) => {
     dispatch({ type: "UPDATE_RESUME_SETTINGS", payload: { fontSize: value } });
   };
@@ -137,390 +141,272 @@ const SettingsNew = ({
     dispatch({ type: "SET_EDITING_MODE", payload: !editMode });
   };
 
-  // --- UI Components ---
-
-  const VerticalSeparator = () => (
-    <div className="h-5 w-[1px] bg-border/60 mx-2 hidden md:block" />
+  const VerticalSeparator = ({ className }: { className?: string }) => (
+    <div className={cn("h-5 w-[1px] bg-border/60 mx-1 md:mx-2", className)} />
   );
-
-  const TemplateSelector = ({ mobile = false }) => (
-    <Select value={selectedTemplate} onValueChange={handleTemplateChange}>
-      <SelectTrigger
-        className={cn(
-          "h-8 text-xs font-medium focus:ring-0 focus:ring-offset-0",
-          mobile
-            ? "w-full border-input bg-background"
-            : "w-[130px] border-0 bg-transparent hover:bg-muted/50 shadow-none px-2"
-        )}
-      >
-        <div className="flex items-center gap-2 truncate">
-          {!mobile && (
-            <LayoutTemplate className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-          )}
-          <SelectValue />
-        </div>
-      </SelectTrigger>
-      <SelectContent>
-        {TEMPLATES.map((t) => (
-          <SelectItem key={t.id} value={t.id} className="text-sm">
-            {t.name}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  );
-
-  const FontSelector = ({ mobile = false }) => (
-    <Select value={fontFamily} onValueChange={handleFontFamilyChange}>
-      <SelectTrigger
-        className={cn(
-          "h-8 text-xs font-medium focus:ring-0 focus:ring-offset-0",
-          mobile
-            ? "w-full border-input bg-background"
-            : "w-[120px] border-0 bg-transparent hover:bg-muted/50 shadow-none px-2"
-        )}
-      >
-        <div className="flex items-center gap-2 truncate">
-          {!mobile && (
-            <Type className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-          )}
-          <SelectValue />
-        </div>
-      </SelectTrigger>
-      <SelectContent>
-        {FONT_FAMILIES.map((f) => (
-          <SelectItem key={f.value} value={f.value} className="text-sm">
-            {f.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  );
-
-  const FontSizeSelector = ({ mobile = false }) => (
-    <Select value={String(fontSize)} onValueChange={handleFontSizeChange}>
-      <SelectTrigger
-        className={cn(
-          "h-8 text-xs font-medium focus:ring-0 focus:ring-offset-0",
-          mobile
-            ? "w-full border-input bg-background"
-            : "w-[80px] border-0 bg-transparent hover:bg-muted/50 shadow-none px-2"
-        )}
-      >
-        <div className="flex items-center gap-1.5 justify-center w-full">
-          <SelectValue />
-        </div>
-      </SelectTrigger>
-      <SelectContent>
-        {Array.from({ length: 9 }, (_, idx) => 10 + idx).map((size) => (
-          <SelectItem key={size} value={String(size)} className="text-sm">
-            {size}px
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  );
-
-  const LineHeightControls = () => (
-    <div className="flex items-center bg-muted/30 rounded-md border border-border/40 h-8">
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={handleLineHeightDecrease}
-        className="h-full w-8 hover:bg-background rounded-l-md rounded-r-none border-r border-border/40"
-        disabled={lineHeight <= 1.0}
-      >
-        <Minus className="h-3 w-3" />
-      </Button>
-      <div className="w-10 text-center text-xs font-semibold tabular-nums text-foreground">
-        {lineHeight.toFixed(1)}
-      </div>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={handleLineHeightIncrease}
-        className="h-full w-8 hover:bg-background rounded-r-md rounded-l-none border-l border-border/40"
-        disabled={lineHeight >= 2.0}
-      >
-        <Plus className="h-3 w-3" />
-      </Button>
-    </div>
-  );
-
-  const ZoomControls = () => (
-    <div className="flex items-center bg-muted/30 rounded-md border border-border/40 h-8">
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={onZoomOut}
-        className="h-full w-8 hover:bg-background rounded-l-md rounded-r-none border-r border-border/40"
-        disabled={zoomLevel <= 0.5}
-      >
-        <ZoomOut className="h-3 w-3" />
-      </Button>
-      <div className="w-11 text-center text-xs font-semibold tabular-nums text-foreground">
-        {Math.round(zoomLevel * 100)}%
-      </div>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={onZoomIn}
-        className="h-full w-8 hover:bg-background rounded-r-md rounded-l-none border-l border-border/40"
-        disabled={zoomLevel >= 1.0}
-      >
-        <ZoomIn className="h-3 w-3" />
-      </Button>
-    </div>
-  );
-
-  // --- Render ---
 
   return (
-    <div className="w-full bg-background/95 backdrop-blur-md rounded-xl border border-border/60 sticky top-2 z-50 shadow-none">
-      {/* -------------------- */}
-      {/* DESKTOP TOOLBAR      */}
-      {/* -------------------- */}
-      <div className="hidden md:block overflow-x-auto scrollbar-hide">
-        <div className="flex items-center justify-between px-3 py-2 gap-2 min-w-max">
-          {/* Left: Design Tools */}
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate(-1)}
-              className="h-8 w-8 text-muted-foreground hover:text-foreground"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-
-            <VerticalSeparator />
-
-            <div className="flex items-center">
-              <TemplateSelector />
-              <FontSelector />
-              <div className="w-[1px] h-4 bg-border/40 mx-1" />
-              <FontSizeSelector />
-              <div className="w-[1px] h-4 bg-border/40 mx-1" />
-              <div className="pl-1">
-                <LineHeightControls />
-              </div>
-            </div>
-
-            <VerticalSeparator />
-
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsManageSectionsOpen(true)}
-              className="h-8 gap-2 text-muted-foreground font-medium hover:text-foreground px-3"
-            >
-              <ArrowDownUp className="h-4 w-4" />
-              <span className="hidden lg:inline">Sections</span>
-            </Button>
-          </div>
-
-          {/* Right: View & Actions */}
-          <div className="flex items-center gap-2">
-            <ZoomControls />
-
-            <VerticalSeparator />
-
-            {/* View/Edit Toggle */}
-            <div
-              className="flex items-center bg-muted/40 p-1 rounded-lg border border-border/40 cursor-pointer hover:bg-muted/60 transition-colors h-8"
-              onClick={toggleEditMode}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  toggleEditMode();
-                }
-              }}
-              title={editMode ? "Switch to View mode" : "Switch to Edit mode"}
-            >
-              <div
-                className={cn(
-                  "flex items-center gap-1.5 px-3 h-full rounded-md transition-all duration-200 text-xs font-medium pointer-events-none",
-                  !editMode
-                    ? "bg-background text-foreground shadow-none border border-border/20"
-                    : "text-muted-foreground"
-                )}
-              >
-                <Eye className="h-3 w-3" />
-                <span className="hidden lg:inline">View</span>
-              </div>
-              <div
-                className={cn(
-                  "flex items-center gap-1.5 px-3 h-full rounded-md transition-all duration-200 text-xs font-medium pointer-events-none",
-                  editMode
-                    ? "bg-background text-foreground shadow-none border border-border/20"
-                    : "text-muted-foreground"
-                )}
-              >
-                <Edit3 className="h-3 w-3" />
-                <span className="hidden lg:inline">Edit</span>
-              </div>
-            </div>
-
-            <Button
-              onClick={handleExport}
-              size="sm"
-              className="h-8 gap-2 px-4 shadow-none font-semibold bg-primary text-primary-foreground hover:bg-primary/90 rounded-md"
-            >
-              <Download className="h-3.5 w-3.5" />
-              <span className="hidden lg:inline">Download</span>
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* -------------------- */}
-      {/* MOBILE NAVBAR        */}
-      {/* -------------------- */}
-      <div className="flex md:hidden items-center justify-between px-4 py-3">
-        <div className="flex items-center gap-3">
+    <div className="w-full bg-background/95 backdrop-blur-md rounded-xl border border-border/60 sticky top-2 z-50">
+      <div className="flex items-center justify-between px-3 py-2 gap-2 overflow-x-auto scrollbar-hide">
+        {/* Left: Design Tools */}
+        <div className="flex items-center gap-1 min-w-max">
           <Button
-            variant="outline"
+            variant="ghost"
             size="icon"
             onClick={() => navigate(-1)}
-            className="h-9 w-9 border-muted-foreground/20"
+            className="h-8 w-8 text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
 
-          {/* Mobile Settings Sheet */}
-          <Sheet
-            open={isMobileSettingsOpen}
-            onOpenChange={setIsMobileSettingsOpen}
-          >
-            <SheetTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-9 gap-2 border-muted-foreground/20 font-semibold text-muted-foreground"
-              >
-                <Settings2 className="h-4 w-4" />
-                <span className="hidden sm:inline">Design</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="bottom" className="rounded-t-2xl px-6 pb-8 pt-6">
-              <SheetHeader className="mb-6 text-left">
-                <SheetTitle className="text-xl font-bold">
-                  Resume Appearance
-                </SheetTitle>
-              </SheetHeader>
+          <VerticalSeparator />
 
-              <div className="space-y-6">
-                {/* Section 1: Template */}
-                <div className="space-y-3">
-                  <label className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
-                    <LayoutTemplate className="h-4 w-4" /> Template
-                  </label>
-                  <TemplateSelector mobile />
+          {/* Template Dropdown */}
+          <DropdownMenu>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 gap-1.5 px-2 text-xs font-medium hover:bg-muted/50 md:px-2.5"
+                  >
+                    <LayoutTemplate className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="hidden md:inline">Template</span>
+                  </Button>
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent>Template</TooltipContent>
+            </Tooltip>
+            <DropdownMenuContent align="start" className="w-48">
+              {TEMPLATES.map((t) => (
+                <DropdownMenuItem
+                  key={t.id}
+                  onClick={() => handleTemplateChange(t.id)}
+                  className={cn(
+                    "cursor-pointer",
+                    selectedTemplate === t.id && "bg-accent"
+                  )}
+                >
+                  {t.name}
+                  {selectedTemplate === t.id && (
+                    <span className="ml-auto text-xs">✓</span>
+                  )}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <VerticalSeparator />
+
+          {/* Typography Dropdown */}
+          <DropdownMenu>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 gap-1.5 px-2 text-xs font-medium hover:bg-muted/50 md:px-2.5"
+                  >
+                    <Type className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="hidden md:inline">Typography</span>
+                  </Button>
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent>Typography</TooltipContent>
+            </Tooltip>
+            <DropdownMenuContent align="start" className="w-64 p-3">
+              <div className="space-y-3">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">Font Family</label>
+                  <Select value={fontFamily} onValueChange={handleFontFamilyChange}>
+                    <SelectTrigger className="h-8 w-full border-input bg-background text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {FONT_FAMILIES.map((f) => (
+                        <SelectItem key={f.value} value={f.value} className="text-sm">
+                          {f.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">Font Size</label>
+                  <Select value={String(fontSize)} onValueChange={handleFontSizeChange}>
+                    <SelectTrigger className="h-8 w-full border-input bg-background text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Array.from({ length: 9 }, (_, idx) => 10 + idx).map((size) => (
+                        <SelectItem key={size} value={String(size)} className="text-sm">
+                          {size}px
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-                {/* Section 2: Typography Grid */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-3">
-                    <label className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
-                      <Type className="h-4 w-4" /> Font
-                    </label>
-                    <FontSelector mobile />
-                  </div>
-                  <div className="space-y-3">
-                    <label className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
-                      Font Size
-                    </label>
-                    <FontSizeSelector mobile />
-                  </div>
-                  <div className="space-y-3">
-                    <label className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
-                      Spacing
-                    </label>
-                    <LineHeightControls />
+          <VerticalSeparator />
+
+          {/* Alignment Dropdown */}
+          <DropdownMenu open={isAlignmentDropdownOpen} onOpenChange={setIsAlignmentDropdownOpen}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 gap-1.5 px-2 text-xs font-medium hover:bg-muted/50 md:px-2.5"
+                  >
+                    <AlignLeft className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="hidden md:inline">Alignment</span>
+                  </Button>
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent>Alignment</TooltipContent>
+            </Tooltip>
+            <DropdownMenuContent align="start" className="w-56 p-3 shadow-sm">
+              <div className="space-y-3">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">Text Alignment</label>
+                  <div className="flex items-center gap-1.5">
+                    <Button variant="outline" size="icon" onClick={() => toast.info("Coming soon!")} className="h-8 w-8">
+                      <AlignLeft className="h-4 w-4" />
+                    </Button>
+                    <Button variant="outline" size="icon" onClick={() => toast.info("Coming soon!")} className="h-8 w-8">
+                      <AlignCenter className="h-4 w-4" />
+                    </Button>
+                    <Button variant="outline" size="icon" onClick={() => toast.info("Coming soon!")} className="h-8 w-8">
+                      <AlignRight className="h-4 w-4" />
+                    </Button>
+                    <Button variant="outline" size="icon" onClick={() => toast.info("Coming soon!")} className="h-8 w-8">
+                      <AlignJustify className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
-
-                {/* Section 3: View & Zoom */}
-                <div className="space-y-3">
-                  <label className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
-                    <Monitor className="h-4 w-4" /> View Scale
-                  </label>
-                  <div className="flex items-center justify-between">
-                    <ZoomControls />
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">Line Height</label>
+                  <div className="w-full flex items-center h-8">
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="icon"
-                      onClick={onResetZoom}
-                      className="h-9 w-9"
-                      title="Reset Zoom"
+                      onClick={(e) => { e.stopPropagation(); handleLineHeightDecrease(); }}
+                      className="h-full w-8 hover:bg-background rounded-l-md rounded-r-none border border-border/40"
+                      disabled={lineHeight <= 1.0}
                     >
-                      <RotateCcw className="h-3.5 w-3.5" />
+                      <Minus className="h-3 w-3" />
+                    </Button>
+                    <div className="w-10 text-center text-xs font-semibold tabular-nums text-foreground">{lineHeight.toFixed(1)}</div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => { e.stopPropagation(); handleLineHeightIncrease(); }}
+                      className="h-full w-8 hover:bg-background rounded-r-md rounded-l-none border border-border/40"
+                      disabled={lineHeight >= 2.0}
+                    >
+                      <Plus className="h-3 w-3" />
                     </Button>
                   </div>
                 </div>
               </div>
-            </SheetContent>
-          </Sheet>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setIsManageSectionsOpen(true)}
-            className="h-9 w-9 border-muted-foreground/20"
-          >
-            <ArrowDownUp className="h-4 w-4" />
-          </Button>
+          <VerticalSeparator />
+
+          {/* Sections Button */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsManageSectionsOpen(true)}
+                className="h-8 gap-1.5 px-2 text-xs font-medium  hover:text-foreground md:px-2.5"
+              >
+                <ArrowDownUp className="h-3.5 w-3.5" />
+                <span className="hidden md:inline">Sections</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Sections</TooltipContent>
+          </Tooltip>
         </div>
 
-        {/* Mobile Right Actions */}
-        <div className="flex items-center gap-3">
-          {/* Toggle Edit/View */}
-          <div
-            className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg border border-border/50 cursor-pointer hover:bg-muted/70 transition-colors"
-            onClick={toggleEditMode}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                toggleEditMode();
-              }
-            }}
-            title={editMode ? "Switch to View mode" : "Switch to Edit mode"}
-          >
-            <div
-              className={cn(
-                "flex items-center gap-1.5 px-2.5 py-1.5 rounded-md transition-all duration-200 text-xs font-medium pointer-events-none",
-                !editMode
-                  ? "bg-background shadow-none text-foreground"
-                  : "text-muted-foreground"
-              )}
+        {/* Right: View & Actions */}
+        <div className="flex items-center gap-2 min-w-max">
+          {/* Zoom Controls - Hidden on Mobile */}
+          <div className="hidden md:flex items-center bg-muted/30 rounded-md border border-border/40 h-8">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onZoomOut}
+              className="h-full w-8 hover:bg-background rounded-l-md border-r border-border/40"
+              disabled={zoomLevel <= 0.5}
             >
-              <Eye className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">View</span>
-            </div>
-            <div
-              className={cn(
-                "flex items-center gap-1.5 px-2.5 py-1.5 rounded-md transition-all duration-200 text-xs font-medium pointer-events-none",
-                editMode
-                  ? "bg-background shadow-none text-foreground"
-                  : "text-muted-foreground"
-              )}
+              <ZoomOut className="h-3 w-3" />
+            </Button>
+            <div className="w-11 text-center text-xs font-semibold tabular-nums">{Math.round(zoomLevel * 100)}%</div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onZoomIn}
+              className="h-full w-8 hover:bg-background rounded-r-md border-l border-border/40"
+              disabled={zoomLevel >= 1.0}
             >
-              <Edit3 className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Edit</span>
-            </div>
+              <ZoomIn className="h-3 w-3" />
+            </Button>
           </div>
 
-          <Button
-            onClick={handleExport}
-            size="icon"
-            className="h-9 w-9 shadow-none"
-          >
-            <Download className="h-4 w-4" />
-          </Button>
+          <VerticalSeparator className="hidden md:block" />
+
+          {/* View/Edit Toggle */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div
+                className="flex items-center bg-muted/40 p-1 rounded-lg border border-border/40 cursor-pointer hover:bg-muted/60 h-8"
+                onClick={toggleEditMode}
+                role="button"
+                tabIndex={0}
+              >
+                <div className={cn(
+                  "flex items-center gap-1.5 px-2 md:px-3 h-full rounded-md transition-all duration-200 text-xs font-medium",
+                  !editMode ? "bg-background text-foreground border border-border/20 shadow-sm" : "text-muted-foreground"
+                )}>
+                  <Eye className="h-3.5 w-3.5" />
+                  <span className="hidden md:inline">View</span>
+                </div>
+                <div className={cn(
+                  "flex items-center gap-1.5 px-2 md:px-3 h-full rounded-md transition-all duration-200 text-xs font-medium",
+                  editMode ? "bg-background text-foreground border border-border/20 shadow-sm" : "text-muted-foreground"
+                )}>
+                  <Edit3 className="h-3.5 w-3.5" />
+                  <span className="hidden md:inline">Edit</span>
+                </div>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>{editMode ? "Switch to View mode" : "Switch to Edit mode"}</TooltipContent>
+          </Tooltip>
+
+          {/* Download Button */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={handleExport}
+                size="sm"
+                variant="default"
+                className="h-8 gap-1.5 px-2 text-xs font-medium"
+              >
+                <Download className="h-3.5 w-3.5" />
+                <span className="hidden md:inline">Download</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Download PDF</TooltipContent>
+          </Tooltip>
         </div>
       </div>
 

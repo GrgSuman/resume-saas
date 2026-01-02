@@ -33,6 +33,7 @@ export type ResumeAction =
   
   // Data updates
   | { type: 'UPDATE_RESUME_DATA'; payload: Partial<ResumeData> }
+  | { type: 'UPDATE_RESUME_DATA_OPERATION'; payload: { operation: string; payload: Partial<ResumeData> } }
   | { type: 'UPDATE_RESUME_SETTINGS'; payload: Partial<ResumeSettings> }
   
   // UI states
@@ -66,10 +67,10 @@ const resumeReducer = (state: ResumeMetaData | null, action: ResumeAction) => {
             return { ...state, resumeEditingMode: action.payload };
 
         case 'SET_RESUME_TITLE':
-            return { ...state, resumeTitle: action.payload };
+            return { ...state, resumeTitle: action.payload, isResumeInitialized: true };
         
         case 'SET_JOB_DESCRIPTION':
-            return { ...state, jobDescription: action.payload };
+            return { ...state, jobDescription: action.payload, isResumeInitialized: true };
 
         case 'INITIALIZE_RESUME_DATA':
             return { ...state, resumeTitle: action.payload.resumeTitle, resumeData: action.payload.resumeData, resumeSettings: action.payload.resumeSettings, jobDescription: action.payload.jobDescription };

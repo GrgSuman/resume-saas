@@ -1,16 +1,10 @@
 import React from "react";
 import { useState, useEffect, useRef, memo } from "react";
-import {
-  ArrowUp,
-  FileText,
-  Loader2,
-  Sparkles,
-  Target,
-  PenTool,
-  Star,
-} from "lucide-react";
+import { ArrowUp, AtSign, X, FileText, Loader2 } from "lucide-react";
 import { ScrollArea } from "../../../../components/ui/scroll-area";
 import { Button } from "../../../../components/ui/button";
+import { Textarea } from "../../../../components/ui/textarea";
+import { Label } from "../../../../components/ui/label";
 import { useResume } from "../../../../hooks/useResume";
 import { useParams } from "react-router";
 import axiosInstance from "../../../../api/axios";
@@ -18,7 +12,6 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import ReactMarkdown from "react-markdown";
 import "./MarkdownStyle.css";
-import Analyzer from "./features/Analyzer";
 
 interface MessageItem {
   role: "model" | "user";
@@ -26,13 +19,8 @@ interface MessageItem {
 }
 
 const Message = memo(({ msg }: { msg: MessageItem }) => (
-  <div
-    className={`flex leading-relaxed ${
-      msg.role === "user" ? "justify-end" : "justify-start"
-    } mb-2 lg:mb-4`}
-  >
-    <div
-      className={`rounded-xl text-sm ${
+  <div className={`flex leading-relaxed ${msg.role === "user" ? "justify-end" : "justify-start"} mb-2 lg:mb-4`}>
+    <div className={`rounded-xl text-sm ${
         msg.role === "model"
           ? "text-gray-800 p-2 lg:p-3"
           : "bg-secondary p-2 px-3 lg:p-3 lg:px-4"
@@ -49,7 +37,10 @@ const Chat = () => {
   const [messages, setMessages] = useState<MessageItem[]>([]);
   const [message, setMessage] = useState("");
   const { state, dispatch } = useResume();
-  const [showAnalyzerDialog, setShowAnalyzerDialog] = useState(false);
+  const [jobDescription, setJobDescription] = useState(
+    state.jobDescription || ""
+  );
+  const [showJobModal, setShowJobModal] = useState(false);
   const [chatLoading, setChatLoading] = useState(true);
   const [msgSending, setMsgSending] = useState(false);
   const endRef = useRef<HTMLDivElement | null>(null);
@@ -63,7 +54,7 @@ const Chat = () => {
     const updateTextareaHeight = () => {
       if (textareaRef.current) {
         const isXL = window.innerWidth >= 1280;
-        textareaRef.current.style.height = isXL ? "48px" : "42px";
+        textareaRef.current.style.height = isXL ? "50px" : "45px";
       }
     };
     updateTextareaHeight();
@@ -76,7 +67,9 @@ const Chat = () => {
   useEffect(() => {
     const getConversation = async () => {
       try {
-        const response = await axiosInstance.get(`/resume/${id}/conversation`);
+        const response = await axiosInstance.get(
+          `/resumegpt/conversation/${id}`
+        );
         const msgHistory = response.data.conversation.map(
           (message: { role: string; text: string }) => ({
             role: message.role as "model" | "user",
@@ -107,19 +100,21 @@ const Chat = () => {
     setMessage("");
     if (textareaRef.current) {
       const isXL = window.innerWidth >= 1280;
-      textareaRef.current.style.height = isXL ? "48px" : "42px";
+      textareaRef.current.style.height = isXL ? "50px" : "45px";
     }
     setMsgSending(true);
 
     try {
-      const response = await axiosInstance.post(`/resume/${id}/conversation`, {
-        userPrompt: message,
-        resumeId: id,
-        jobDescription: state.jobDescription,
-        resumeData: state.resumeData,
-        resumeSettings: state.resumeSettings,
-        messages: messages,
-      });
+      const response = await axiosInstance.post(
+        `/resumegpt/conversation/${id}`,
+        {
+          userPrompt: message,
+          resumeId: id,
+          jobDescription: state.jobDescription,
+          resumeData: state.resumeData,
+          resumeSettings: state.resumeSettings,
+        }
+      );
 
       setMessages((prev) => [
         ...prev,
@@ -128,13 +123,11 @@ const Chat = () => {
 
       // Apply resume data changes if shouldApplyChanges is true
       // The response.data contains only the fields that have changed
-      if (
-        response.data?.response?.shouldApplyChanges &&
-        response.data?.response?.data
-      ) {
+      if (response.data?.response?.shouldApplyChanges && response.data?.response?.data) {
         const payload = response.data.response.data;
         dispatch({ type: "UPDATE_RESUME_DATA", payload: payload });
       }
+
     } catch (error) {
       if (axios.isAxiosError(error)) {
         toast.error("Something went wrong. Please try again.", {
@@ -153,47 +146,120 @@ const Chat = () => {
     }
   };
 
-  // Handle Analyze Resume - opens dialog
-  const handleAnalyzeResume = () => {
-    if (msgSending) return;
-    setShowAnalyzerDialog(true);
+  const handleAddJobDescription = () => {
+    if (!jobDescription.trim()) return;
+    dispatch({ type: "SET_JOB_DESCRIPTION", payload: jobDescription.trim() });
+    setShowJobModal(false);
   };
-
 
   return (
     <>
-      {/* Analyzer Dialog */}
-      <Analyzer
-        open={showAnalyzerDialog}
-        onOpenChange={setShowAnalyzerDialog}
-      />
-
-      {/* Chat Container */}
-      <div className="flex flex-col h-full border-l lg:border-gray-200">
-        {/* Header - Transparent with Blur */}
-        <div className="sticky top-0 z-30 w-full border-b border-gray-200 bg-white backdrop-blur-sm">
-          <div className="px-6 py-3">
-            <div className="flex items-center justify-between">
-              {/* Minimalist Title */}
-              <h2 className="text-lg font-semibold tracking-tight text-foreground">
-                Resume Assistant
-              </h2>
-
-              {/* Action Buttons */}
+      {/* Job Description Modal */}
+      {showJobModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-2 lg:p-4">
+          <div className="bg-background rounded-lg border max-w-lg w-full max-h-[85vh] overflow-hidden flex flex-col shadow-lg">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b bg-muted/50">
               <div className="flex items-center gap-2">
-                <Button
-                  onClick={handleAnalyzeResume}
-                  disabled={msgSending}
-                  size="sm"
-                  variant="outline"
-                  className="h-8 gap-1.5 px-2 text-xs font-medium"
-                >
-                  <Sparkles className="h-3.5 w-3.5" />
-                  <span className="hidden md:inline">Tailor and Analyze</span>
-                </Button>
+                <div className="w-7 h-7 bg-primary/10 rounded flex items-center justify-center">
+                  <FileText className="w-4 h-4 text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-md font-semibold">
+                    {state.jobDescription
+                      ? "Edit Job Description"
+                      : "Add Job Description"}
+                  </h2>
+                  <p className="text-xs text-muted-foreground">
+                    {state.jobDescription
+                      ? "Update the job description content"
+                      : "Paste the job description to get tailored resume advice"}
+                  </p>
+                </div>
               </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowJobModal(false)}
+                className="h-7 w-7 p-0"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 p-3 lg:p-6 overflow-y-auto">
+              <Label htmlFor="job-description" className="text-sm font-medium">
+                Job Description
+              </Label>
+              <Textarea
+                id="job-description"
+                value={jobDescription}
+                onChange={(e) => setJobDescription(e.target.value)}
+                placeholder="Paste the job description here..."
+                className="h-[180px] lg:h-[250px] overflow-y-auto resize-none text-sm lg:text-base"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                The AI will analyze this job description and provide specific
+                recommendations for your resume.
+              </p>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-2 p-3 lg:p-6 border-t bg-muted/50">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowJobModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={
+                  state.jobDescription
+                    ? () => {
+                        setShowJobModal(false);
+                        if (jobDescription.trim() !== state.jobDescription)
+                          dispatch({
+                            type: "SET_JOB_DESCRIPTION",
+                            payload: jobDescription.trim(),
+                          });
+                      }
+                    : handleAddJobDescription
+                }
+                disabled={!jobDescription.trim()}
+              >
+                {state.jobDescription
+                  ? "Update Job Description"
+                  : "Add Job Description"}
+              </Button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Chat Container */}
+      <div className="flex flex-col h-full bg-gradient-to-br from-gray-50 via-white to-gray-50 border-l lg:border-gray-200">
+        {/* Header */}
+        <div className="h-12 lg:h-14 flex items-center justify-between px-3 lg:px-4 border-b bg-white/80 backdrop-blur-md">
+          <h2 className="text-sm lg:text-lg font-semibold text-gray-900">
+            Resume Assistant
+          </h2>
+          <Button
+            onClick={() => setShowJobModal(true)}
+            variant="ghost"
+            size="sm"
+            className={`flex items-center gap-1 text-[11px] lg:text-xs px-2.5 py-1 lg:px-3 lg:py-1.5 rounded-md transition ${
+              state.jobDescription
+                ? "text-green-700 bg-green-50 hover:bg-green-100 border border-green-200"
+                : "text-gray-600 hover:bg-gray-100 border border-gray-200"
+            }`}
+          >
+            <AtSign className="w-3 h-3" />
+            {state.jobDescription
+              ? "Edit Job Description"
+              : "Add Job Description"}
+          </Button>
         </div>
 
         {/* Messages */}
@@ -225,65 +291,21 @@ const Chat = () => {
             <ScrollArea className="h-full">
               <div className="p-3 lg:p-6 space-y-2 lg:space-y-3">
                 {messages.length === 0 ? (
-                  <div className="flex flex-col h-full items-center justify-center">
-                    <div className="w-full max-w-2xl space-y-10">
-                      {/* Capabilities Section */}
-                      <div className="space-y-4 mt-6">
-                        <p className="text-sm font-medium text-center text-slate-500 uppercase tracking-wide">
-                          What I Can Help With
-                        </p>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                          {[
-                            {
-                              icon: Sparkles,
-                              title: "Resume Feedback",
-                              desc: "Get comprehensive AI feedback to identify what's missing and what needs improvement.",
-                            },
-                            {
-                              icon: Target,
-                              title: "Job Matching",
-                              desc: "Align your resume to job requirements.",
-                            },
-                            {
-                              icon: FileText,
-                              title: "Content Improvement",
-                              desc: "Enhance clarity, grammar, and tone.",
-                            },
-                            {
-                              icon: ArrowUp,
-                              title: "Best Practices",
-                              desc: "ATS keywords and formatting tips.",
-                            },
-                            {
-                              icon: PenTool,
-                              title: "Writing Enhancement",
-                              desc: "Improve professional language and impact.",
-                            },
-                            {
-                              icon: Star,
-                              title: "Achievement Highlighting",
-                              desc: "Make your accomplishments stand out.",
-                            },
-                          ].map(({ icon: Icon, title, desc }) => (
-                            <div
-                              key={title}
-                              className="flex items-start gap-2.5 p-3 rounded-lg bg-white border border-slate-200 hover:bg-slate-50/50 transition-colors"
-                            >
-                              <Icon className="h-3.5 w-3.5 text-slate-500 mt-0.5" />
-                              <div>
-                                <p className="text-xs font-medium text-slate-900 leading-none">
-                                  {title}
-                                </p>
-                                <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
-                                  {desc}
-                                </p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+                  <div className="flex flex-col items-center justify-center h-full text-center text-gray-500 py-12">
+                    <div className="w-16 h-16 rounded overflow-hidden mb-2 lg:mb-4">
+                      <img
+                        src="/avatar.png"
+                        alt="AI Assistant"
+                        className="w-full h-full object-contain"
+                      />
                     </div>
+                    <h3 className="text-base lg:text-lg font-semibold text-gray-900 mb-1 lg:mb-2">
+                      How can I help with your resume?
+                    </h3>
+                    <p className="text-xs lg:text-sm text-gray-500 max-w-md">
+                      Get feedback on your resume, optimize for job
+                      descriptions, or improve your content.
+                    </p>
                   </div>
                 ) : (
                   <>
@@ -330,7 +352,7 @@ const Chat = () => {
           </div>
           <div className="relative">
             <div className="relative border border-gray-300 rounded-2xl bg-white focus-within:ring-2 focus-within:ring-gray-900/30 transition-all">
-              <div className="p-2 sm:p-2.5 lg:p-3">
+              <div className="p-2.5 sm:p-3 lg:p-4 xl:p-5">
                 <textarea
                   ref={textareaRef}
                   value={message}
@@ -338,7 +360,7 @@ const Chat = () => {
                     setMessage(e.target.value);
                     if (textareaRef.current) {
                       const isXL = window.innerWidth >= 1280;
-                      const minHeight = isXL ? 48 : 42;
+                      const minHeight = isXL ? 70 : 45;
                       textareaRef.current.style.height = "auto";
                       textareaRef.current.style.height = `${Math.max(
                         minHeight,
@@ -348,7 +370,7 @@ const Chat = () => {
                   }}
                   onKeyDown={handleKeyPress}
                   placeholder="Ask anything about your resume..."
-                  className="w-full text-[16px] resize-none focus:outline-none bg-transparent placeholder:text-gray-400 leading-relaxed min-h-[42px] xl:min-h-[48px]"
+                  className="w-full text-[16px] resize-none focus:outline-none bg-transparent placeholder:text-gray-400 leading-relaxed min-h-[45px] xl:min-h-[60px]"
                   rows={1}
                   style={{
                     maxHeight: "140px",
@@ -359,13 +381,9 @@ const Chat = () => {
                 size="icon"
                 onClick={handleSend}
                 disabled={!message.trim() || msgSending}
-                className="absolute bottom-2 right-2 sm:bottom-2.5 sm:right-2.5 lg:bottom-3 lg:right-3 rounded-full"
+                className="absolute bottom-2.5 right-2.5 sm:bottom-3 sm:right-3 lg:bottom-4 lg:right-4 xl:bottom-5 xl:right-5 rounded-full"
               >
-                {msgSending ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <ArrowUp className="w-4 h-4" />
-                )}
+                {msgSending ? <Loader2 className="w-4 h-4 animate-spin"/> : <ArrowUp className="w-4 h-4"/>}
               </Button>
             </div>
           </div>

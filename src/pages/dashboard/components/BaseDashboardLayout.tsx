@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router";
+import { Outlet, useLocation, useNavigate, Link } from "react-router";
 import { Button } from "../../../components/ui/button";
 import {
-  Menu,
+  PanelLeft,
   ChevronDown,
-  X,
   Plus,
   FileText,
   Mail,
-  // Settings,
   Home,
+  CreditCard,
+  User,
+  LogOut,
+  Briefcase,
+  Puzzle,
   MessageSquare,
 } from "lucide-react";
-import { CreditCard } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,9 +22,6 @@ import {
   DropdownMenuTrigger,
 } from "../../../components/ui/dropdown-menu";
 import { useAuth } from "../../../hooks/useAuth";
-import { Link } from "react-router";
-import { User } from "lucide-react";
-import { LogOut } from "lucide-react";
 import { manageLocalStorage } from "../../../lib/localstorage";
 import { cn } from "../../../lib/utils";
 
@@ -30,12 +29,42 @@ const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
   { href: "/dashboard/resume", label: "Resumes", icon: FileText },
   { href: "/dashboard/cover-letter", label: "Cover Letters", icon: Mail },
-  // { href: "/dashboard/preferences", label: "Preferences", icon: Settings },
+  { href: "/dashboard/jobs", label: "Job Space", icon: Briefcase },
+  { href: "/dashboard/subscription", label: "Billing and Usage", icon: CreditCard },
 ];
 
 const BaseDashboardLayout = () => {
   const { user, setUser, setAuthStates } = useAuth();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+  const [headerAvatarError, setHeaderAvatarError] = useState(false);
+  const [dropdownAvatarError, setDropdownAvatarError] = useState(false);
+
+  // Reset avatar errors when user changes
+  useEffect(() => {
+    setHeaderAvatarError(false);
+    setDropdownAvatarError(false);
+  }, [user?.picture]);
+
+  // Responsive sidebar
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const isDesktop = mq.matches;
+    setIsMobile(!isDesktop);
+    setIsSidebarOpen(isDesktop);
+
+    const handler = (e: MediaQueryListEvent) => {
+      const isDesktop = e.matches;
+      setIsMobile(!isDesktop);
+      setIsSidebarOpen(isDesktop);
+    };
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
   const handleLogout = () => {
     manageLocalStorage.remove("token");
     setUser(null);
@@ -46,255 +75,363 @@ const BaseDashboardLayout = () => {
     });
     navigate("/signin");
   };
-  
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const location = useLocation();
-  const pathname = location.pathname;
-
-  // Open by default on desktop, closed on mobile
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 1024px)');
-    setIsSidebarOpen(mq.matches);
-  }, []);
 
   return (
-    <div className="min-h-screen">
-      {/* Fixed Sidebar with slide in/out */}
+    <div className="min-h-screen bg-white">
+      {/* SIDEBAR */}
       <aside
         className={cn(
-          "fixed top-0 left-0 h-screen w-64 bg-[#f5f5f5] border-r  z-60 lg:z-[50]",
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          "fixed inset-y-0 left-0 bg-white border-r border-slate-200",
+          "transition-all duration-300 ease-in-out z-50",
+          isMobile
+            ? isSidebarOpen
+              ? "w-64 translate-x-0"
+              : "-translate-x-full w-64"
+            : isSidebarOpen
+            ? "w-64 translate-x-0"
+            : "w-16 translate-x-0"
         )}
       >
-        <div className="flex h-full flex-col gap-4 p-4">
-          {/* Mobile header with close button */}
-          <div className="lg:hidden flex items-center justify-between pb-4 border-b border-border">
-            <Link
-              to="/"
-              className="flex items-center gap-2 font-semibold text-xl text-slate-900 tracking-tight"
-            >
-              <img src="/icon.png" alt="CloneCV logo" className="h-7 w-6.5" />
-              <span className="text-xl pt-[5px]">
-                Clone<span className="text-[#7060fc]">CV</span>
-              </span>
-            </Link>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsSidebarOpen(false)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-
-          {/* Desktop logo inside sidebar */}
-          <div className="hidden lg:flex items-center justify-between">
+        <div
+          className={cn(
+            "flex h-full flex-col gap-4 transition-all duration-300",
+            isSidebarOpen ? "px-4 py-4" : "px-2 py-4"
+          )}
+        >
+          {/* Logo */}
+          <div
+            className={cn(
+              "flex items-center transition-all",
+              isSidebarOpen ? "justify-between" : "justify-center"
+            )}
+          >
             <Link
               to="/"
               className={cn(
-                "flex items-center gap-2 font-semibold text-xl text-slate-900 tracking-tight"
+                "flex items-center transition-all",
+                isSidebarOpen ? "gap-2" : "justify-center"
               )}
             >
-              <img src="/icon.png" alt="CloneCV logo" className="h-7 w-6.5" />
-              <span className="text-xl pt-[5px] font-medium">
-                Clone<span className="text-[#7060fc]">CV</span>
-              </span>
+              <img src="/icon.png" alt="CloneCV" className="h-7 w-7" />
+              {isSidebarOpen && (
+                <span className="text-lg font-semibold tracking-tight text-slate-900 whitespace-nowrap">
+                  Clone<span className="text-[#7060fc]">CV</span>
+                </span>
+              )}
             </Link>
+
+            {isSidebarOpen && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-slate-400 hover:bg-slate-100"
+                onClick={() => setIsSidebarOpen(false)}
+              >
+                <PanelLeft className="h-4 w-4" />
+              </Button>
+            )}
           </div>
 
+          {/* Create Button */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button className={cn("w-full justify-between mt-2")}>
-                <span className="flex items-center gap-2">
+              {isSidebarOpen ? (
+                <Button className="w-full justify-between bg-slate-900 hover:bg-slate-800 text-white font-medium mt-2 h-auto py-2 px-3">
+                  <span className="flex items-center gap-2">
+                    <Plus className="h-4 w-4" />
+                    Create New
+                  </span>
+                  <ChevronDown className="h-4 w-4 opacity-70" />
+                </Button>
+              ) : (
+                <button
+                  className={cn(
+                    "relative w-auto mx-auto flex items-center justify-center rounded-md text-sm font-medium transition-colors mt-2 py-2 px-2",
+                    "bg-slate-900 hover:bg-slate-800 text-white"
+                  )}
+                  title="Create New"
+                >
                   <Plus className="h-4 w-4" />
-                  <span>Create New</span>
-                </span>
-                <ChevronDown className="h-4 w-4" />
-              </Button>
+                </button>
+              )}
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56 z-[70]">
-              <DropdownMenuItem onClick={() => {
-                navigate("/dashboard/resume", { state: { openCreateModal: true } }); 
-                if (window.innerWidth < 1024) setIsSidebarOpen(false);
-              }}>
+            <DropdownMenuContent
+              align={isSidebarOpen ? "start" : "end"}
+              sideOffset={isSidebarOpen ? 0 : 8}
+              className="w-56"
+            >
+              <DropdownMenuItem
+                onClick={() =>
+                  navigate("/dashboard/resume", {
+                    state: { openCreateModal: true },
+                  })
+                }
+              >
                 <FileText className="mr-2 h-4 w-4" />
                 Resume
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => {navigate("/dashboard/cover-letter", { state: { openCreateModal: true } }); if (window.innerWidth < 1024) setIsSidebarOpen(false);}}>
+              <DropdownMenuItem
+                onClick={() =>
+                  navigate("/dashboard/cover-letter", {
+                    state: { openCreateModal: true },
+                  })
+                }
+              >
                 <Mail className="mr-2 h-4 w-4" />
                 Cover Letter
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <nav className="flex flex-col gap-1">
+          {/* Navigation */}
+          <nav className="flex flex-col gap-1 flex-1">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = pathname === item.href;
+              const isActive =
+                pathname === item.href ||
+                (item.href !== "/dashboard" &&
+                  pathname.startsWith(item.href));
+
               return (
-                <Link key={item.href}to={item.href}>
-                  <Button
-                    variant={isActive ? "secondary" : "ghost"}
+                <Link key={item.href} to={item.href}>
+                  <div
                     className={cn(
-                      "w-full",
-                      "justify-start",
-                      "text-neutral-700",
-                      "cursor-pointer",
-                      isActive && "bg-[#e5e5e5] text-neutral-900"
+                      "flex items-center rounded-md text-sm font-medium transition-colors",
+                      isSidebarOpen
+                        ? "gap-3 px-3 py-2"
+                        : "justify-center px-0 py-2",
+                      isActive
+                        ? "bg-slate-200 text-slate-900 font-semibold"
+                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                     )}
-                    onClick={() =>{
-                      if (window.innerWidth < 1024) setIsSidebarOpen(false);
+                    onClick={() => {
+                      if (isMobile) setIsSidebarOpen(false);
                     }}
+                    title={!isSidebarOpen ? item.label : undefined}
                   >
-                    <Icon className={cn("h-4 w-4 mr-2")} />
-                    {item.label}
-                  </Button>
+                    <Icon className="h-4 w-4 shrink-0" />
+                    {isSidebarOpen && <span>{item.label}</span>}
+                  </div>
                 </Link>
               );
             })}
+
+            {/* Chrome Extension Link - Bottom */}
+            <div className="mt-auto pt-4 border-t border-slate-200">
+              <Link to="/dashboard/extension">
+                <div
+                  className={cn(
+                    "relative group rounded-md transition-colors",
+                    isSidebarOpen ? "px-3 py-2" : "px-0 py-2 flex justify-center",
+                    pathname === "/dashboard/extension"
+                      ? "bg-slate-100"
+                      : "hover:bg-slate-50"
+                  )}
+                  onClick={() => {
+                    if (isMobile) setIsSidebarOpen(false);
+                  }}
+                  title={!isSidebarOpen ? "Chrome Extension" : undefined}
+                >
+                  <div
+                    className={cn(
+                      "flex items-center",
+                      isSidebarOpen ? "gap-3" : "justify-center"
+                    )}
+                  >
+                    <Puzzle
+                      className={cn(
+                        "h-4 w-4 shrink-0",
+                        pathname === "/dashboard/extension"
+                          ? "text-slate-900"
+                          : "text-slate-600 group-hover:text-slate-900"
+                      )}
+                    />
+                    {isSidebarOpen && (
+                      <span
+                        className={cn(
+                          "text-sm font-medium",
+                          pathname === "/dashboard/extension"
+                            ? "text-slate-900 font-semibold"
+                            : "text-slate-600 group-hover:text-slate-900"
+                        )}
+                      >
+                        Chrome Extension
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Badge - Only show when sidebar is open */}
+                  {isSidebarOpen && (
+                    <span className="absolute top-0 right-0 inline-flex items-center rounded-full bg-[#7060fc]/10 text-[#7060fc] text-[11px] font-medium px-2 py-0.5">
+                      Quick install
+                    </span>
+                  )}
+                </div>
+              </Link>
+            </div>
           </nav>
         </div>
       </aside>
 
-      {/* Fixed Header that shifts based on sidebar */}
+      {/* HEADER */}
       <header
         className={cn(
-          "fixed top-0 right-0 left-0 h-16 border-b border-slate-200 bg-white  z-50",
-          isSidebarOpen ? "lg:left-64" : "lg:left-0"
+          "fixed top-0 right-0 h-13 bg-white border-b border-slate-200 z-40",
+          "transition-[left] duration-300",
+          isMobile
+            ? isSidebarOpen
+              ? "left-64"
+              : "left-0"
+            : isSidebarOpen
+            ? "left-64"
+            : "left-16"
         )}
       >
-        <div className="h-full flex items-center justify-between px-6">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsSidebarOpen((v) => !v)}
-          >
-            <Menu className="h-4 w-4" />
-          </Button>
-          <div className="flex items-center justify-end w-full gap-3">
+        <div className="flex h-full items-center justify-between px-6">
+          {!isSidebarOpen && (
             <Button
-              variant="outline"
-              size="sm"
-              onClick={() => window.open("https://docs.google.com/forms/d/e/1FAIpQLSeA2tZS8ukqiGWVCFIGN-pOPZJ-krue3EM44vwZ47MiToU3wA/viewform?usp=preview", "_blank")}
-              className="text-slate-800 hidden lg:flex bg-white font-medium hover:bg-slate-50 shadow-none"
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsSidebarOpen(true)}
+              className="text-slate-500 hover:bg-slate-100"
             >
-              <MessageSquare className="mr-0.5 mt-0.5 h-4 w-4" />
+              <PanelLeft className="h-5 w-5" />
+            </Button>
+          )}
+
+          <div className="flex items-center gap-3 ml-auto">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                // You can replace this with your feedback link/modal
+                window.open("mailto:support@clonecv.com?subject=Feedback", "_blank");
+              }}
+              className="flex items-center gap-1.5 text-slate-700 border-slate-200 hover:bg-slate-100 shadow-none"
+            >
+              <MessageSquare className="h-4 w-4" />
               Feedback
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={()=>navigate("/dashboard/pricing")}
-              className="text-slate-800 bg-white font-medium hover:bg-slate-50 shadow-none"
-            >
-              <CreditCard className="mr-0.5 mt-0.5 h-4 w-4" />
-              Upgrade Plan
-            </Button>
 
+            {user?.subscription.plan === "FREE" && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => navigate("/dashboard/pricing")}
+              className="flex items-center gap-1.5 text-slate-700 border-slate-200 hover:bg-slate-100 shadow-none"
+            >
+              <CreditCard className="h-4 w-4" />
+              Upgrade
+            </Button>
+            )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="flex items-center gap-1 bg-white hover:bg-slate-50 transition-all duration-200 cursor-pointer focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none"
+                  className="flex items-center gap-1 border-slate-200 hover:bg-slate-100 shadow-none"
                 >
-                  <div className="w-6 h-6 bg-[#7060fc] rounded-full flex items-center justify-center overflow-hidden">
-                    {user?.picture ? (
+                  {/* Avatar (smaller than button) */}
+                  <div className="w-7 h-7 rounded-full  flex items-center justify-center overflow-hidden">
+                    {user?.picture && !headerAvatarError ? (
                       <img
                         src={user.picture}
-                        alt="user profile"
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.style.display = "none";
-                          e.currentTarget.nextElementSibling?.classList.remove(
-                            "hidden"
-                          );
-                        }}
+                        alt="User"
+                        className="w-6 h-6 rounded-full object-cover"
+                        onError={() => setHeaderAvatarError(true)}
                       />
-                    ) : null}
-                    <div
-                      className={`w-full h-full rounded-full flex items-center justify-center text-white text-xs font-bold ${
-                        user?.picture ? "hidden" : ""
-                      }`}
-                    >
-                      {user?.name?.charAt(0)?.toUpperCase() || "U"}
-                    </div>
+                    ) : (
+                      <div className="bg-[#7060fc] w-6 h-6 rounded-full flex items-center justify-center">
+                        <User className="h-3.5 w-3.5 text-white" />
+                      </div>
+                    )}
                   </div>
-                  <span className="text-sm font-medium text-slate-700">
+
+                  <span className="text-sm font-medium text-slate-700 hidden sm:block">
                     {user?.name?.split(" ")[0]}
                   </span>
-                  <ChevronDown className="h-3 w-3 text-slate-600" />
+
+                  <ChevronDown className="h-3 w-3 text-slate-500" />
                 </Button>
               </DropdownMenuTrigger>
+
               <DropdownMenuContent
-                className="w-80 border border-slate-200 bg-white rounded-lg"
                 align="end"
+                sideOffset={8}
+                className="w-72 rounded-xl border border-slate-200 bg-white shadow-lg"
               >
-                <div className="px-3  border-b border-slate-100">
-                  <div className="flex items-center gap-3 py-2">
-                    <div className="w-6 h-6 bg-[#7060fc] rounded-full flex items-center justify-center overflow-hidden">
-                      {user?.picture ? (
+                {/* User Card */}
+                <div className="px-4 py-3 border-b border-slate-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full flex items-center justify-center overflow-hidden">
+                      {user?.picture && !dropdownAvatarError ? (
                         <img
                           src={user.picture}
-                          alt="user profile"
-                          className="w-full h-full object-cover rounded-full"
-                          onError={(e) => {
-                            e.currentTarget.style.display = "none";
-                            e.currentTarget.nextElementSibling?.classList.remove(
-                              "hidden"
-                            );
-                          }}
+                          alt="User"
+                          className="w-8 h-8 rounded-full object-cover"
+                          onError={() => setDropdownAvatarError(true)}
                         />
-                      ) : null}
-                      <div
-                        className={`w-full h-full rounded-full flex items-center justify-center text-white text-xs font-bold ${
-                          user?.picture ? "hidden" : ""
-                        }`}
-                      >
-                        {user?.name?.charAt(0)?.toUpperCase() || "U"}
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="text-sm font-semibold text-slate-900">
-                          {user?.name}
-                        </p>
-                        <div className="px-2 py-0.5 bg-blue-100 text-[#7060fc] text-xs font-semibold rounded">
-                          {/* {user?.credits} Credits */}
-                          {user?.isPaidUser ? "Pro Plan" : "Free Plan"}
+                      ) : (
+                        <div className="bg-[#7060fc] w-8 h-8 rounded-full flex items-center justify-center">
+                          <User className="h-4 w-4 text-white" />
                         </div>
-                      </div>
-                      <p className="text-xs text-slate-600">{user?.email}</p>
+                      )}
                     </div>
+
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-slate-900 truncate">
+                        {user?.name}
+                      </p>
+                      <p className="text-xs text-slate-500 truncate">
+                        {user?.email}
+                      </p>
+                    </div>
+
+                    {/* Plan Badge */}
+                    <span
+                      className={cn(
+                        "text-xs font-semibold px-2 py-0.5 rounded-full border",
+                        user?.role === "pro"
+                          ? "bg-green-50 text-green-700 border-green-200"
+                          : "bg-slate-50 text-slate-600 border-slate-200"
+                      )}
+                    >
+                      {user?.subscription.plan}
+                    </span>
                   </div>
                 </div>
 
-                <DropdownMenuItem asChild>
-                  <Link
-                    to="/dashboard/profile"
-                    className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 font-medium transition-colors cursor-pointer"
-                  >
-                    <User className="h-4 w-4" />
-                    Profile
-                  </Link>
-                </DropdownMenuItem>
+                {/* Menu */}
+                <div className="py-1">
+                  <DropdownMenuItem asChild>
+                    <Link
+                      to="/dashboard/profile"
+                      className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                    >
+                      <User className="h-4 w-4" />
+                      Profile
+                    </Link>
+                  </DropdownMenuItem>
 
-                <DropdownMenuItem asChild>
-                  <Link
-                    to="/dashboard/pricing"
-                    className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 font-medium transition-colors cursor-pointer"
-                  >
-                    <CreditCard className="h-4 w-4" />
-                    Upgrade Plan
-                  </Link>
-                </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => navigate("/dashboard/subscription")}
+                      className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                    >
+                      <CreditCard className="h-4 w-4" />
+                      Manage Subscription
+                    </DropdownMenuItem>
+                </div>
 
+                {/* Divider */}
+                <div className="border-t border-slate-100 my-1" />
+
+                {/* Logout */}
                 <DropdownMenuItem
                   onClick={handleLogout}
-                  className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 font-medium transition-colors cursor-pointer"
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
                 >
                   <LogOut className="h-4 w-4" />
-                  Sign Out
+                  Sign out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -302,21 +439,27 @@ const BaseDashboardLayout = () => {
         </div>
       </header>
 
-      {/* Mobile overlay */}
-      {isSidebarOpen && (
+      {/* MOBILE OVERLAY */}
+      {isMobile && isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/30 z-50 lg:hidden"
+          className="fixed inset-0 bg-black/30 z-40"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
-      {/* Content */}
+      {/* CONTENT */}
       <main
         className={cn(
-          "min-h-screen pt-16",
-          isSidebarOpen ? "lg:ml-64" : "lg:ml-0"
+          "pt-14 transition-[margin] duration-300",
+          isMobile
+            ? isSidebarOpen
+              ? "lg:ml-64"
+              : "lg:ml-0"
+            : isSidebarOpen
+            ? "lg:ml-64"
+            : "lg:ml-16"
         )}
-      > 
+      >
         <Outlet />
       </main>
     </div>

@@ -37,7 +37,7 @@ const ResumePreview = ({ zoomLevel }: ResumePreviewProps) => {
       setShowSkeleton(true);
 
       try {
-        const response = await axiosInstance.post("/resumegpt/generate-sample-resume", {
+        const response = await axiosInstance.post("/resume/generate-sample-resume", {
           jobTitle: jobTitleForResume,
         });
         

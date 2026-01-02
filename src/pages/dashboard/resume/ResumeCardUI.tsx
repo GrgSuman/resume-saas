@@ -28,7 +28,6 @@ const ResumeCardUI = ({ resume }: ResumeCardUIProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  // const { deductCredits } = useAuth();
 
 
   // Edit title mutation
@@ -110,7 +109,7 @@ const ResumeCardUI = ({ resume }: ResumeCardUIProps) => {
     <>
       <div 
         onClick={() => navigate(`/dashboard/resume/${resume.id}`)} 
-        className="group relative cursor-pointer rounded-2xl backdrop-blur-sm border  transition-all duration-300 hover:scale-105 p-6 flex flex-col h-[220px]"
+        className="group relative cursor-pointer rounded-2xl backdrop-blur-sm border  transition-all duration-300 hover:scale-105 p-6 flex flex-col h-[200px]"
         style={{ backgroundColor: resume.bgColor }}
       >
         <div className="flex items-start justify-between mb-4">

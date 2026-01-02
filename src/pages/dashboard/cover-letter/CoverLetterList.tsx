@@ -5,7 +5,6 @@ import {
   Pencil,
   Trash2,
   Plus,
-  ArrowUpRight,
 } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import {
@@ -44,6 +43,11 @@ export default function App() {
   });
 
   const coverLetters = coverLetterData?.data?.coverLetters || [];
+  
+  // Sort by date (newest first)
+  const sortedCoverLetters = [...coverLetters].sort((a: CoverLetter, b: CoverLetter) => 
+    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
 
   const queryClient = useQueryClient();
 
@@ -180,191 +184,183 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="min-h-screen bg-background p-6 sm:p-8">
+      <div className="mx-auto space-y-8">
+        {/* Header */}
         <div className="space-y-1">
-          <h1 className="text-xl sm:text-2xl font-medium text-foreground">
-            My Cover Letters
-          </h1>
-          <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
+          <h1 className="text-lg sm:text-xl font-semibold text-foreground">My Cover Letters</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground">
             Create, manage, and customize your professional cover letters
           </p>
         </div>
-        <Button
-          className="gap-2 w-full sm:w-auto"
-          onClick={() => setIsDialogOpen(true)}
-        >
-          <Plus className="w-4 h-4" />
-          Create New
-        </Button>
-      </div>
 
-      {/* Loading State */}
-      {isLoading && (
-        <div className="space-y-3">
-          {Array.from({ length: 8 }).map((_, i) => (
+        {/* Loading State */}
+        {isLoading && (
+          <div className="space-y-3">
+            {/* Cover Letter List Skeletons */}
+
             <div
-              key={i}
-              className="flex flex-row items-center gap-3 rounded-xl sm:rounded-2xl border border-slate-200 bg-white/70 p-3 sm:p-4"
+              onClick={() => setIsDialogOpen(true)}
+              className="group relative cursor-pointer rounded-lg bg-white border-2 border-dashed border-slate-300 hover:border-slate-400 transition-all duration-200 p-4 flex items-center gap-4 hover:bg-slate-50/50"
             >
-              <div className="flex flex-1 items-center gap-2 sm:gap-3 min-w-0">
-                <Skeleton className="w-9 h-9 sm:w-10 sm:h-10 rounded-md flex-shrink-0" />
-                <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
-                  <Skeleton className="h-4 w-32 sm:w-40" />
-                  <Skeleton className="h-3 w-24 sm:w-32" />
-                </div>
+              <div className="h-10 w-10 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors flex-shrink-0">
+                <Plus className="h-5 w-5 text-slate-600" />
               </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <Skeleton className="h-8 w-8 sm:h-9 sm:w-9 rounded-md" />
-                <Skeleton className="h-8 w-8 rounded-md" />
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-sm text-slate-900">
+                  Create New Cover Letter
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Start writing your cover letter
+                </p>
               </div>
             </div>
-          ))}
-        </div>
-      )}
 
-      {/* Error State */}
-      {isError && (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="relative rounded-2xl bg-white/80 backdrop-blur-sm border border-white/20 p-8 flex flex-col h-[280px] w-[320px] bg-gradient-to-br from-red-500/20 to-rose-500/20">
-            <div className="flex items-start justify-center mb-6">
-              <span className="text-6xl">⚠️</span>
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <h3 className="font-semibold text-2xl text-slate-900 line-clamp-2 leading-tight mb-2">
-              Unable to load cover letters
-            </h3>
-          </div>
-
-          <div className="mt-auto"></div>
-        </div>
-      )}
-
-      {/* Empty State */}
-      {!isLoading && !isError && coverLetters.length === 0 && (
-        <div className="flex flex-col items-center justify-center min-h-[400px] animate-in fade-in zoom-in duration-500">
-          {/* Icon Container */}
-          <div className="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center mb-6 ring-8 ring-blue-50/50">
-            <FileText className="w-10 h-10 text-blue-600" strokeWidth={1.5} />
-          </div>
-
-          {/* Typography */}
-          <h3 className="text-xl font-bold text-slate-900 mb-2 tracking-tight">
-            Let's write your first letter
-          </h3>
-          <p className="text-slate-500 max-w-xs text-center mb-8 text-sm sm:text-base">
-            Stand out from the crowd with a personalized cover letter tailored
-            to your dream job.
-          </p>
-
-          {/* Button */}
-          <Button onClick={() => setIsDialogOpen(true)} size="lg" className="">
-            <Plus className="w-5 h-5" />
-            Start Writing
-          </Button>
-        </div>
-      )}
-      {/* List */}
-      {!isLoading && !isError && coverLetters.length > 0 && (
-        <div className="space-y-3">
-          {coverLetters.map((coverLetter: CoverLetter) => (
-            <div
-              key={coverLetter.id}
-              className="flex flex-row items-center gap-3 rounded-xl sm:rounded-2xl border border-slate-200 bg-white/70 p-3 sm:p-4 transition hover:border-slate-300 hover:bg-white"
-            >
-              <Link
-                to={`/dashboard/cover-letter/${coverLetter.id}`}
-                className="flex flex-1 items-center gap-2 sm:gap-3 min-w-0"
+            
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div
+                key={i}
+                className="rounded-lg bg-white border border-slate-200 p-4 flex items-center gap-4"
               >
-                <div
-                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-md flex items-center justify-center flex-shrink-0 border border-white/60 shadow-sm"
-                  style={{
-                    backgroundColor: coverLetter.bgColor,
-                  }}
-                >
-                  <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-700" />
+                <Skeleton className="h-10 w-10 rounded-lg flex-shrink-0" />
+                <div className="flex-1 min-w-0 space-y-2">
+                  <Skeleton className="h-4 w-48" />
+                  <Skeleton className="h-3 w-32" />
                 </div>
-                <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
-                  <p className="text-sm font-medium text-slate-900 truncate">
-                    {coverLetter.title}
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    Created on{" "}
-                    <span className="font-medium text-slate-600">
-                      {new Date(coverLetter.createdAt).toLocaleDateString(
-                        "en-US",
-                        { month: "short", day: "numeric", year: "numeric" }
-                      )}
-                    </span>
-                  </p>
-                </div>
-              </Link>
+                <Skeleton className="h-8 w-8 rounded-md flex-shrink-0" />
+              </div>
+            ))}
+          </div>
+        )}
 
-              <div className="flex items-center gap-2 flex-shrink-0">
+        {/* Error State */}
+        {isError && (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="relative rounded-2xl bg-white/80 backdrop-blur-sm border border-white/20 p-8 flex flex-col h-[280px] w-[320px] bg-gradient-to-br from-red-500/20 to-rose-500/20">
+              <div className="flex items-start justify-center mb-6">
+                <span className="text-6xl">⚠️</span>
+              </div>
+              <div className="mb-6">
+                <h3 className="font-semibold text-2xl text-slate-900 line-clamp-2 leading-tight mb-2">
+                  Unable to load cover letters
+                </h3>
+                <p className="text-slate-600 font-medium">
+                  There was an error loading your cover letters
+                </p>
+              </div>
+              <div className="mt-auto">
                 <Button
-                  variant="outline"
-                  size="sm"
-                  asChild
-                  className="gap-1.5 h-8 sm:h-9"
+                  onClick={() => window.location.reload()}
+                  className="w-full bg-white/90 backdrop-blur-sm border border-white/30 hover:bg-white text-slate-700 hover:text-slate-900 font-medium"
                 >
-                  <Link to={`/dashboard/cover-letter/${coverLetter.id}`}>
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                  </Link>
+                  Try Again
                 </Button>
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                    >
-                      <MoreVertical className="w-4 h-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-
-                  <DropdownMenuContent align="end" className="w-44">
-                    <DropdownMenuItem onClick={() => handleRename(coverLetter)}>
-                      <Pencil className="w-4 h-4 mr-2" /> Rename
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem 
-                      className="text-destructive"
-                      onClick={() => handleDelete(coverLetter)}
-                    >
-                      <Trash2 className="w-4 h-4 mr-2" /> Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
               </div>
             </div>
-          ))}
-        </div>
-      )}
+          </div>
+        )}
 
-      {/* Cover Letter Dialog */}
-      <CoverLetterDialog
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        onSubmit={(data) => {
-          createCoverLetterMutation.mutate(data);
-        }}
-        isCreating={createCoverLetterMutation.isPending}
-      />
+        {/* Cover Letter List */}
+        {!isLoading && (
+          <div className="space-y-3">
+            {/* New Cover Letter Card */}
+            <div
+              onClick={() => setIsDialogOpen(true)}
+              className="group relative cursor-pointer rounded-lg bg-white border-2 border-dashed border-slate-300 hover:border-slate-400 transition-all duration-200 p-4 flex items-center gap-4 hover:bg-slate-50/50"
+            >
+              <div className="h-10 w-10 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors flex-shrink-0">
+                <Plus className="h-5 w-5 text-slate-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-sm text-slate-900">
+                  Create New Cover Letter
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Start writing your cover letter
+                </p>
+              </div>
+            </div>
 
-      {/* Edit Title Modal */}
-      {selectedCoverLetter && (
-        <EditTitleModal
-          open={isEditModalOpen}
-          onOpenChange={setIsEditModalOpen}
-          onSubmit={handleEditSubmit}
-          currentTitle={selectedCoverLetter.title}
-          isLoading={updateCoverLetterTitleMutation.isPending}
+            {/* Cover Letters */}
+            {sortedCoverLetters.length > 0 &&
+              sortedCoverLetters.map((coverLetter: CoverLetter) => (
+                <Link
+                  key={coverLetter.id}
+                  to={`/dashboard/cover-letter/${coverLetter.id}`}
+                  className="group relative rounded-lg bg-white border border-slate-200 transition-all duration-200 p-4 flex items-center gap-4 hover:border-slate-300 hover:bg-slate-50"
+                >
+                  <div
+                    style={{ backgroundColor: coverLetter.bgColor || "#f1f5f9" }}
+                    className="h-10 w-10 rounded-lg flex items-center justify-center border border-slate-200 flex-shrink-0"
+                  >
+                    <FileText className="h-5 w-5 text-slate-700" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-sm text-slate-900 truncate">
+                      {coverLetter.title}
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Created {new Date(coverLetter.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </p>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+                        onClick={(e) => e.preventDefault()}
+                      >
+                        <MoreVertical className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-44">
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleRename(coverLetter);
+                        }}
+                      >
+                        <Pencil className="w-4 h-4 mr-2" /> Rename
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className="text-destructive"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleDelete(coverLetter);
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" /> Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </Link>
+              ))}
+          </div>
+        )}
+
+        {/* Cover Letter Dialog */}
+        <CoverLetterDialog
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+          onSubmit={(data) => {
+            createCoverLetterMutation.mutate(data);
+          }}
+          isCreating={createCoverLetterMutation.isPending}
         />
-      )}
+
+        {/* Edit Title Modal */}
+        {selectedCoverLetter && (
+          <EditTitleModal
+            open={isEditModalOpen}
+            onOpenChange={setIsEditModalOpen}
+            onSubmit={handleEditSubmit}
+            currentTitle={selectedCoverLetter.title}
+            isLoading={updateCoverLetterTitleMutation.isPending}
+          />
+        )}
+      </div>
     </div>
   );
 }

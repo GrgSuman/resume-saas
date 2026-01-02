@@ -84,7 +84,7 @@ const CertificationsForm = ({ onClose }: { onClose: () => void }) => {
       credentialId: "",
       credentialUrl: ""
     }
-    setFormData(prev => [...prev, newCertification])
+    setFormData(prev => [...prev, { ...newCertification, order: prev.length + 1 }])
     setHasChanges(true)
     
     // Scroll to the newly added certification form

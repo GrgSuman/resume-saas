@@ -4,7 +4,7 @@ import { Button } from "../../../../../components/ui/button"
 import { Input } from "../../../../../components/ui/input"
 import { Label } from "../../../../../components/ui/label"
 import { Plus, Trash2 } from "lucide-react"
-import type { SkillCategory } from "../../../types/resume"
+import type { AchievementItem, SkillCategory } from "../../../types/resume"
 import { useResume } from "../../../../../hooks/useResume"
 import { ResumeSectionKey } from "../../../types/constants"
 
@@ -42,7 +42,7 @@ const SkillsForm = ({ onClose }: { onClose: () => void }) => {
     
     formData.forEach((skillGroup, index) => {
       const items = Array.isArray(skillGroup.items) ? skillGroup.items : [skillGroup.items]
-      if (!items.length || items.every(item => !item.trim())) {
+      if (!items.length || items.every((item: AchievementItem) => !item.content.trim())) {
         newErrors[`${index}-items`] = 'At least one skill is required'
       }
     })
@@ -81,10 +81,7 @@ const SkillsForm = ({ onClose }: { onClose: () => void }) => {
     setFormData(prev => prev.map((item, i) => 
       i === skillIndex 
         ? { 
-            ...item, 
-            items: Array.isArray(item.items) 
-              ? [...item.items, ""] 
-              : [...(item.items ? [item.items] : []), ""]
+            ...item, items: [...item.items, { order: item.items.length + 1, content: "" }]
           }
         : item
     ))
@@ -96,11 +93,9 @@ const SkillsForm = ({ onClose }: { onClose: () => void }) => {
       i === skillIndex 
         ? { 
             ...item, 
-            items: Array.isArray(item.items) 
-              ? item.items.map((skill, sIndex) => 
-                  sIndex === itemIndex ? value : skill
-                )
-              : [value]
+            items: item.items.map((skill, sIndex) => 
+              sIndex === itemIndex ? { ...skill, content: value } : skill
+            )
           }
         : item
     ))
@@ -122,11 +117,7 @@ const SkillsForm = ({ onClose }: { onClose: () => void }) => {
   }
 
   const handleAddCategory = () => {
-    const newCategory = {
-      category: "",
-      items: []
-    }
-    setFormData(prev => [...prev, newCategory])
+    setFormData(prev => [...prev, { order: prev.length + 1, categoryName: "", items: [{ order: 1, content: "" }] }])
     setHasChanges(true)
     
     // Scroll to the newly added category form
@@ -190,8 +181,8 @@ const SkillsForm = ({ onClose }: { onClose: () => void }) => {
               <span className="text-xs text-muted-foreground">(leave empty for simple list without grouping)</span>
             </div>
             <Input
-              value={skillGroup.category || ""}
-              onChange={(e) => handleInputChange(index, 'category', e.target.value)}
+              value={skillGroup.categoryName || ""}
+              onChange={(e) => handleInputChange(index, 'categoryName', e.target.value)}
               className="h-10"
               placeholder="Technical Skills or Soft Skills or any other category"
             />
@@ -217,7 +208,7 @@ const SkillsForm = ({ onClose }: { onClose: () => void }) => {
                 <div key={skillItemIndex} className="group relative">
                   <div className="flex items-center gap-2 p-2 rounded-md border bg-background hover:bg-muted/50 transition-colors">
                     <Input
-                      value={skill}
+                      value={skill.content}
                       onChange={(e) => handleUpdateSkill(index, skillItemIndex, e.target.value)}
                       className="border-none bg-transparent p-0 text-sm focus:outline-none focus:ring-0 shadow-none flex-1"
                       placeholder="Enter skill..."
@@ -235,7 +226,7 @@ const SkillsForm = ({ onClose }: { onClose: () => void }) => {
                 </div>
               )) : []}
               
-              {(!Array.isArray(skillGroup.items) || skillGroup.items.length === 0) && (
+              {skillGroup.items.length === 0 && (
                 <div className="w-full text-center py-4 text-muted-foreground text-sm">
                   No skills added yet. Click "Add Skill" to get started.
                 </div>

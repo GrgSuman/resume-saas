@@ -4,7 +4,7 @@ import { Input } from "../../../../../components/ui/input"
 import { Label } from "../../../../../components/ui/label"
 import { Textarea } from "../../../../../components/ui/textarea"
 import { Plus, Trash2 } from "lucide-react"
-import type { Experience } from "../../../types/resume"
+import type { AchievementItem, Experience } from "../../../types/resume"
 import { useResume } from "../../../../../hooks/useResume"
 import { ResumeSectionKey } from "../../../types/constants"
 
@@ -45,7 +45,7 @@ const ExperienceForm = ({ onClose }: { onClose: () => void }) => {
       if (!job.dateRange?.trim()) {
         newErrors[`${index}-dateRange`] = 'Date range is required'
       }
-      if (!job.achievements?.length || job.achievements.every(a => !a.trim())) {
+      if (!job.achievements?.length || job.achievements.every((achievement: AchievementItem) => !achievement.content.trim())) {
         newErrors[`${index}-achievements`] = 'At least one achievement is required'
       }
     })
@@ -81,13 +81,14 @@ const ExperienceForm = ({ onClose }: { onClose: () => void }) => {
 
   const handleAddExperience = () => {
     const newExperience: Experience = {
+      order: formData.length + 1,
       role: "",
       company: "",
       dateRange: "",
       location: "",
-      achievements: []
+      achievements: [{ order: 1, content: "" }]
     }
-    setFormData(prev => [...prev, newExperience])
+    setFormData(prev => [...prev, { ...newExperience, order: prev.length + 1 }])
     setHasChanges(true)
     
     // Scroll to the newly added form after a short delay
@@ -111,7 +112,7 @@ const ExperienceForm = ({ onClose }: { onClose: () => void }) => {
   const handleAddAchievement = (experienceIndex: number) => {
     setFormData(prev => prev.map((item, i) => 
       i === experienceIndex 
-        ? { ...item, achievements: [...(item.achievements || []), ""] }
+        ? { ...item, achievements: [...(item.achievements || []), { order: (item.achievements?.length || 0) + 1, content: "" }] }
         : item
     ))
     setHasChanges(true)
@@ -122,8 +123,8 @@ const ExperienceForm = ({ onClose }: { onClose: () => void }) => {
       i === experienceIndex 
         ? { 
             ...item, 
-            achievements: item.achievements?.map((achievement, aIndex) => 
-              aIndex === achievementIndex ? value : achievement
+            achievements: item.achievements.map((achievement, aIndex) => 
+              aIndex === achievementIndex ? { ...achievement, content: value } : achievement
             ) || []
           }
         : item
@@ -255,7 +256,7 @@ const ExperienceForm = ({ onClose }: { onClose: () => void }) => {
                   <div className="flex items-start gap-2 p-2 rounded-md hover:bg-muted/50 transition-colors">
                     <div className="flex items-center gap-2 flex-1 min-w-0">
                       <Textarea
-                        value={achievement}
+                        value={achievement.content}
                         onChange={(e) => handleUpdateAchievement(index, achievementIndex, e.target.value)}
                         className="flex-1 min-h-[40px] max-h-[100px] resize-none border-none bg-transparent p-0 text-sm leading-relaxed focus:outline-none focus:ring-0 shadow-none"
                         placeholder="Enter an achievement..."

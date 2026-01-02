@@ -1,7 +1,7 @@
 import { AlertCircle, CheckCircle, Clock, ArrowRight } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useSearchParams, useNavigate } from "react-router"
-import axiosInstance from "../../api/axios"
+import axiosInstance from "../../../api/axios"
 import { toast } from "sonner"
 
 export default function PaymentSuccess() {
@@ -44,7 +44,7 @@ export default function PaymentSuccess() {
 
     const checkPaymentStatus = async () => {
       try {
-        const response = await axiosInstance.get(`/verify-payment?sessionId=${sessionId}`)
+        const response = await axiosInstance.get(`/payment/verify-payment?sessionId=${sessionId}`)
         const data = response.data
         console.log(data)
 
