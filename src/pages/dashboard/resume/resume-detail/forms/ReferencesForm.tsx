@@ -79,7 +79,7 @@ const ReferencesForm = ({ onClose }: { onClose: () => void }) => {
       email: "",
       phone: ""
     }
-    setFormData(prev => [...prev, newReference])
+    setFormData(prev => [...prev, { ...newReference, order: prev.length + 1 }])
     setHasChanges(true)
     
     // Scroll to the newly added reference form

@@ -8,9 +8,6 @@ import LoadingResumeDetail from "./LoadingResumeDetail";
 import TEMPLATE_REGISTRY from "./templates/TemplateRegistry";
 import { Sheet } from "react-modal-sheet";
 
-/* --------------------------------------------
-   Main Component
----------------------------------------------*/
 const ResumeDetail = () => {
   const [zoomLevel, setZoomLevel] = useState(0.92);
   const [isOpen, setOpen] = useState(false);
@@ -19,9 +16,6 @@ const ResumeDetail = () => {
   const { state } = useResume();
   const htmlRef = useRef<HTMLDivElement>(null);
 
-  /* --------------------------------------------
-     Detect Mobile (below XL)
-  ---------------------------------------------*/
   useEffect(() => {
     const checkScreen = () => {
       setIsMobile(window.innerWidth < 1280);
@@ -31,9 +25,6 @@ const ResumeDetail = () => {
     return () => window.removeEventListener("resize", checkScreen);
   }, []);
 
-  /* --------------------------------------------
-     Zoom logic
-  ---------------------------------------------*/
 
   const handleZoomIn = () => {
     setZoomLevel((prev) => Math.min(prev + 0.1, 1.0));
@@ -61,10 +52,6 @@ const ResumeDetail = () => {
     };
   }, [handleResetZoom]);
 
-  /* --------------------------------------------
-     Render
-  ---------------------------------------------*/
-
   return (
     <>
       {state?.resumeDownloading && <DownloadingUI />}
@@ -74,7 +61,7 @@ const ResumeDetail = () => {
       ) : (
         <div className="h-[100vh] flex flex-col xl:flex-row overflow-hidden bg-[#f5f5f5]">
           {/* LEFT: Resume Preview */}
-          <div className="relative flex flex-col flex-[2.5] min-h-0 transition-all duration-300 ease-in-out">
+          <div className="relative flex flex-col flex-[2] min-h-0 transition-all duration-300 ease-in-out">
             {/* Settings Toolbar */}
             <div className="absolute top-2 left-2 right-2 z-20">
               <SettingsNew

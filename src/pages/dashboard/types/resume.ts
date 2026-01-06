@@ -1,9 +1,11 @@
 import { ResumeSectionKey } from "./constants"
+import type { ResumeAnalysis } from "./resumeAnalysis"
 
 // Main Resume Data Type
 export type ResumeMetaData = {
     resumeData:ResumeData,
     resumeSettings:ResumeSettings
+    resumeAnalysis?:ResumeAnalysis[]
     resumeDownloading:boolean
     resumeEditingMode:boolean
     resumeError:string | null
@@ -19,6 +21,7 @@ export type ResumeSettings = {
     fontFamily: string
     lineHeight: string //1.2-1.8
     template: string //classic, modern, minimal, etc.
+    textAlignment: 'left' | 'center' | 'right' | 'justify'
     sections:Section[],
 }
 
@@ -31,23 +34,28 @@ export type Section = {
     skillsMode?: 'categorized' | 'simple' // For skills section
 }
 
+export type AchievementItem = {
+  order: number,
+  content: string,
+};
+
 // Resume Data Type
 export type ResumeData = {
     personalInfo: PersonalInfo
     education: Education[]
     experience: Experience[]
-    projects?: Project[]
+    projects: Project[]
     skills: SkillCategory[]
-    certifications?: Certification[]
-    references?: Reference[]
-    customSections?: CustomSection[]
+    certifications: Certification[]
+    references: Reference[]
+    customSections: CustomSection[]
 }
 
 // Personal Info Type
 export type PersonalInfo = {
   profilePicture?: string
   name: string
-  label?: string // e.g., "Full Stack Developer"
+  profession?: string // e.g., "Full Stack Developer"
   email: string
   phone?: string
   address?: string
@@ -60,6 +68,7 @@ export type PersonalInfo = {
 
 // Education Types
 export type Education = {
+  order: number,
   institution: string
   degree: string
   dateRange: string //eg. "2021-2025"
@@ -69,28 +78,32 @@ export type Education = {
 
 // Work Experience Types
 export type Experience = {
+  order: number,
   company: string
   role: string //eg. "Software Engineer", "Full Stack Developer", etc.
   dateRange: string //eg. "2021-2025"
   location?: string //eg. "San Francisco, CA", "New York, NY", etc.
-  achievements?: string[] //eg. ["Architected and developed microservices platform serving 100,000+ daily active users, resulting in 40% performance improvement"], ["Led cross-functional team of 5 developers in implementing CI/CD pipelines using Docker and Kubernetes, reducing deployment time by 60%"], ["Mentored 3 junior developers and established code review processes, improving code quality by 35%"], ["Optimized database queries and implemented caching strategies, reducing API response time from 500ms to 200ms"], ["Collaborated with product managers to deliver 15+ features on time and within budget"]
+  achievements: AchievementItem[] //eg. ["Architected and developed microservices platform serving 100,000+ daily active users, resulting in 40% performance improvement"], ["Led cross-functional team of 5 developers in implementing CI/CD pipelines using Docker and Kubernetes, reducing deployment time by 60%"], ["Mentored 3 junior developers and established code review processes, improving code quality by 35%"], ["Optimized database queries and implemented caching strategies, reducing API response time from 500ms to 200ms"], ["Collaborated with product managers to deliver 15+ features on time and within budget"]
 }
 
 // Project Types
 export type Project = {
+  order: number,
   name: string
-  achievements?: string[]
+  achievements: AchievementItem[]
   link?: string
 }
 
 // Skills Types
 export type SkillCategory = {
-  category?: string // e.g., "Languages", "Frameworks"
-  items: string | string[]
+  order: number,
+  categoryName: string,
+  items: AchievementItem[]
 }
 
 // Awards / Certifications Types
 export type Certification = {
+  order: number,
   name: string
   issuer?: string
   date?: string
@@ -99,6 +112,7 @@ export type Certification = {
 
 // References Types
 export type Reference = {
+  order: number,
   name: string
   position?: string
   company?: string
@@ -108,8 +122,8 @@ export type Reference = {
 
 // Custom Section Types
 export type CustomSection = {
-    label?: string // e.g., "Languages", "Frameworks"
-    content: string | string[]
-    isListMode: boolean // true if the content is a list of items, false if it is a simple description
+  order: number,
+  name: string,
+  achievements: AchievementItem[]
 }
 

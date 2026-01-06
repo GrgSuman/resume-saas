@@ -63,7 +63,7 @@ const PersonalInfoForm = ({ onClose }: { onClose: () => void }) => {
           <div className="space-y-2">
             <Label className="text-sm font-medium">Job Title *</Label>
             <Input
-              value={formData.label || ""}
+              value={formData.profession || ""}
               onChange={(e) => handleInputChange('label', e.target.value)}
               className="h-10"
               placeholder="e.g., Senior Software Engineer"

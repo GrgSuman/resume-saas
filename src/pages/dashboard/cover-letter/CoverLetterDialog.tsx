@@ -45,10 +45,10 @@ export default function CoverLetterDialog({ open, onOpenChange, onSubmit, isCrea
 
     const {data: resumeData, isLoading, isError} = useQuery({
       queryKey: ["resumes"],
-      queryFn: () => axiosInstance.get("/resume/user"),
+      queryFn: () => axiosInstance.get("/resume/"),
     });
   
-    const resumes = resumeData?.data?.resume || [];
+    const resumes = resumeData?.data?.resumes || [];
 
   useEffect(() => {
     if (!open) {
@@ -141,7 +141,7 @@ export default function CoverLetterDialog({ open, onOpenChange, onSubmit, isCrea
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl max-w-full min-h-[80vh] max-h-[95vh] p-0 overflow-hidden">
+      <DialogContent className="sm:max-w-3xl max-w-full min-h-[80vh] max-h-[95vh] p-0 overflow-hidden">
         <div className="flex flex-col h-full">
           <div className="px-6 pt-6 pb-4 border-b space-y-1.5">
             <h2 className="text-lg font-semibold text-slate-900">Create a cover letter</h2>

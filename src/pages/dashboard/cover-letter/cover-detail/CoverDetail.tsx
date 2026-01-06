@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { ArrowLeft, 
-  Download, 
+  // Download, 
   RefreshCw, AlignLeft, 
   Copy } from "lucide-react";
 import { Button } from "../../../../components/ui/button";
@@ -14,7 +14,7 @@ import {
 import { Textarea } from "../../../../components/ui/textarea";
 import { useNavigate, useParams } from "react-router";
 import axiosInstance from "../../../../api/axios";
-import { AxiosError } from "axios";
+import axios, { AxiosError } from "axios";
 import CoverLetterWritingLoader from "./CoverLetterWritingLoader";
 import { toast } from "react-toastify";
 
@@ -93,9 +93,16 @@ const CoverDetail = () => {
       setCoverLetterData(response.data.updatedCoverLetter);
       toast.success("Cover letter regenerated successfully");
     } catch (error) {
-      if (error instanceof AxiosError) {
-        console.error(error);
-        toast.error("Failed to regenerate cover letter, try again later");
+      if (axios.isAxiosError(error)) {
+        if(error?.response?.data?.message.includes("Monthly limit reached")){
+          toast.error(error?.response?.data?.message, {
+            position: "top-right",
+          });
+        } else {
+          toast.error("Something went wrong. Please try again.", {
+            position: "top-right",
+          });
+        }
       }
     } finally {
       setIsWriting(false);
@@ -285,13 +292,13 @@ const CoverDetail = () => {
               Copy
             </Button>
 
-            <Button
+            {/* <Button
               size="sm"
               className="gap-2 bg-slate-900 hover:bg-slate-800 text-white transition-colors shadow-sm hover:shadow"
             >
               <Download className="h-4 w-4" />
               Download
-            </Button>
+            </Button> */}
           </div>
         </div>
       </header>

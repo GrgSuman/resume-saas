@@ -1,21 +1,20 @@
-import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { Button } from "../../components/ui/button";
-import { Dialog, DialogContent } from "../../components/ui/dialog";
 import { Link } from "react-router";
-import { ArrowUpRight, FileText, PenSquare } from "lucide-react";
+import { ArrowUpRight, FileText, PenSquare, Plus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "../../api/axios";
 import { formatRelativeTime } from "../../lib/utils";
 import { Skeleton } from "../../components/ui/skeleton";
-// import { Video } from "lucide-react";
+import { useNavigate } from "react-router";
 
 const DashboardNew = () => {
   const { user } = useAuth();
-  const [isVideoOpen, setIsVideoOpen] = useState(false);
+  const navigate = useNavigate();
+
   const { data, isLoading, isError } = useQuery({
     queryKey: ["dashboard"],
-    queryFn: () => axiosInstance.get("/dashboard"),
+    queryFn: () => axiosInstance.get("/auth/dashboard"),
   });
 
   const dashboardData = data?.data;
@@ -24,227 +23,194 @@ const DashboardNew = () => {
     {
       title: "Resumes",
       count: dashboardData?.resumeCount || 0,
-      description: "Last edited 2 days ago",
-      action: "Go to resumes",
       href: "/dashboard/resume",
-      iconBg: "bg-indigo-100",
-      iconColor: "text-indigo-600",
       icon: FileText,
     },
     {
       title: "Cover Letters",
       count: dashboardData?.coverLetterCount || 0,
-      description: "Draft ready to personalize",
-      action: "Go to cover letters",
       href: "/dashboard/cover-letter",
-      iconBg: "bg-amber-100",
-      iconColor: "text-amber-600",
       icon: PenSquare,
     },
   ];
 
   return (
-    <div className="min-h-screen bg-background py-8 px-4 sm:px-6 lg:px-8 space-y-6 max-w-7xl mx-auto">
+    <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-medium text-foreground">
-            Welcome back, {user?.name?.split(" ")[0] ?? "there"} 👋
+          <h1 className="text-2xl font-semibold text-slate-900">
+            Welcome back{user?.name ? `, ${user.name.split(" ")[0]}` : ""}
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-          Your drafts are ready. Pick one and keep moving you're closer than you think.
+          <p className="text-sm text-slate-500 mt-1">
+            Manage your resumes and cover letters
           </p>
         </div>
-        {/* <Button
-          variant="default"
-          onClick={() => setIsVideoOpen(true)}
-          className="gap-2 bg-gray-900 hover:bg-black text-white"
-        >
-          <Video className="h-4 w-4" />
-          How to use
-        </Button> */}
       </div>
 
-      {/* Video Dialog */}
-      <Dialog open={isVideoOpen} onOpenChange={setIsVideoOpen}>
-        <DialogContent
-          className="sm:max-w-4xl p-0 border-0 bg-transparent shadow-none"
-          showCloseButton={false}
-        >
-          <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
-            <iframe
-              className="absolute inset-0 h-full w-full border-0"
-              src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-              title="How to use Resume Builder"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Summary */}
-      {isLoading ? (
-        <div className="grid gap-4 md:grid-cols-2">
-          {[
-            { title: "RESUMES", iconBg: "bg-indigo-100", icon: FileText },
-            { title: "COVER LETTERS", iconBg: "bg-amber-100", icon: PenSquare },
-          ].map((card) => (
-            <div
-              key={card.title}
-              className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-4"
-            >
-              <div className="space-y-1">
-                <p className="text-base font-medium uppercase text-slate-900">{card.title}</p>
-                <Skeleton className="h-3 w-32" />
-                <Skeleton className="h-4 w-28" />
-              </div>
-              <div className={`h-12 w-12 rounded-xl ${card.iconBg} flex items-center justify-center`}>
-                <card.icon className={`h-5 w-5 ${card.title === "RESUMES" ? "text-indigo-600" : "text-amber-600"}`} />
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : isError ? (
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="flex items-center justify-center rounded-2xl border border-red-200 bg-red-50 px-5 py-8">
-            <p className="text-sm text-red-600">Failed to load dashboard data</p>
-          </div>
-        </div>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2">
-          {summaryCards.map((card) => (
-            <div
-              key={card.title}
-              className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-4"
-            >
-              <div className="space-y-1">
-                <p className="text-base font-medium uppercase text-slate-900">{card.title}</p>
-                <p className="text-2xl font-semibold text-slate-900">
-                  {card.count}
-                </p>
-                <Link
-                  to={card.href}
-                  className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:underline"
-                >
-                  {card.action}
-                  <ArrowUpRight className="h-3.5 w-3.5" />
-                </Link>
-              </div>
+      {/* Summary Cards */}
+      <div className="grid gap-3 sm:grid-cols-2">
+        {isLoading ? (
+          <>
+            {[1, 2].map((i) => (
               <div
-                className={`h-12 w-12 rounded-xl ${card.iconBg} flex items-center justify-center`}
+                key={i}
+                className="rounded-lg border border-slate-200 bg-white p-4"
               >
-                <card.icon className={`h-5 w-5 ${card.iconColor}`} />
+                <Skeleton className="h-4 w-20 mb-3" />
+                <Skeleton className="h-7 w-16" />
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </>
+        ) : (
+          summaryCards.map((card) => (
+            <Link
+              key={card.title}
+              to={card.href}
+              className="group rounded-lg border border-slate-200 bg-white p-4 transition-colors hover:border-slate-300 hover:bg-slate-50"
+            >
+              <div className="flex items-start justify-between">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-slate-600">
+                    {card.title}
+                  </p>
+                  <p className="text-2xl font-semibold text-slate-900">
+                    {card.count}
+                  </p>
+                </div>
+                <div className="h-10 w-10 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
+                  <card.icon className="h-5 w-5 text-slate-600" />
+                </div>
+              </div>
+            </Link>
+          ))
+        )}
+      </div>
 
-      {/* Recent list */}
-      <div className="space-y-4">
+      {/* Recent Documents */}
+      <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-base font-medium uppercase text-slate-900">
-              Recently opened
+            <h2 className="text-lg font-semibold text-slate-900">
+              Recent documents
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              Continue where you left off
+              Your latest work
             </p>
           </div>
-          {dashboardData?.latestItems && dashboardData.latestItems.length > 0 && (
+          {dashboardData?.latestItems?.length > 0 && (
             <Button variant="ghost" size="sm" asChild>
-              <Link to={`/dashboard/${dashboardData.latestItems[0]?.type === 'cover-letter' ? 'cover-letter' : 'resume'}`}>
+              <Link to="/dashboard/resume">
                 View all
-                <ArrowUpRight className="h-3.5 w-3.5 ml-1" />
+                <ArrowUpRight className="ml-1.5 h-4 w-4" />
               </Link>
             </Button>
           )}
         </div>
+
         {isLoading ? (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white/70 p-4"
+                className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-3"
               >
-                <Skeleton className="h-10 w-10 rounded-lg flex-shrink-0" />
-                <div className="space-y-2 flex-1 min-w-0">
+                <Skeleton className="h-10 w-10 rounded-md" />
+                <div className="flex-1 space-y-1.5">
                   <Skeleton className="h-4 w-48" />
                   <Skeleton className="h-3 w-32" />
                 </div>
-                <Skeleton className="h-4 w-4 flex-shrink-0" />
               </div>
             ))}
           </div>
         ) : isError ? (
-          <div className="rounded-xl border border-red-200 bg-red-50/50 px-5 py-8 text-center">
-            <p className="text-sm font-medium text-red-700">Failed to load recent items</p>
+          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-6 text-sm text-red-700">
+            Failed to load recent documents.
           </div>
-        ) : dashboardData?.latestItems && dashboardData.latestItems.length > 0 ? (
-          <div className="space-y-3">
-            {dashboardData.latestItems.map((item: { title: string; type: string; updatedAt: string; id: string,bgColor: string }) => {
-              const Icon = item.type === 'cover-letter' ? PenSquare : FileText;
-              return (
-                <div
-                  key={item.id}
-                  className="flex flex-col gap-3 rounded-xl sm:rounded-2xl border border-slate-200 bg-white/70 p-3 sm:p-4 transition hover:border-slate-300 hover:bg-white md:flex-row md:items-center md:justify-between"
-                >
-                  <Link
-                    to={`/dashboard/${item.type === 'cover-letter' ? 'cover-letter' : 'resume'}/${item.id}`}
-                    className="flex flex-1 items-center gap-2 sm:gap-3 min-w-0"
-                  >
-                    <div
-                      className="w-9 h-9 sm:w-10 sm:h-10 rounded-md flex items-center justify-center flex-shrink-0 border border-white/60 "
-                      style={{
-                        backgroundColor: item.bgColor,
-                      }}
-                    >
-                      <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-700" />
-                    </div>
-                    <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
-                      <p className="text-sm font-medium text-slate-900 truncate">
-                        {item.title}
-                      </p>
-                      <p className="text-xs text-slate-500">
-                        <span className="capitalize">{item.type === 'cover-letter' ? 'Cover Letter' : 'Resume'}</span>
-                        <span> last edited {formatRelativeTime(item.updatedAt)}</span>
-                      </p>
-                    </div>
-                  </Link>
+        ) : dashboardData?.latestItems?.length > 0 ? (
+          <div className="bg-white">
+            {dashboardData.latestItems.map(
+              (item: {
+                id: string;
+                title: string;
+                type: string;
+                updatedAt: string;
+                bgColor: string;
+              }) => {
+                const Icon =
+                  item.type === "cover-letter" ? PenSquare : FileText;
 
-                  <div className="flex items-center gap-2 sm:gap-2 self-end sm:self-auto">
+                return (
+                  <Link
+                    key={item.id}
+                    to={`/dashboard/${
+                      item.type === "cover-letter"
+                        ? "cover-letter"
+                        : "resume"
+                    }/${item.id}`}
+                    className="flex items-center justify-between py-5 hover:bg-slate-50 transition-colors group"
+                  >
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <div
+                        className="h-10 w-10 rounded-md flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: item.bgColor }}
+                      >
+                        <Icon className="h-4 w-4 text-slate-700" />
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-slate-900 truncate">
+                          {item.title}
+                        </p>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          {item.type === "cover-letter"
+                            ? "Cover letter"
+                            : "Resume"}{" "}
+                          · {formatRelativeTime(item.updatedAt)}
+                        </p>
+                      </div>
+                    </div>
+
+                    <ArrowUpRight className="h-4 w-4 text-slate-400 group-hover:text-slate-600 transition-colors flex-shrink-0 ml-2" />
+                  </Link>
+                );
+              }
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="rounded-xl border border-slate-200 bg-white">
+              <div className="px-8 py-20 text-center">
+                <div className="mx-auto max-w-sm space-y-5">
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border-2 border-slate-200 bg-slate-50">
+                    <FileText className="h-7 w-7 text-slate-500" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-semibold text-slate-900">
+                      No documents yet
+                    </h3>
+                    <p className="text-sm text-slate-600">
+                      Get started by creating your first resume or cover letter.
+                    </p>
+                  </div>
+                  <div className="pt-1">
                     <Button
-                      variant="outline"
-                      size="sm"
-                      asChild
-                      className="gap-1.5 h-8 sm:h-9"
+                      size="default"
+                      onClick={() =>
+                        navigate("/dashboard/resume", {
+                          state: { openCreateModal: true },
+                        })
+                      }
+                      className="group"
                     >
-                      <Link to={`/dashboard/${item.type === 'cover-letter' ? 'cover-letter' : 'resume'}/${item.id}`}>
-                        <ArrowUpRight className="w-3.5 h-3.5" />
-                      </Link>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create Resume
                     </Button>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="rounded-xl border border-slate-200 bg-white/70 px-6 py-10 text-center">
-            <div className="max-w-sm mx-auto space-y-3">
-              <div className="inline-flex items-center justify-center h-12 w-12 rounded-xl bg-slate-100">
-                <FileText className="h-6 w-6 text-slate-400" />
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-slate-900">
-                  No recent activity
-                </p>
-                <p className="text-xs text-slate-500">
-                  Create your first resume or cover letter to get started
-                </p>
               </div>
             </div>
-          </div>
+          </>
         )}
       </div>
     </div>

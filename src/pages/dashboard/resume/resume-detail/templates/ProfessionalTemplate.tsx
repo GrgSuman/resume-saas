@@ -59,9 +59,9 @@ const ProfessionalTemplate = ({resumeData, resumeSettings, openForms }: {resumeD
         <h1 className="text-center font-bold text-2xl mb-2">
           {data.personalInfo.name}
         </h1>
-        {data.personalInfo.label && (
+        {data.personalInfo.profession && (
           <p className="text-center my-2 font-bold">
-            {data.personalInfo.label}
+            {data.personalInfo.profession}
           </p>
         )}
         {firstLine.length > 0 && (
@@ -111,7 +111,7 @@ const ProfessionalTemplate = ({resumeData, resumeSettings, openForms }: {resumeD
                 {job.achievements?.map((achievement, idx) => (
                     <li key={idx} className="flex items-start">
                       <span className="mr-2">•</span>
-                      <span>{achievement}</span>
+                      <span>{achievement.content}</span>
                     </li>
                   ))}
                 </ul>
@@ -149,8 +149,8 @@ const ProfessionalTemplate = ({resumeData, resumeSettings, openForms }: {resumeD
         <div className="space-y-2">
           {data.skills?.map((skillGroup, index) => (
             <div key={index}>
-              <span className="font-bold ">{skillGroup.category ? `${skillGroup.category}: ` : ''}</span>
-              <span className="">{Array.isArray(skillGroup.items) ? skillGroup.items.join(', ') : skillGroup.items}</span>
+              <span className="font-bold ">{skillGroup.categoryName ? `${skillGroup.categoryName}: ` : ''}</span>
+              <span className="">{skillGroup.items.map((item) => item.content).join(', ')}</span>
             </div>
           ))}
         </div>
@@ -174,7 +174,7 @@ const ProfessionalTemplate = ({resumeData, resumeSettings, openForms }: {resumeD
                   {project.achievements?.map((achievement, idx) => (
                     <li key={idx} className="flex items-start">
                       <span className="mr-2">•</span>
-                      <span>{achievement}</span>
+                      <span>{achievement.content}</span>
                     </li>
                   ))}
                 </ul>
@@ -245,21 +245,11 @@ const ProfessionalTemplate = ({resumeData, resumeSettings, openForms }: {resumeD
       )}
         {data.customSections?.map((section, index) => (
           <div key={index} className="mb-5">
-            {/* <SectionHeader label={section.label} sectionKey="customSections" /> */}
-            <h2 className="font-bold tracking-wide border-b border-black pb-1 mb-3">{section.label}</h2>
+            {section.name && <h2 className="font-bold tracking-wide border-b border-black pb-1 mb-3">{section.name}</h2>}
             <div>
-              {Array.isArray(section.content) ? (
-                <ul className=" space-y-1">
-                  {section.content.map((item, idx) => (
-                    <li key={idx} className="flex items-start">
-                      <span className="mr-2 font-bold">•</span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>{section.content}</p>
-              )}
+              {section.achievements.map((item) => (
+                <p key={item.order}>{item.content}</p>
+              ))}
             </div>
           </div>
         ))}

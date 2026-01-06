@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router";
 import axiosInstance from "../../../api/axios";
 import { AxiosError } from "axios";
 import { defaultResumeData } from "../types/defaultResumeData";
+import type { ResumeAnalysis } from "../types/resumeAnalysis";
 
 const initialState: ResumeMetaData={
     resumeData: defaultResumeData.resumeData,
@@ -14,7 +15,8 @@ const initialState: ResumeMetaData={
     resumeLoading: true,
     jobDescription: '',
     resumeTitle: '',
-    isResumeInitialized:false
+    isResumeInitialized:false,
+    resumeAnalysis: []
 }
 
 // Action Types
@@ -34,7 +36,11 @@ export type ResumeAction =
   // Data updates
   | { type: 'UPDATE_RESUME_DATA'; payload: Partial<ResumeData> }
   | { type: 'UPDATE_RESUME_SETTINGS'; payload: Partial<ResumeSettings> }
-  
+
+  | { type: 'INITIALIZE_RESUME_ANALYSIS'; payload: ResumeAnalysis[] }
+
+  // Analysis updates
+  | { type: 'SET_RESUME_ANALYSIS'; payload: ResumeAnalysis[] }
   // UI states
   | { type: 'SET_DOWNLOADING'; payload: boolean }
   | { type: 'SET_EDITING_MODE'; payload: boolean }
@@ -66,13 +72,21 @@ const resumeReducer = (state: ResumeMetaData | null, action: ResumeAction) => {
             return { ...state, resumeEditingMode: action.payload };
 
         case 'SET_RESUME_TITLE':
-            return { ...state, resumeTitle: action.payload };
+            return { ...state, resumeTitle: action.payload, isResumeInitialized: true };
         
         case 'SET_JOB_DESCRIPTION':
-            return { ...state, jobDescription: action.payload };
+            return { ...state, jobDescription: action.payload, isResumeInitialized: true };
 
         case 'INITIALIZE_RESUME_DATA':
-            return { ...state, resumeTitle: action.payload.resumeTitle, resumeData: action.payload.resumeData, resumeSettings: action.payload.resumeSettings, jobDescription: action.payload.jobDescription };
+            return { ...state,
+                 resumeTitle: action.payload.resumeTitle,
+                 resumeData: action.payload.resumeData,
+                 resumeSettings: action.payload.resumeSettings,
+                 jobDescription: action.payload.jobDescription,
+                };
+
+        case 'INITIALIZE_RESUME_ANALYSIS':
+            return { ...state, resumeAnalysis: action.payload };
 
         case 'UPDATE_RESUME_DATA':
             return { ...state,resumeData: { ...state.resumeData, ...action.payload }, isResumeInitialized: true };
@@ -97,11 +111,14 @@ export const ResumeProvider: React.FC<{children: React.ReactNode}> = ({ children
         const fetchResume = async () => {
             try {
                 const response = await axiosInstance.get(`/resume/${id}`);
-                dispatch({type: 'INITIALIZE_RESUME_DATA', payload: {resumeData: response.data.resume.resumeData,
+                dispatch({type: 'INITIALIZE_RESUME_DATA', payload: {
+                    resumeData: response.data.resume.resumeData,
                      resumeSettings: response.data.resume.resumeSettings,
                       resumeTitle: response.data.resume.title,
                       jobDescription: response.data.resume.jobDescription
                 }});
+                console.log("111111", response.data.resume.resumeAnalysis);
+                dispatch({type: 'INITIALIZE_RESUME_ANALYSIS', payload: response.data.resume.resumeAnalysis});
             } catch (error) {
                 if(error instanceof AxiosError){
                     if(error.response?.status === 404){

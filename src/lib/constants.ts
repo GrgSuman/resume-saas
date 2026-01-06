@@ -39,14 +39,19 @@ export const FONT_OPTIONS = Object.entries(FONTS).map(([key, value]) => ({
   css: value
 }));
 
-export const CREDIT_COSTS = {
-  CREATE_RESUME: 3,
-  CLONE_RESUME: 2,
-  AI_CONVERSATION: 1,
-  DOWNLOAD_PDF: 2,
-  EXPORT_TO_DOCX: 3,
-  AI_OPTIMIZATION_AND_ATS_CHECKER:3
+// Billing model: Most features are FREE, only these are paid:
+export const PAID_FEATURES = {
+  AI_CONVERSATION: 1, // per 5 messages
+  CREATE_COVER_LETTER: 1, // per cover letter
+  AI_TAILORED_RESUME: 1, // per AI-tailored resume
 }
+
+// FREE features (no charges):
+// - Resume builder (creation, editing, cloning)
+// - Resume downloads (PDF, DOCX)
+// - AI optimization & ATS checker
+// - All templates and customization
+// - Job tracking (unlimited)
 
 export const SECTION_LABELS = {
   summary: "Summary",
