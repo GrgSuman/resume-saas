@@ -1,9 +1,11 @@
 import { ResumeSectionKey } from "./constants"
+import type { ResumeAnalysis } from "./resumeAnalysis"
 
 // Main Resume Data Type
 export type ResumeMetaData = {
     resumeData:ResumeData,
     resumeSettings:ResumeSettings
+    resumeAnalysis?:ResumeAnalysis[]
     resumeDownloading:boolean
     resumeEditingMode:boolean
     resumeError:string | null
@@ -19,6 +21,7 @@ export type ResumeSettings = {
     fontFamily: string
     lineHeight: string //1.2-1.8
     template: string //classic, modern, minimal, etc.
+    textAlignment: 'left' | 'center' | 'right' | 'justify'
     sections:Section[],
 }
 

@@ -3,196 +3,113 @@ import axiosInstance from "../../../api/axios";
 import { Button } from "../../../components/ui/button";
 import { SUBSCRIPTION_PLAN_LIMITS } from "../types/constants";
 import { Link } from "react-router";
-import { AlertTriangle, Loader2 } from "lucide-react";
+import { 
+  Loader2, 
+  MessageSquare,
+  FileText,
+  Sparkles,
+  Download,
+  Check,
+  AlertCircle
+} from "lucide-react";
 import { toast } from "react-toastify";
 import { AxiosError } from "axios";
 import { useState } from "react";
 import SubscriptionLoadingSkeleton from "./SubscriptionLoadingSkeleton";
 
 const MySubscription = () => {
-
   const [loadingManageSubscription, setLoadingManageSubscription] = useState(false);
 
-  const {
-    data,
-    isLoading,
-    isError,
-  } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["usage"],
     queryFn: () => axiosInstance.get("/auth/usage"),
   });
 
-  if (isLoading) {
-    return <SubscriptionLoadingSkeleton />;
-  }
+  if (isLoading) return <SubscriptionLoadingSkeleton />;
 
   if (isError || !data?.data?.userUsage) {
     return (
-      <div className="min-h-screen bg-background p-6 sm:p-8 flex items-center justify-center">
-        <div className="text-center space-y-2">
-          <p className="text-slate-600">Failed to load subscription data</p>
-          <Button onClick={() => window.location.reload()}>Retry</Button>
+      <div className="min-h-[50vh] flex flex-col items-center justify-center p-6">
+        <div className="rounded-full bg-red-50 p-3 mb-4">
+          <AlertCircle className="h-6 w-6 text-red-500" />
         </div>
+        <h3 className="text-sm font-medium text-slate-900">Failed to load subscription</h3>
+        <Button 
+          variant="link" 
+          onClick={() => window.location.reload()} 
+          className="mt-2 text-slate-500"
+        >
+          Try again
+        </Button>
       </div>
     );
   }
 
   const userPlan = data.data.userUsage.subscription?.plan;
   const usageData = data.data.userUsage.usage?.[0];
+  const isPro = userPlan === "PRO";
 
-
-
-const manageSubscription = async () => {
+  const manageSubscription = async () => {
     setLoadingManageSubscription(true);
     try {
-      // Initialize Stripe
       const response = await axiosInstance.post("/payment/manage-subscription");
-      const { session } = response.data;
-      //open in new tab
-      window.open(session, "_blank");
+      window.open(response.data.session, "_blank");
     } catch (err) {
-      if(err instanceof AxiosError){
-        toast.error("Something went wrong. Please try again.", {
-          position: "top-right",
-        });
+      if (err instanceof AxiosError) {
+        toast.error("Unable to open billing portal.");
       }
     } finally {
       setLoadingManageSubscription(false);
     }
-  }
+  };
 
-  if (!userPlan || !usageData) {
-    return (
-      <div className="min-h-screen bg-background p-6 sm:p-8 flex items-center justify-center">
-        <div className="text-center space-y-2">
-          <p className="text-slate-600">Invalid subscription data</p>
-        </div>
-      </div>
-    );
-  }
+  /* --- Sub-Components --- */
 
-  const UsageCard = ({title,used,total,unlimited,icon: Icon}: {
-    title: string;
-    used: number;
-    total: number;
-    unlimited?: boolean;
-    icon?: React.ComponentType<{ className?: string }>;
+  const UsageItem = ({
+    label,
+    count,
+    limit,
+    isUnlimited,
+    icon: Icon
+  }: {
+    label: string;
+    count: number;
+    limit: number;
+    isUnlimited: boolean;
+    icon: React.ElementType;
   }) => {
-    const remaining = total - used;
-    const progress = unlimited ? 0 : Math.min((used / total) * 100, 100);
-    const isLow = !unlimited && remaining <= total * 0.2 && remaining > 0;
-    const isFinished = remaining <= 0 && !unlimited;
-    
-    return (
-      <div className={`rounded-xl border bg-white p-4 sm:p-5 shadow-xs hover:shadow-sm transition-shadow ${
-        isFinished 
-          ? "border-red-200 bg-red-50/30" 
-          : "border-slate-200"
-      }`}>
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center gap-2.5 min-w-0">
-            {Icon && (
-              <div className="flex-shrink-0 p-1.5 rounded-lg bg-slate-100 text-slate-600">
-                <Icon className="h-4 w-4" />
-              </div>
-            )}
-            <h4 className="text-xs sm:text-sm font-semibold text-slate-900 leading-tight">
-              {title}
-            </h4>
-          </div>
-          {!unlimited && (
-            <span
-              className={`flex-shrink-0 px-2 py-0.5 text-[10px] font-medium rounded-full border ${
-                isFinished
-                  ? "bg-red-50 text-red-700 border-red-200"
-                  : isLow
-                  ? "bg-amber-50 text-amber-700 border-amber-200"
-                  : "bg-slate-50 text-slate-600 border-slate-200"
-              }`}
-            >
-              {isFinished ? "Limit reached" : `${remaining} left`}
-            </span>
-          )}
-        </div>  
+    const progress = isUnlimited ? 0 : Math.min((count / limit) * 100, 100);
+    const isFull = !isUnlimited && count >= limit;
 
-        {/* Numbers */}
-        <div className="mb-3">
-          {unlimited ? (
-            <>
-              <div className="text-2xl sm:text-3xl font-bold text-slate-900 mb-1">
-                ∞
-              </div>
-              <p className="text-[10px] sm:text-xs text-slate-500 font-medium">
-                Unlimited
-              </p>
-            </>
-          ) : (
-            <>
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-2xl sm:text-3xl font-bold text-slate-900">
-                  {used}
-                </span>
-                <span className="text-xs sm:text-sm text-slate-400 font-medium">
-                  / {total}
-                </span>
-              </div>
-              <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5">
-                used
-              </p>
-            </>
-          )}
+    return (
+      <div className="flex flex-col space-y-3 py-1">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md border border-slate-100 bg-slate-50 text-slate-500">
+              <Icon className="h-4 w-4" />
+            </div>
+            <span className="text-sm font-medium text-slate-700">{label}</span>
+          </div>
+          <div className="text-right">
+            {isUnlimited ? (
+              <span className="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Unlimited</span>
+            ) : (
+              <span className="text-xs font-medium text-slate-600">
+                {count} <span className="text-slate-400">/ {limit}</span>
+              </span>
+            )}
+          </div>
         </div>
 
-        {/* Progress */}
-        {!unlimited && (
-          <div className="space-y-1.5">
-            <div className="h-1.5 w-full rounded-full bg-slate-100 overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-all duration-300 ${
-                  isFinished 
-                    ? "bg-red-500" 
-                    : isLow 
-                    ? "bg-amber-500" 
-                    : "bg-slate-900"
-                }`}
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            {isFinished ? (
-              <div className="flex items-center gap-1.5">
-                <AlertTriangle className="h-3 w-3 text-red-600" />
-                <p className="text-[10px] text-red-600 font-medium">
-                  You've reached your limit
-                </p>
-              </div>
-            ) : isLow && (
-              <p className="text-[10px] text-amber-600 font-medium">
-                Running low
-              </p>
-            )}
-          </div>
-        )}
-        
-        {/* Upgrade Warning for Finished Quota */}
-        {isFinished && !unlimited && (
-          <div className="mt-3 pt-3 border-t border-red-200">
-            <Button
-              size="sm"
-              className="w-full bg-red-600 hover:bg-red-700 text-white text-xs"
-              asChild
-            >
-              <Link to="/dashboard/pricing">
-                Upgrade Plan
-              </Link>
-            </Button>
-          </div>
-        )}
-
-        {unlimited && (
-          <div className="flex items-center gap-1">
-            <span className="text-[10px] text-emerald-600 font-medium">
-              ✓ No limit
-            </span>
+        {/* Minimal Progress Bar */}
+        {!isUnlimited && (
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+            <div
+              className={`h-full rounded-full transition-all duration-300 ${
+                isFull ? "bg-red-500" : "bg-slate-900"
+              }`}
+              style={{ width: `${progress}%` }}
+            />
           </div>
         )}
       </div>
@@ -200,151 +117,190 @@ const manageSubscription = async () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6 sm:p-8">
-      <div className="mx-auto space-y-8 max-w-6xl">
+    <div className="min-h-screen bg-white p-6 sm:p-10 animate-in fade-in duration-500">
+      <div className="mx-auto max-w-6xl space-y-10">
+        
         {/* Header */}
-        <div className="space-y-1.5">
-          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900">
-            My Subscription
+        <div className="flex flex-col gap-1">
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+            Subscription
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500">
-            View your current plan, usage, and billing details.
+          <p className="text-sm text-slate-500">
+            Manage your billing information and view usage statistics.
           </p>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] items-start">
-
-          {/* LEFT SIDE */}
+        <div className="grid gap-8 lg:grid-cols-[1fr_340px] items-start">
+          
+          {/* LEFT: Usage List (Clean List View) */}
           <div className="space-y-6">
-            {/* USAGE SECTION */}
-            <div className="space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <h3 className="text-sm sm:text-base font-semibold text-slate-900">
-                  Usage this billing period
-                </h3>
-                {
-                  userPlan !== "PRO" && (
-                    <p className="text-xs text-slate-500">
-                      Renews on start of next month
-                    </p>
-                  )
-                }
+            <div className="rounded-xl border border-slate-200 bg-white p-6">
+              <div className="mb-6 flex items-center justify-between">
+                <h3 className="text-sm font-medium text-slate-900">Current Usage</h3>
+                <span className="text-xs text-slate-500">
+                  Resets {new Date(data.data.userUsage.subscription?.periodEnd).toLocaleDateString()}
+                </span>
               </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                <UsageCard
-                  title="AI Chat Messages"
-                  used={usageData.aiChatMessages}
-                  total={SUBSCRIPTION_PLAN_LIMITS[userPlan as keyof typeof SUBSCRIPTION_PLAN_LIMITS]?.chat ?? 0}
-                  unlimited={userPlan === "PRO"}
+              
+              <div className="space-y-6">
+                <UsageItem 
+                  label="AI Chat Messages"
+                  count={usageData.aiChatMessages}
+                  limit={SUBSCRIPTION_PLAN_LIMITS[userPlan as keyof typeof SUBSCRIPTION_PLAN_LIMITS]?.chat ?? 0}
+                  isUnlimited={isPro}
+                  icon={MessageSquare}
                 />
-
-                <UsageCard
-                  title="AI-Tailored Resumes"
-                  used={usageData.aiTailoredResumes}
-                  total={SUBSCRIPTION_PLAN_LIMITS[userPlan as keyof typeof SUBSCRIPTION_PLAN_LIMITS]?.resumes ?? 0}
-                  unlimited={userPlan === "PRO"}
+                <div className="h-px bg-slate-100" />
+                
+                <UsageItem 
+                  label="Auto Tailored Resumes"
+                  count={usageData.aiTailoredResumes}
+                  limit={SUBSCRIPTION_PLAN_LIMITS[userPlan as keyof typeof SUBSCRIPTION_PLAN_LIMITS]?.resumes ?? 0}
+                  isUnlimited={isPro}
+                  icon={FileText}
                 />
+                <div className="h-px bg-slate-100" />
 
-                <UsageCard
-                  title="Cover Letters"
-                  used={usageData.coverLetters}
-                  total={SUBSCRIPTION_PLAN_LIMITS[userPlan as keyof typeof SUBSCRIPTION_PLAN_LIMITS]?.covers ?? 0}
-                  unlimited={userPlan === "PRO"}
+                <UsageItem 
+                  label="Cover Letters"
+                  count={usageData.coverLetters}
+                  limit={SUBSCRIPTION_PLAN_LIMITS[userPlan as keyof typeof SUBSCRIPTION_PLAN_LIMITS]?.covers ?? 0}
+                  isUnlimited={isPro}
+                  icon={FileText}
                 />
+                <div className="h-px bg-slate-100" />
 
-                <UsageCard
-                  title="Analysis & Feedback"
-                  used={usageData.resumeAnalyzeFeedback}
-                  total={SUBSCRIPTION_PLAN_LIMITS[userPlan as keyof typeof SUBSCRIPTION_PLAN_LIMITS]?.analyzerAndFeedback ?? 0}
-                  unlimited={userPlan === "PRO"}
+                <UsageItem 
+                  label="Resume Analysis"
+                  count={usageData.resumeAnalyzeFeedback}
+                  limit={SUBSCRIPTION_PLAN_LIMITS[userPlan as keyof typeof SUBSCRIPTION_PLAN_LIMITS]?.analyzerAndFeedback ?? 0}
+                  isUnlimited={isPro}
+                  icon={Sparkles}
                 />
+                <div className="h-px bg-slate-100" />
 
-                <UsageCard
-                  title="Downloads"
-                  used={usageData.downloadsAndTemplates}
-                  total={SUBSCRIPTION_PLAN_LIMITS[userPlan as keyof typeof SUBSCRIPTION_PLAN_LIMITS]?.downloadsAndTemplates ?? 0}
-                  unlimited={userPlan !== "FREE"}
+                <UsageItem 
+                  label="PDF Downloads"
+                  count={usageData.downloadsAndTemplates}
+                  limit={SUBSCRIPTION_PLAN_LIMITS[userPlan as keyof typeof SUBSCRIPTION_PLAN_LIMITS]?.downloadsAndTemplates ?? 0}
+                  isUnlimited={userPlan !== "FREE"}
+                  icon={Download}
                 />
               </div>
             </div>
           </div>
 
-          {/* RIGHT SIDE */}
-          <div>
-            {/* CURRENT PLAN CARD */}
-            <div className="rounded-xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-5 sm:p-6 shadow-xs hover:shadow-sm transition-shadow">
-              <div className="space-y-4">
-                <div>
-                  <p className="text-xs sm:text-sm font-medium uppercase tracking-wide text-slate-500 mb-2">
-                    Current Plan
-                  </p>
-                  <div className="flex items-center gap-2.5 flex-wrap mb-3">
-                    <h2 className="text-xl font-bold text-slate-900 ">
-                      {userPlan}
-                    </h2>
-                    <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700 border border-emerald-200">
-                      {data.data.userUsage.subscription?.status.toUpperCase()}
-                    </span>
-                  </div>
-                  <div className="flex items-baseline gap-2 flex-wrap mb-3">
-                    <span className="text-lg sm:text-xl font-semibold text-slate-900 tracking-tight">
-                      $ {SUBSCRIPTION_PLAN_LIMITS[userPlan as keyof typeof SUBSCRIPTION_PLAN_LIMITS]?.price ?? 0}
-                    </span>
-                    <span className="text-xs sm:text-sm font-medium text-slate-500 uppercase">
-                      USD
-                    </span>
-                    {userPlan !== "FREE" && (
-                      <span className="text-xs sm:text-sm text-slate-400">
-                        / Monthly
-                      </span>
-                    )}
-                  </div>
-                  {userPlan !== "FREE" && data.data.userUsage.subscription?.periodEnd ? (
-                    <p className="text-xs sm:text-sm text-slate-500">
-                      Next billing date:{" "}
-                      <span className="font-medium text-slate-700">
-                        {new Date(data.data.userUsage.subscription.periodEnd).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })}
-                      </span>
-                    </p>
-                  ) : (
-                    <p className="text-xs sm:text-sm text-slate-500">
-                      Enjoy free access to essential features
-                    </p>
-                  )}
-                </div>
-                <div className="pt-2 border-t border-slate-200 space-y-2">
-                  {userPlan === "FREE" ? (
-                    <>
-                      <Button
-                        size="sm"
-                        className="w-full bg-slate-900 hover:bg-slate-800 text-white"
-                        asChild
-                      >
-                        <Link to="/dashboard/pricing">
-                          Upgrade Plan
-                        </Link>
-                      </Button>
-                      <p className="text-[10px] sm:text-xs text-slate-500 text-center">
-                        Unlock more features and higher limits
-                      </p>
-                    </>
-                  ) : (
-                    <Button
-                      size="sm"
-                      className="w-full"
-                      onClick={() => manageSubscription()}
-                      disabled={loadingManageSubscription}
-                    >
-                      {loadingManageSubscription ? <Loader2 className="h-4 w-4 animate-spin" /> : "Manage my subscription"}
-                    </Button>
-                  )}
-                </div>
+          {/* RIGHT: Plan Details (Minimal Card) */}
+          <div className="space-y-4">
+            <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-medium text-slate-900">Current Plan</h3>
+                {isPro ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-slate-900 px-2.5 py-0.5 text-xs font-medium text-white">
+                    PRO
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-0.5 text-xs font-medium text-slate-600">
+                    FREE
+                  </span>
+                )}
               </div>
+
+              <div className="mb-6">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-3xl font-bold text-slate-900">
+                    ${SUBSCRIPTION_PLAN_LIMITS[userPlan as keyof typeof SUBSCRIPTION_PLAN_LIMITS]?.price ?? 0}
+                  </span>
+                  <span className="text-sm text-slate-500">/mo</span>
+                </div>
+                <p className="mt-2 text-xs text-slate-500 leading-relaxed">
+                  {isPro 
+                    ? "You have full access to all AI features and unlimited generation." 
+                    : "You are currently on the free tier with limited generation credits."}
+                </p>
+              </div>
+
+              {userPlan === "FREE" ? (
+                <Button 
+                  className="w-full bg-slate-900 hover:bg-slate-800 text-white" 
+                  asChild
+                >
+                  <Link to="/dashboard/pricing">Upgrade Plan</Link>
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-900"
+                  onClick={manageSubscription}
+                  disabled={loadingManageSubscription}
+                >
+                  {loadingManageSubscription && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
+                  Manage Subscription
+                </Button>
+              )}
+            </div>
+
+            {/* Feature List */}
+            <div className="rounded-xl border border-slate-200 bg-white p-5">
+              <h4 className="mb-3 text-xs font-medium uppercase tracking-wider text-slate-400">
+                Included in your plan
+              </h4>
+              <ul className="space-y-2.5">
+                {userPlan === "FREE" ? (
+                  <>
+                    {[
+                      "20 AI messages / month",
+                      "2 job-tailored resumes",
+                      "2 job-tailored cover letters",
+                      "2 resume analyzer runs (basic)",
+                      "Unlimited job tracking",
+                      "Chrome extension",
+                      "Manual resume editing",
+                      "10 PDF downloads / month",
+                    ].map((feature, i) => (
+                      <li key={i} className="flex items-center gap-2 text-sm text-slate-600">
+                        <Check className="h-3.5 w-3.5 text-emerald-500 flex-shrink-0" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </>
+                ) : userPlan === "STARTER" ? (
+                  <>
+                    {[
+                      "100 AI messages / month",
+                      "50 job-tailored resumes",
+                      "50 job-tailored cover letters",
+                      "50 resume analyzer runs (advanced)",
+                      "Chrome extension (full workflow)",
+                      "Unlimited job tracking",
+                      "Unlimited PDF downloads",
+                    ].map((feature, i) => (
+                      <li key={i} className="flex items-center gap-2 text-sm text-slate-600">
+                        <Check className="h-3.5 w-3.5 text-emerald-500 flex-shrink-0" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    {[
+                      "Unlimited AI messages",
+                      "Unlimited job-tailored resumes",
+                      "Unlimited job-tailored cover letters",
+                      "Unlimited resume analyzer runs (advanced)",
+                      "Chrome extension (full workflow)",
+                      "Unlimited job tracking",
+                      "Unlimited PDF downloads",
+                      "Priority Support",
+                    ].map((feature, i) => (
+                      <li key={i} className="flex items-center gap-2 text-sm text-slate-600">
+                        <Check className="h-3.5 w-3.5 text-emerald-500 flex-shrink-0" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </>
+                )}
+              </ul>
             </div>
           </div>
 

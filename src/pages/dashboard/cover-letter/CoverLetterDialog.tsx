@@ -48,7 +48,7 @@ export default function CoverLetterDialog({ open, onOpenChange, onSubmit, isCrea
       queryFn: () => axiosInstance.get("/resume/"),
     });
   
-    const resumes = resumeData?.data?.resume || [];
+    const resumes = resumeData?.data?.resumes || [];
 
   useEffect(() => {
     if (!open) {

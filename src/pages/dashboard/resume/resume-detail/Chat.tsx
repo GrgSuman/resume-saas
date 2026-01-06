@@ -1,14 +1,6 @@
 import React from "react";
 import { useState, useEffect, useRef, memo } from "react";
-import {
-  ArrowUp,
-  FileText,
-  Loader2,
-  Sparkles,
-  Target,
-  PenTool,
-  Star,
-} from "lucide-react";
+import {ArrowUp,FileText,Target,PenTool,Star,Loader2,Sparkles} from "lucide-react";
 import { ScrollArea } from "../../../../components/ui/scroll-area";
 import { Button } from "../../../../components/ui/button";
 import { useResume } from "../../../../hooks/useResume";
@@ -50,6 +42,7 @@ const Chat = () => {
   const [message, setMessage] = useState("");
   const { state, dispatch } = useResume();
   const [showAnalyzerDialog, setShowAnalyzerDialog] = useState(false);
+  const [showJobDescDialog, setShowJobDescDialog] = useState(false);
   const [chatLoading, setChatLoading] = useState(true);
   const [msgSending, setMsgSending] = useState(false);
   const endRef = useRef<HTMLDivElement | null>(null);
@@ -72,8 +65,10 @@ const Chat = () => {
   }, []);
 
   const { id } = useParams<{ id: string }>();
+  const hasJobDescription = state.jobDescription?.trim().length > 0;
 
-  useEffect(() => {
+// Get conversation history
+useEffect(() => {
     const getConversation = async () => {
       try {
         const response = await axiosInstance.get(`/resume/${id}/conversation`);
@@ -100,7 +95,8 @@ const Chat = () => {
     if (id) getConversation();
   }, [id]);
 
-  const handleSend = async () => {
+// Handle Send Message
+const handleSend = async () => {
     if (!message.trim()) return;
 
     setMessages((prev) => [...prev, { role: "user", text: message }]);
@@ -115,38 +111,49 @@ const Chat = () => {
       const response = await axiosInstance.post(`/resume/${id}/conversation`, {
         userPrompt: message,
         resumeId: id,
-        jobDescription: state.jobDescription,
+        jobDescription: state.jobDescription || "",
         resumeData: state.resumeData,
-        resumeSettings: state.resumeSettings,
+        resumeSectionSettings: state.resumeSettings?.sections,
         messages: messages,
       });
 
+      // Add LLM message to chat
       setMessages((prev) => [
         ...prev,
         { role: "model", text: response.data.response.message },
       ]);
 
       // Apply resume data changes if shouldApplyChanges is true
-      // The response.data contains only the fields that have changed
-      if (
-        response.data?.response?.shouldApplyChanges &&
-        response.data?.response?.data
-      ) {
-        const payload = response.data.response.data;
-        dispatch({ type: "UPDATE_RESUME_DATA", payload: payload });
+      if (response.data?.response?.shouldApplyChanges) {
+        if(response.data?.response?.data) {
+          const payload = response.data.response.data;
+          dispatch({ type: "UPDATE_RESUME_DATA", payload: payload });
+        }
+        if(response.data?.response?.resumeSectionSettings) {
+          const payload = { sections: response.data.response.resumeSectionSettings };
+          dispatch({ type: "UPDATE_RESUME_SETTINGS", payload: payload });
+        }
       }
     } catch (error) {
+
       if (axios.isAxiosError(error)) {
-        toast.error("Something went wrong. Please try again.", {
-          position: "top-right",
-        });
+        if(error?.response?.data?.message.includes("Monthly limit reached")){
+          toast.error(error?.response?.data?.message, {
+            position: "top-right",
+          });
+        } else {
+          toast.error("Something went wrong. Please try again.", {
+            position: "top-right",
+          });
+        }
       }
     } finally {
       setMsgSending(false);
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+// Handle Key Press enter to send message
+const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey && !msgSending) {
       e.preventDefault();
       handleSend();
@@ -154,7 +161,7 @@ const Chat = () => {
   };
 
   // Handle Analyze Resume - opens dialog
-  const handleAnalyzeResume = () => {
+ const handleAnalyzeResume = () => {
     if (msgSending) return;
     setShowAnalyzerDialog(true);
   };
@@ -166,6 +173,8 @@ const Chat = () => {
       <Analyzer
         open={showAnalyzerDialog}
         onOpenChange={setShowAnalyzerDialog}
+        openJobDescDialog={showJobDescDialog}
+        onJobDescDialogChange={setShowJobDescDialog}
       />
 
       {/* Chat Container */}
@@ -189,7 +198,7 @@ const Chat = () => {
                   className="h-8 gap-1.5 px-2 text-xs font-medium"
                 >
                   <Sparkles className="h-3.5 w-3.5" />
-                  <span className="hidden md:inline">Tailor and Analyze</span>
+                  <span className="hidden md:inline">Analyze Resume</span>
                 </Button>
               </div>
             </div>
@@ -228,8 +237,8 @@ const Chat = () => {
                   <div className="flex flex-col h-full items-center justify-center">
                     <div className="w-full max-w-2xl space-y-10">
                       {/* Capabilities Section */}
-                      <div className="space-y-4 mt-6">
-                        <p className="text-sm font-medium text-center text-slate-500 uppercase tracking-wide">
+                      <div className="space-y-4 mt-10">
+                        <p className="text-base font-medium text-slate-600 uppercase tracking-wide">
                           What I Can Help With
                         </p>
 
@@ -310,7 +319,7 @@ const Chat = () => {
         </div>
 
         {/* Input Area */}
-        <div className="p-2 lg:p-4 backdrop-blur-sm flex flex-col gap-1 lg:gap-2 relative bg-white z-20">
+        <div className="pt-4 pb-2 lg:pt-6 lg:pb-4 px-2 lg:px-4 backdrop-blur-sm flex flex-col gap-1 lg:gap-2 relative bg-white z-20">
           <div className="block absolute -top-10 left-0 right-0 h-10 bg-gradient-to-t from-white to-transparent pointer-events-none" />
           <div className="flex-wrap gap-1.5 mb-1 hidden lg:flex">
             {[
@@ -329,8 +338,9 @@ const Chat = () => {
             ))}
           </div>
           <div className="relative">
-            <div className="relative border border-gray-300 rounded-2xl bg-white focus-within:ring-2 focus-within:ring-gray-900/30 transition-all">
-              <div className="p-2 sm:p-2.5 lg:p-3">
+            <div className="border border-gray-300 rounded-2xl bg-white focus-within:ring-2 focus-within:ring-gray-900/30 transition-all overflow-hidden">
+              {/* Textarea Section */}
+              <div className="p-2 sm:p-2.5 lg:p-3 pb-0">
                 <textarea
                   ref={textareaRef}
                   value={message}
@@ -355,18 +365,31 @@ const Chat = () => {
                   }}
                 />
               </div>
-              <Button
-                size="icon"
-                onClick={handleSend}
-                disabled={!message.trim() || msgSending}
-                className="absolute bottom-2 right-2 sm:bottom-2.5 sm:right-2.5 lg:bottom-3 lg:right-3 rounded-full"
-              >
-                {msgSending ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <ArrowUp className="w-4 h-4" />
-                )}
-              </Button>
+              {/* Buttons Section */}
+              <div className="flex items-center justify-between px-2 pb-2 sm:px-2.5 sm:pb-2.5 lg:px-3 lg:pb-3 pt-0">
+                <button
+                  onClick={() => setShowJobDescDialog(true)}
+                  disabled={msgSending}
+                  title={hasJobDescription ? "Response will be tailored to job" : "Add Job Description for tailored results"}
+                  className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors border disabled:opacity-50 disabled:cursor-not-allowed ${
+                      "bg-gray-50 hover:bg-gray-100 text-gray-600 hover:text-gray-700 border-gray-200/50"
+                  }`}
+                >
+                  @ {hasJobDescription ? "Edit Job" : "Add Job"}
+                </button>
+                <Button
+                  size="icon"
+                  onClick={handleSend}
+                  disabled={!message.trim() || msgSending}
+                  className={`rounded-full ${hasJobDescription ? 'bg-black hover:bg-gray-900 text-white' : ''}`}
+                >
+                  {msgSending ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <ArrowUp className="w-4 h-4" />
+                  )}
+                </Button>
+              </div>
             </div>
           </div>
         </div>

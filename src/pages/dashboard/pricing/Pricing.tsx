@@ -89,7 +89,7 @@ export default function PricingDialog() {
 
     try {
       // Initialize Stripe
-      const stripePromise = await loadStripe("pk_test_51RpilqRtBE3WEzfFOjYZ79SlZZigBXhAADtol7Ku17mKizzGabTKPJiTjlRqDwB3xmk60GQsxid6yLZWkYX0nihs00bfDJGcX4")
+      const stripePromise = await loadStripe("pk_live_51RpilURpmJmQnVSV42vcOistNO4lRKbn2KMLHbfBHpz0pJHvnzhiGvtt9JXZzTGmfDqlzY9iY6mptyOCLEEGLJhj00XEZYEW9c")
 
       const response = await axiosInstance.post("/payment/create-checkout-session",
         {

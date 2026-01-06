@@ -18,7 +18,6 @@ const CreativeTemplate = ({
   const settings = resumeSettings;
   const { state } = useResume();
 
-  // Header style: Text on left, Edit button on right, Line underneath
   const SectionHeader = ({
     label,
     sectionKey,
@@ -27,8 +26,8 @@ const CreativeTemplate = ({
     sectionKey: string;
   }) => (
     <div className="mt-5 mb-2">
-      <div className="flex items-center justify-between border-b border-gray-300 pb-0.5">
-        <h2 className="font-bold text-[12pt] text-gray-900 uppercase tracking-wide">
+      <div className="flex items-center justify-between border-b border-black pb-0.5">
+        <h2 className="font-bold text-[11pt] text-black">
           {label}
         </h2>
         {state.resumeEditingMode && (
@@ -36,25 +35,47 @@ const CreativeTemplate = ({
             size="sm"
             variant="ghost"
             onClick={() => openForms(sectionKey)}
-            className="h-6 px-2 text-[10px] font-medium text-blue-600 hover:bg-blue-50 border border-blue-200"
+            className="h-6 px-2 text-[10px] font-medium text-blue-600 hover:bg-blue-50"
           >
-            Edit {label}
+            Edit
           </Button>
         )}
       </div>
     </div>
   );
 
+  // Helper function to format URL with protocol
+  const formatUrl = (url: string): string => {
+    if (!url) return "";
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+      return url;
+    }
+    return `https://${url}`;
+  };
+
   const renderPersonalInfo = () => {
-    const contactInfo = [];
-    if (data.personalInfo.address) contactInfo.push(data.personalInfo.address);
-    if (data.personalInfo.email) contactInfo.push(data.personalInfo.email);
-    if (data.personalInfo.phone) contactInfo.push(data.personalInfo.phone);
-    if (data.personalInfo.linkedin) contactInfo.push("LinkedIn");
-    if (data.personalInfo.github) contactInfo.push("GitHub");
+    type ContactItem = 
+      | { type: "text"; value: string }
+      | { type: "link"; label: string; url: string };
+    
+    const contactInfo: ContactItem[] = [];
+    if (data.personalInfo.phone) contactInfo.push({ type: "text", value: data.personalInfo.phone });
+    if (data.personalInfo.email) contactInfo.push({ type: "text", value: data.personalInfo.email });
+    if (data.personalInfo.website) {
+      contactInfo.push({ type: "link", label: "Website", url: formatUrl(data.personalInfo.website) });
+    }
+    if (data.personalInfo.linkedin) {
+      contactInfo.push({ type: "link", label: "LinkedIn", url: formatUrl(data.personalInfo.linkedin) });
+    }
+    if (data.personalInfo.github) {
+      contactInfo.push({ type: "link", label: "Github", url: formatUrl(data.personalInfo.github) });
+    }
+    if (data.personalInfo.twitter) {
+      contactInfo.push({ type: "link", label: "Twitter", url: formatUrl(data.personalInfo.twitter) });
+    }
 
     return (
-      <div className="text-center mb-6">
+      <div className="text-center mb-4">
         {state.resumeEditingMode && (
           <div className="flex justify-end mb-2">
             <Button
@@ -63,137 +84,291 @@ const CreativeTemplate = ({
               onClick={() => openForms(ResumeSectionKey.PERSONAL_INFO)}
               className="h-6 text-[10px] border-blue-200 text-blue-600"
             >
-              Edit Header & Summary
+              Edit Header
             </Button>
           </div>
         )}
-        <h1 className="text-[26pt] font-serif text-gray-900 leading-tight mb-1">
+        
+        <h1 className="text-[20pt] font-bold text-black mb-2">
           {data.personalInfo.name}
         </h1>
-        <div className="text-[10pt] text-gray-700 flex justify-center items-center gap-2">
+        
+        <div className="text-[9pt] text-black">
           {contactInfo.map((item, index) => (
-            <span key={index} className="flex items-center">
-              {item}
-              {index < contactInfo.length - 1 && (
-                <span className="mx-2 text-gray-400 font-light">|</span>
+            <span key={index}>
+              {item.type === "link" ? (
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-black hover:underline"
+                >
+                  {item.label}
+                </a>
+              ) : (
+                item.value
               )}
+              {index < contactInfo.length - 1 && " | "}
             </span>
           ))}
-        </div>
-
-        {/* Summary appears right under Personal Info, like Section 1 in your image */}
-        <div className="text-left">
-          <SectionHeader 
-            label={settings.sections.find(s => s.key === ResumeSectionKey.PERSONAL_INFO)?.label || "Professional Summary"}
-            sectionKey={ResumeSectionKey.PERSONAL_INFO}
-          />
-          <p className="text-[10.5pt] leading-snug text-gray-800">
-            {data.personalInfo.summary}
-          </p>
         </div>
       </div>
     );
   };
 
-  const renderSkills = () => (
-    <div className="mb-4">
-      <SectionHeader
-        label={settings.sections.find((s) => s.key === "skills")?.label}
-        sectionKey="skills"
-      />
-      <div className="space-y-1">
-        {data.skills?.map((skillGroup, index) => (
-          <div key={index} className="text-[10.5pt] leading-tight">
-            <span className="font-bold text-gray-900">• {skillGroup.categoryName}: </span>
-            <span className="text-gray-800">
-              {skillGroup.items.map((item) => item.content).join(", ")}
-            </span>
-          </div>
-        ))}
+  const renderEducation = () => {
+    const section = settings.sections.find((s) => s.key === ResumeSectionKey.EDUCATION);
+    
+    return (
+      <div>
+        <SectionHeader label={section?.label} sectionKey={ResumeSectionKey.EDUCATION} />
+        <div className="space-y-3">
+          {data.education
+            ?.slice()
+            .sort((a, b) => a.order - b.order)
+            .map((edu, index) => (
+              <div key={index} className="text-[10pt]">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <h3 className="font-bold text-black">{edu.institution}</h3>
+                    <div className="italic text-black">
+                      {edu.degree}
+                      {edu.grade && `, GPA: ${edu.grade}`}
+                    </div>
+                  </div>
+                  <div className="text-right ml-4">
+                    <div className="italic text-black">{edu.dateRange}</div>
+                  </div>
+                </div>
+                {edu.description && (
+                  <p className="text-black mt-1">{edu.description}</p>
+                )}
+              </div>
+            ))}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
-  const renderExperience = () => (
-    <div className="mb-4">
-      <SectionHeader
-        label={settings.sections.find((s) => s.key === "experience")?.label}
-        sectionKey="experience"
-      />
-      <div className="space-y-4">
-        {data.experience.map((job, index) => (
-          <div key={index} className="text-[10.5pt]">
-            <div className="flex justify-between items-baseline">
-              <h3 className="font-bold text-gray-900">{job.company}</h3>
-              <span className="text-gray-800 font-medium">{job.dateRange}</span>
-            </div>
-            <div className="flex justify-between items-baseline italic text-gray-700 mb-1">
-              <span>{job.role}</span>
-              {job.location && <span className="not-italic text-[9.5pt] text-gray-600">{job.location}</span>}
-            </div>
-            <ul className="list-disc ml-5 space-y-0.5">
-              {job.achievements?.map((achievement, idx) => (
-                <li key={idx} className="text-gray-800 leading-normal pl-1">
+  const renderExperience = () => {
+    const section = settings.sections.find((s) => s.key === ResumeSectionKey.EXPERIENCE);
+    
+    return (
+      <div>
+        <SectionHeader label={section?.label} sectionKey={ResumeSectionKey.EXPERIENCE} />
+        <div className="space-y-3">
+          {data.experience
+            ?.slice()
+            .sort((a, b) => a.order - b.order)
+            .map((job, index) => (
+              <div key={index} className="text-[10pt]">
+                <div className="flex justify-between items-start mb-0.5">
+                  <h3 className="font-bold text-black">{job.role}</h3>
+                  <span className="text-black ml-4">{job.dateRange}</span>
+                </div>
+                <div className="flex justify-between items-start mb-1">
+                  <div className="italic text-black">{job.company}</div>
+                  {job.location && (
+                    <div className="italic text-black ml-4">{job.location}</div>
+                  )}
+                </div>
+                {job.achievements && job.achievements.length > 0 && (
+                  <ul className="list-disc ml-5 space-y-0.5">
+                    {job.achievements
+                      .slice()
+                      .sort((a, b) => a.order - b.order)
+                      .map((achievement, idx) => (
+                        <li key={idx} className="text-black leading-normal">
+                          {achievement.content}
+                        </li>
+                      ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+        </div>
+      </div>
+    );
+  };
+
+  const renderProjects = () => {
+    const section = settings.sections.find((s) => s.key === ResumeSectionKey.PROJECTS);
+    
+    return (
+      <div>
+        <SectionHeader label={section?.label} sectionKey={ResumeSectionKey.PROJECTS} />
+        <div className="space-y-3">
+          {data.projects
+            ?.slice()
+            .sort((a, b) => a.order - b.order)
+            .map((project, index) => (
+              <div key={index} className="text-[10pt]">
+                <div className="mb-1">
+                  <span className="font-bold text-black">{project.name}</span>
+                  {project.link && (
+                    <span className="italic text-black"> | {project.link}</span>
+                  )}
+                </div>
+                {project.achievements && project.achievements.length > 0 && (
+                  <ul className="list-disc ml-5 space-y-0.5">
+                    {project.achievements
+                      .slice()
+                      .sort((a, b) => a.order - b.order)
+                      .map((achievement, idx) => (
+                        <li key={idx} className="text-black leading-normal">
+                          {achievement.content}
+                        </li>
+                      ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+        </div>
+      </div>
+    );
+  };
+
+  const renderSkills = () => {
+    const section = settings.sections.find((s) => s.key === ResumeSectionKey.SKILLS);
+    
+    return (
+      <div>
+        <SectionHeader label={section?.label} sectionKey={ResumeSectionKey.SKILLS} />
+        <div className="space-y-1 text-[10pt]">
+          {data.skills
+            ?.slice()
+            .sort((a, b) => a.order - b.order)
+            .map((skillGroup, index) => (
+              <div key={index} className="text-black">
+                <span className="font-bold">{skillGroup.categoryName}: </span>
+                <span>
+                  {skillGroup.items
+                    .slice()
+                    .sort((a, b) => a.order - b.order)
+                    .map((item) => item.content)
+                    .join(", ")}
+                </span>
+              </div>
+            ))}
+        </div>
+      </div>
+    );
+  };
+
+  const renderCertifications = () => {
+    const section = settings.sections.find((s) => s.key === ResumeSectionKey.CERTIFICATIONS);
+    
+    return (
+      <div>
+        <SectionHeader label={section?.label} sectionKey={ResumeSectionKey.CERTIFICATIONS} />
+        <div className="space-y-2 text-[10pt]">
+          {data.certifications
+            ?.slice()
+            .sort((a, b) => a.order - b.order)
+            .map((cert, index) => (
+              <div key={index}>
+                <div className="flex justify-between items-start">
+                  <span className="font-bold text-black">{cert.name}</span>
+                  {cert.date && (
+                    <span className="text-black ml-4">{cert.date}</span>
+                  )}
+                </div>
+                {cert.issuer && (
+                  <div className="text-black">{cert.issuer}</div>
+                )}
+                {cert.description && (
+                  <div className="text-black">{cert.description}</div>
+                )}
+              </div>
+            ))}
+        </div>
+      </div>
+    );
+  };
+
+  const renderReferences = () => {
+    const section = settings.sections.find((s) => s.key === ResumeSectionKey.REFERENCES);
+    
+    return (
+      <div>
+        <SectionHeader label={section?.label} sectionKey={ResumeSectionKey.REFERENCES} />
+        <div className="space-y-2 text-[10pt]">
+          {data.references
+            ?.slice()
+            .sort((a, b) => a.order - b.order)
+            .map((ref, index) => (
+              <div key={index}>
+                <div className="font-bold text-black">{ref.name}</div>
+                {(ref.position || ref.company) && (
+                  <div className="text-black">
+                    {ref.position}
+                    {ref.position && ref.company && " - "}
+                    {ref.company}
+                  </div>
+                )}
+                {ref.contact && (
+                  <div className="text-black">{ref.contact}</div>
+                )}
+                {ref.description && (
+                  <div className="text-black">{ref.description}</div>
+                )}
+              </div>
+            ))}
+        </div>
+      </div>
+    );
+  };
+
+  const renderCustomSection = (sectionKey: string) => {
+    const section = settings.sections.find((s) => s.key === sectionKey);
+    const customSection = data.customSections?.find((cs) => cs.name === section?.label);
+    
+    if (!customSection) return null;
+
+    return (
+      <div>
+        <SectionHeader label={section?.label} sectionKey={sectionKey} />
+        {customSection.achievements && customSection.achievements.length > 0 && (
+          <ul className="list-disc ml-5 space-y-0.5 text-[10pt]">
+            {customSection.achievements
+              .slice()
+              .sort((a, b) => a.order - b.order)
+              .map((achievement, idx) => (
+                <li key={idx} className="text-black leading-normal">
                   {achievement.content}
                 </li>
               ))}
-            </ul>
-          </div>
-        ))}
+          </ul>
+        )}
       </div>
-    </div>
-  );
-
-  const renderEducation = () => (
-    <div className="mb-4">
-      <SectionHeader
-        label={settings.sections.find((s) => s.key === "education")?.label}
-        sectionKey="education"
-      />
-      {data.education?.map((edu, index) => (
-        <div key={index} className="text-[10.5pt] mb-3">
-          <div className="flex justify-between items-baseline">
-            <h3 className="font-bold text-gray-900">{edu.institution}</h3>
-            <span className="text-gray-800 font-medium">{edu.dateRange}</span>
-          </div>
-          <div className="flex justify-between items-baseline italic text-gray-700">
-            <span>{edu.degree}</span>
-            {edu.grade && <span className="not-italic font-medium">GPA: {edu.grade}</span>}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
+    );
+  };
 
   return (
-    <div className="w-full bg-white text-black font-sans p-8 md:p-12 print:p-0 print:border-0">
+    <div className="w-full max-w-[8.5in] mx-auto bg-white text-black px-6 py-8 print:px-6 print:py-8">
+      {renderPersonalInfo()}
+      
       {settings.sections
         ?.slice()
         .sort((a, b) => a.order - b.order)
         .map((section, index) => {
-          if (!section.visible) return null;
+          if (!section.visible || section.key === ResumeSectionKey.PERSONAL_INFO) return null;
+          
           switch (section.key) {
-            case ResumeSectionKey.PERSONAL_INFO: return <div key={index}>{renderPersonalInfo()}</div>;
-            case ResumeSectionKey.EXPERIENCE: return <div key={index}>{renderExperience()}</div>;
-            case ResumeSectionKey.EDUCATION: return <div key={index}>{renderEducation()}</div>;
-            case ResumeSectionKey.SKILLS: return <div key={index}>{renderSkills()}</div>;
+            case ResumeSectionKey.EDUCATION:
+              return <div key={index}>{renderEducation()}</div>;
+            case ResumeSectionKey.EXPERIENCE:
+              return <div key={index}>{renderExperience()}</div>;
             case ResumeSectionKey.PROJECTS:
-              return (
-                <div key={index} className="mb-4">
-                  <SectionHeader label="Projects" sectionKey="projects" />
-                  {data.projects?.map((p, i) => (
-                    <div key={i} className="mb-4 text-[10.5pt]">
-                       <div className="flex justify-between items-baseline">
-                         <span className="font-bold text-gray-900">{p.name}</span>
-                       </div>
-                       <ul className="list-disc ml-5 mt-1 space-y-0.5">
-                         {p.achievements?.map((a, ai) => <li key={ai} className="text-gray-800">{a.content}</li>)}
-                       </ul>
-                    </div>
-                  ))}
-                </div>
-              );
-            default: return null;
+              return <div key={index}>{renderProjects()}</div>;
+            case ResumeSectionKey.SKILLS:
+              return <div key={index}>{renderSkills()}</div>;
+            case ResumeSectionKey.CERTIFICATIONS:
+              return <div key={index}>{renderCertifications()}</div>;
+            case ResumeSectionKey.REFERENCES:
+              return <div key={index}>{renderReferences()}</div>;
+            default:
+              return <div key={index}>{renderCustomSection(section.key)}</div>;
           }
         })}
     </div>

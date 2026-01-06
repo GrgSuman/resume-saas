@@ -160,6 +160,7 @@ const ResumePreview = ({ zoomLevel }: ResumePreviewProps) => {
                     fontFamily: state.resumeSettings?.fontFamily ?? "Lato",
                     padding: "28px",
                     lineHeight: `${state.resumeSettings?.lineHeight ?? "1.4"}em`,
+                    textAlign: state.resumeSettings?.textAlignment ?? "left",
                   }}
                 >
                   {!state.resumeEditingMode && pageBreaks}

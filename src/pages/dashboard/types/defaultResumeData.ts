@@ -14,6 +14,7 @@ export const defaultResumeData: ResumeMetaData = {
         fontFamily: "lato",
         lineHeight: "1.4",
         template: "classic",
+        textAlignment: "left",
         sections: [
             { key: ResumeSectionKey.PERSONAL_INFO, label: "ProfessionalSummary", order: 1, visible: true },
             { key: ResumeSectionKey.EXPERIENCE, label: "Experience", order: 2, visible: true },

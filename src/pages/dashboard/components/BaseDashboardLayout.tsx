@@ -11,8 +11,8 @@ import {
   CreditCard,
   User,
   LogOut,
-  Briefcase,
-  Puzzle,
+  // Briefcase,
+  // Puzzle,
   MessageSquare,
 } from "lucide-react";
 import {
@@ -29,7 +29,7 @@ const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
   { href: "/dashboard/resume", label: "Resumes", icon: FileText },
   { href: "/dashboard/cover-letter", label: "Cover Letters", icon: Mail },
-  { href: "/dashboard/jobs", label: "Job Space", icon: Briefcase },
+  // { href: "/dashboard/jobs", label: "Job Space", icon: Briefcase },
   { href: "/dashboard/subscription", label: "Billing and Usage", icon: CreditCard },
 ];
 
@@ -217,7 +217,7 @@ const BaseDashboardLayout = () => {
             })}
 
             {/* Chrome Extension Link - Bottom */}
-            <div className="mt-auto pt-4 border-t border-slate-200">
+            {/* <div className="mt-auto pt-4 border-t border-slate-200">
               <Link to="/dashboard/extension">
                 <div
                   className={cn(
@@ -260,7 +260,6 @@ const BaseDashboardLayout = () => {
                     )}
                   </div>
 
-                  {/* Badge - Only show when sidebar is open */}
                   {isSidebarOpen && (
                     <span className="absolute top-0 right-0 inline-flex items-center rounded-full bg-[#7060fc]/10 text-[#7060fc] text-[11px] font-medium px-2 py-0.5">
                       Quick install
@@ -268,7 +267,7 @@ const BaseDashboardLayout = () => {
                   )}
                 </div>
               </Link>
-            </div>
+            </div> */}
           </nav>
         </div>
       </aside>
