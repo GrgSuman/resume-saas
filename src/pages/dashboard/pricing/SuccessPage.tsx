@@ -46,7 +46,6 @@ export default function PaymentSuccess() {
       try {
         const response = await axiosInstance.get(`/payment/verify-payment?sessionId=${sessionId}`)
         const data = response.data
-        console.log(data)
 
         if (data.status) {
           setStatus("success")
