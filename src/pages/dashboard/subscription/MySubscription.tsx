@@ -138,7 +138,7 @@ const MySubscription = () => {
               <div className="mb-6 flex items-center justify-between">
                 <h3 className="text-sm font-medium text-slate-900">Current Usage</h3>
                 <span className="text-xs text-slate-500">
-                  Resets {new Date(data.data.userUsage.subscription?.periodEnd).toLocaleDateString()}
+                  Resets starting from 1st of next month
                 </span>
               </div>
               

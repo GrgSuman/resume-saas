@@ -117,7 +117,6 @@ export const ResumeProvider: React.FC<{children: React.ReactNode}> = ({ children
                       resumeTitle: response.data.resume.title,
                       jobDescription: response.data.resume.jobDescription
                 }});
-                console.log("111111", response.data.resume.resumeAnalysis);
                 dispatch({type: 'INITIALIZE_RESUME_ANALYSIS', payload: response.data.resume.resumeAnalysis});
             } catch (error) {
                 if(error instanceof AxiosError){

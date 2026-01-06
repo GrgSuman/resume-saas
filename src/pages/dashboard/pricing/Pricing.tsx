@@ -109,6 +109,8 @@ export default function PricingDialog() {
       }
       
       const { error } = await stripe.redirectToCheckout({ sessionId });
+
+      setLoadingPlanId(null);
   
       if (error) throw error;
         
