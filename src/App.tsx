@@ -15,7 +15,7 @@ import ResumeList from "./pages/dashboard/resume/ResumeList";
 import BaseDashboardLayout from "./pages/dashboard/components/BaseDashboardLayout";
 import ResumeDetail from "./pages/dashboard/resume/resume-detail/ResumeDetail";
 import { ResumeProvider } from "./pages/dashboard/context/ResumeContext";
-import NotificationBannar from "./components/layouts/NotificationBannar";
+// import NotificationBannar from "./components/layouts/NotificationBannar";
 import CoverLetterList from "./pages/dashboard/cover-letter/CoverLetterList";
 import Pricing from "./pages/dashboard/pricing/Pricing";
 import CoverDetail from "./pages/dashboard/cover-letter/cover-detail/CoverDetail";
@@ -31,7 +31,7 @@ function App() {
        <ToastContainer />
       <GoogleOAuthProvider clientId="620421156218-5b2p94rdcismn2eqr8afggor7tqd2sum.apps.googleusercontent.com">
         <AuthProvider>
-          <NotificationBannar />
+          {/* <NotificationBannar /> */}
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<Layout />}>
