@@ -247,7 +247,7 @@ const Analyzer = ({
               {/* Job Description Section - Always Visible */}
               {!hasJobDescription && (
                 <Alert className="border-slate-200 bg-slate-50">
-                  <FileText className="h-4 w-4 text-slate-600 mt-1" />
+                    <FileText className="h-4 w-4 text-slate-600 mt-1" />
                   <AlertDescription className="flex items-center justify-between">
                     <span className="text-sm text-slate-700">
                       Add a target job description for better recommendations,
@@ -305,24 +305,24 @@ const Analyzer = ({
                   </div>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {/* Most Recent Analysis - Always Visible */}
-                  {mostRecentAnalysis && (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
+              <div className="space-y-4">
+                {/* Most Recent Analysis - Always Visible */}
+                {mostRecentAnalysis && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
                         <h4 className="font-semibold text-slate-900">
                           Latest Analysis
                         </h4>
                         <div className="flex items-center gap-2">
-                          {olderAnalyses.length > 0 && (
+                      {olderAnalyses.length > 0 && (
                             <>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setShowHistory(!showHistory)}
-                                className="text-xs"
-                              >
-                                <History className="h-3.5 w-3.5 mr-1.5" />
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowHistory(!showHistory)}
+                          className="text-xs"
+                        >
+                          <History className="h-3.5 w-3.5 mr-1.5" />
                                 {showHistory
                                   ? "Hide Past Analyses"
                                   : `View ${olderAnalyses.length} Past ${
@@ -330,12 +330,12 @@ const Analyzer = ({
                                         ? "Analysis"
                                         : "Analyses"
                                     }`}
-                                <ChevronDown
-                                  className={`h-3.5 w-3.5 ml-1.5 transition-transform ${
-                                    showHistory ? "rotate-180" : ""
-                                  }`}
-                                />
-                              </Button>
+                          <ChevronDown
+                            className={`h-3.5 w-3.5 ml-1.5 transition-transform ${
+                              showHistory ? "rotate-180" : ""
+                            }`}
+                          />
+                        </Button>
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -353,38 +353,38 @@ const Analyzer = ({
                                 )}
                               </Button>
                             </>
-                          )}
-                        </div>
+                      )}
+                    </div>
                       </div>
                       <AnalysisCard
                         key={mostRecentAnalysis.id}
                         analysis={mostRecentAnalysis}
                         defaultExpanded={true}
                       />
-                    </div>
-                  )}
+                  </div>
+                )}
 
-                  {/* History Section - Toggleable */}
-                  {showHistory && olderAnalyses.length > 0 && (
-                    <div className="space-y-4">
-                      {olderAnalyses.map((analysis) => (
+                {/* History Section - Toggleable */}
+                {showHistory && olderAnalyses.length > 0 && (
+                  <div className="space-y-4">
+                    {olderAnalyses.map((analysis) => (
                         <AnalysisCard
                           key={analysis.id}
                           analysis={analysis}
                           defaultExpanded={false}
                         />
-                      ))}
-                    </div>
-                  )}
+                    ))}
+                  </div>
+                )}
 
-                  {/* Empty State - Only show if no analyses at all */}
-                  {previousAnalyses.length === 0 && (
-                    <div className="border border-slate-200 rounded-lg bg-white p-6">
-                      <div className="text-center max-w-md mx-auto">
+                {/* Empty State - Only show if no analyses at all */}
+                {previousAnalyses.length === 0 && (
+                  <div className="border border-slate-200 rounded-lg bg-white p-6">
+                    <div className="text-center max-w-md mx-auto">
                         <h5 className="text-lg font-medium text-slate-900 mb-2">
                           No analysis history
                         </h5>
-                        <p className="text-sm text-slate-500 mb-5 leading-relaxed">
+                      <p className="text-sm text-slate-500 mb-5 leading-relaxed">
                           Get started for detailed feedback on ATS optimization,
                           strengths, areas for improvement, and actionable
                           recommendations.
@@ -400,20 +400,20 @@ const Analyzer = ({
                           ) : (
                             <Sparkles className="h-4 w-4" />
                           )}
-                          Create New Analysis
-                        </Button>
-                      </div>
+                        Create New Analysis
+                      </Button>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
+              </div>
               )}
             </div>
           </div>
 
           {/* Footer */}
           <div className="border-t border-slate-200 px-6 py-4 flex justify-end">
-            <Button
-              onClick={handleStartAnalysis}
+            <Button 
+              onClick={handleStartAnalysis} 
               disabled={isLoading}
               className="bg-gray-900 text-white hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -425,7 +425,7 @@ const Analyzer = ({
               ) : (
                 <>
                   <Sparkles className="h-4 w-4" />
-                  Create New Analysis
+              Create New Analysis
                 </>
               )}
             </Button>

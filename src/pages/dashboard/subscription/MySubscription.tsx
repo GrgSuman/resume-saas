@@ -117,15 +117,15 @@ const MySubscription = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white p-6 sm:p-10 animate-in fade-in duration-500">
-      <div className="mx-auto max-w-6xl space-y-10">
+    <div className="min-h-screen bg-background p-6 sm:p-8 animate-in fade-in duration-500">
+      <div className="mx-auto space-y-8">
         
         {/* Header */}
-        <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+        <div className="space-y-1">
+          <h1 className="text-lg sm:text-xl font-semibold text-foreground">
             Subscription
           </h1>
-          <p className="text-sm text-slate-500">
+          <p className="text-xs sm:text-sm text-muted-foreground">
             Manage your billing information and view usage statistics.
           </p>
         </div>

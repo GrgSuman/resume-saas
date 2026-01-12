@@ -2,35 +2,27 @@ import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { AxiosError } from "axios";
-import axiosInstance from "../../../api/axios";
-import { Button } from "../../../components/ui/button";
-import { Input } from "../../../components/ui/input";
-import { Label } from "../../../components/ui/label";
-import { Textarea } from "../../../components/ui/textarea";
+import axiosInstance from "../../../../api/axios";
+import { Button } from "../../../../components/ui/button";
+import { Input } from "../../../../components/ui/input";
+import { Label } from "../../../../components/ui/label";
+import { Textarea } from "../../../../components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../../components/ui/select";
+} from "../../../../components/ui/select";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "../../../components/ui/dialog";
+} from "../../../../components/ui/dialog";
 import { Save } from "lucide-react";
-
-const statuses = [
-  { value: "Saved", label: "Saved" },
-  { value: "Applied", label: "Applied" },
-  { value: "Interviewing", label: "Interviewing" },
-  { value: "Offer", label: "Offer" },
-  { value: "Rejected", label: "Rejected" },
-  { value: "Archived", label: "Archived" }
-];
+import type { Job } from "../../types/jobs";
 
 const jobTypes = [
   { value: "Full-time", label: "Full-time" },
@@ -42,12 +34,13 @@ const jobTypes = [
   { value: "Hybrid", label: "Hybrid" },
 ];
 
-interface TrackJobFormProps {
+interface TrackJobFormEditProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  job: Job | null;
 }
 
-const TrackJobForm = ({ open, onOpenChange }: TrackJobFormProps) => {
+const TrackJobFormEdit = ({ open, onOpenChange, job }: TrackJobFormEditProps) => {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     jobTitle: "",
@@ -57,15 +50,26 @@ const TrackJobForm = ({ open, onOpenChange }: TrackJobFormProps) => {
     companyUrl: "",
     jobType: jobTypes[0].value,
     jobDescription: "",
-    status: statuses[0].value,
-    statusDate: new Date().toISOString().split("T")[0],
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Reset form when dialog closes
+  // Prefill form when job is provided or reset when dialog closes
   useEffect(() => {
-    if (!open) {
+    if (open && job) {
+      // Prefill with job data
+      setFormData({
+        jobTitle: job.title || "",
+        company: job.companyName || "",
+        location: job.location || "",
+        jobUrl: job.jobUrl || "",
+        companyUrl: job.companyUrl || "",
+        jobType: job.jobType || jobTypes[0].value,
+        jobDescription: job.jobDescription || "",
+      });
+      setErrors({});
+    } else if (!open) {
+      // Reset form when dialog closes
       setFormData({
         jobTitle: "",
         company: "",
@@ -74,12 +78,10 @@ const TrackJobForm = ({ open, onOpenChange }: TrackJobFormProps) => {
         companyUrl: "",
         jobType: jobTypes[0].value,
         jobDescription: "",
-        status: statuses[0].value,
-        statusDate: new Date().toISOString().split("T")[0],
       });
       setErrors({});
     }
-  }, [open]);
+  }, [open, job]);
 
   const handleChange = (
     field: string,
@@ -92,38 +94,39 @@ const TrackJobForm = ({ open, onOpenChange }: TrackJobFormProps) => {
     }
   };
 
-  const createJobMutation = useMutation({
-    mutationFn: async (data: {title: string, companyName: string, location: string, jobUrl: string, companyUrl: string, jobType: string, jobDescription: string, status: string, timeline: { status: string, date: string, note: string }[]}) => {
-      const response = await axiosInstance.post("/jobs/", {
-       job:{
-        title: data.title,
-        companyName: data.companyName,
-        location: data.location,
-        jobUrl: data.jobUrl || null,
-        companyUrl: data.companyUrl || null,
-        jobType: data.jobType,
-        jobDescription: data.jobDescription,
-        status: data.status,
-        timeline: data.timeline,
-       }
+  const updateJobMutation = useMutation({
+    mutationFn: async (data: {title: string, companyName: string, location: string, jobUrl: string | null, companyUrl: string | null, jobType: string, jobDescription: string}) => {
+      if (!job?.id) {
+        throw new Error("Job ID is required");
       }
-    );
+      const response = await axiosInstance.patch(`/jobs/${job.id}`, {
+        job: {
+          title: data.title,
+          companyName: data.companyName,
+          location: data.location,
+          jobUrl: data.jobUrl,
+          companyUrl: data.companyUrl,
+          jobType: data.jobType,
+          jobDescription: data.jobDescription,
+        }
+      });
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["jobs"] });
-      toast.success("Job tracked successfully!", {
+      queryClient.invalidateQueries({ queryKey: ["job", job?.id] });
+      toast.success("Job updated successfully!", {
         position: "top-right",
       });
       onOpenChange(false);
     },
     onError: (error: unknown) => {
       if (error instanceof AxiosError) {
-        toast.error(error.response?.data?.message || "Failed to track job", {
+        toast.error(error.response?.data?.message || "Failed to update job", {
           position: "top-right",
         });
       } else {
-        toast.error("Failed to track job", {
+        toast.error("Failed to update job", {
           position: "top-right",
         });
       }
@@ -153,32 +156,32 @@ const TrackJobForm = ({ open, onOpenChange }: TrackJobFormProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
+    if (!job?.id) {
+      toast.error("Job ID is required", {
+        position: "top-right",
+      });
+      return;
+    }
 
     const data = {
-      title:formData.jobTitle,
-      companyName:formData.company,
-      location:formData.location,
-      jobUrl:formData.jobUrl,
-      companyUrl:formData.companyUrl,
-      jobType:formData.jobType,
-      jobDescription:formData.jobDescription,
-      status:formData.status,
-      timeline: [{
-        status:formData.status,
-        date:formData.statusDate,
-        note:"Status updated",
-      }],
+      title: formData.jobTitle,
+      companyName: formData.company,
+      location: formData.location,
+      jobUrl: formData.jobUrl || null,
+      companyUrl: formData.companyUrl || null,
+      jobType: formData.jobType,
+      jobDescription: formData.jobDescription,
     };
-    createJobMutation.mutate(data);
+    updateJobMutation.mutate(data);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="min-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden">
         <DialogHeader className="px-6 pt-6 pb-4 flex-shrink-0">
-          <DialogTitle>Track New Job</DialogTitle>
+          <DialogTitle>Edit Job</DialogTitle>
           <DialogDescription>
-            Add a job application to track your progress
+            Update job application details
           </DialogDescription>
         </DialogHeader>
 
@@ -298,50 +301,8 @@ const TrackJobForm = ({ open, onOpenChange }: TrackJobFormProps) => {
                 </div>
               </div>
 
-              {/* Status & Date */}
-              <div className="space-y-4 pt-4 border-t border-slate-200">
-                <h3 className="text-sm font-semibold text-slate-900">
-                  Status & Timeline
-                </h3>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Status */}
-                  <div className="space-y-2">
-                    <Label htmlFor="status" className="text-xs sm:text-sm font-medium text-slate-700">
-                      Status
-                    </Label>
-                    <Select
-                      value={formData.status}
-                      onValueChange={(value) => handleChange("status", value)}
-                    >
-                      <SelectTrigger id="status" className="w-full">
-                        <SelectValue placeholder="Select status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {statuses.map((status) => (
-                          <SelectItem key={status.value} value={status.value}>{status.label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Date of Status */}
-                  <div className="space-y-2">
-                    <Label htmlFor="statusDate" className="text-xs sm:text-sm font-medium text-slate-700">
-                      Date of Status
-                    </Label>
-                    <Input
-                      id="statusDate"
-                      type="date"
-                      value={formData.statusDate}
-                      onChange={(e) => handleChange("statusDate", e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-
               {/* Job Description */}
-              <div className="space-y-2 pt-4 border-t border-slate-200">
+              <div className="space-y-2">
                 <Label htmlFor="jobDescription" className="text-xs sm:text-sm font-medium text-slate-700">
                   Job Description <span className="text-red-500">*</span>
                 </Label>
@@ -371,10 +332,10 @@ const TrackJobForm = ({ open, onOpenChange }: TrackJobFormProps) => {
             <Button 
               type="submit" 
               className="gap-2"
-              disabled={createJobMutation.isPending}
+              disabled={updateJobMutation.isPending}
             >
               <Save className="h-4 w-4" />
-              {createJobMutation.isPending ? "Saving..." : "Save Job"}
+              {updateJobMutation.isPending ? "Updating..." : "Update Job"}
             </Button>
           </div>
         </form>
@@ -383,4 +344,4 @@ const TrackJobForm = ({ open, onOpenChange }: TrackJobFormProps) => {
   );
 };
 
-export default TrackJobForm;
+export default TrackJobFormEdit;

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import {
   MoreVertical,
-  FileText,
   Pencil,
   Trash2,
   Plus,
@@ -184,50 +183,29 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6 sm:p-8">
-      <div className="mx-auto space-y-8">
+    <div className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* Header */}
-        <div className="space-y-1">
-          <h1 className="text-lg sm:text-xl font-semibold text-foreground">My Cover Letters</h1>
-          <p className="text-xs sm:text-sm text-muted-foreground">
+        <div>
+          <h1 className="text-lg sm:text-xl font-semibold text-slate-900">Cover Letters</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
             Create, manage, and customize your professional cover letters
           </p>
         </div>
 
         {/* Loading State */}
         {isLoading && (
-          <div className="space-y-3">
-            {/* Cover Letter List Skeletons */}
-
-            <div
-              onClick={() => setIsDialogOpen(true)}
-              className="group relative cursor-pointer rounded-lg bg-white border-2 border-dashed border-slate-300 hover:border-slate-400 transition-all duration-200 p-4 flex items-center gap-4 hover:bg-slate-50/50"
-            >
-              <div className="h-10 w-10 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors flex-shrink-0">
-                <Plus className="h-5 w-5 text-slate-600" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-sm text-slate-900">
-                  Create New Cover Letter
-                </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Start writing your cover letter
-                </p>
-              </div>
-            </div>
-
-            
-            {Array.from({ length: 5 }).map((_, i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {Array.from({ length: 8 }).map((_, i) => (
               <div
                 key={i}
-                className="rounded-lg bg-white border border-slate-200 p-4 flex items-center gap-4"
+                className="rounded-2xl bg-white border border-slate-200 p-6 h-[200px] flex flex-col justify-between"
               >
-                <Skeleton className="h-10 w-10 rounded-lg flex-shrink-0" />
-                <div className="flex-1 min-w-0 space-y-2">
-                  <Skeleton className="h-4 w-48" />
-                  <Skeleton className="h-3 w-32" />
+                <Skeleton className="h-6 w-3/4" />
+                <div className="space-y-2 mt-auto">
+                  <Skeleton className="h-3 w-1/2" />
+                  <Skeleton className="h-3 w-2/3" />
                 </div>
-                <Skeleton className="h-8 w-8 rounded-md flex-shrink-0" />
               </div>
             ))}
           </div>
@@ -235,47 +213,43 @@ export default function App() {
 
         {/* Error State */}
         {isError && (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="relative rounded-2xl bg-white/80 backdrop-blur-sm border border-white/20 p-8 flex flex-col h-[280px] w-[320px] bg-gradient-to-br from-red-500/20 to-rose-500/20">
-              <div className="flex items-start justify-center mb-6">
-                <span className="text-6xl">⚠️</span>
-              </div>
-              <div className="mb-6">
-                <h3 className="font-semibold text-2xl text-slate-900 line-clamp-2 leading-tight mb-2">
-                  Unable to load cover letters
-                </h3>
-                <p className="text-slate-600 font-medium">
-                  There was an error loading your cover letters
-                </p>
-              </div>
-              <div className="mt-auto">
-                <Button
-                  onClick={() => window.location.reload()}
-                  className="w-full bg-white/90 backdrop-blur-sm border border-white/30 hover:bg-white text-slate-700 hover:text-slate-900 font-medium"
-                >
-                  Try Again
-                </Button>
-              </div>
+          <div className="min-h-[50vh] flex flex-col items-center justify-center p-6">
+            <div className="rounded-full bg-red-50 p-3 mb-4">
+              <span className="text-2xl">⚠️</span>
             </div>
+            <h3 className="text-sm font-medium text-slate-900 mb-1">Failed to load cover letters</h3>
+            <p className="text-xs text-slate-500 mb-4">There was an error loading your cover letters</p>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => window.location.reload()} 
+              className="text-slate-700 border-slate-200 hover:bg-slate-50"
+            >
+              Try again
+            </Button>
           </div>
         )}
 
         {/* Cover Letter List */}
         {!isLoading && (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {/* New Cover Letter Card */}
             <div
               onClick={() => setIsDialogOpen(true)}
-              className="group relative cursor-pointer rounded-lg bg-white border-2 border-dashed border-slate-300 hover:border-slate-400 transition-all duration-200 p-4 flex items-center gap-4 hover:bg-slate-50/50"
+              className="group relative cursor-pointer rounded-2xl bg-white border-2 border-dashed border-slate-300 hover:border-slate-400 transition-all duration-300 hover:scale-105 p-6 flex flex-col h-[200px] hover:bg-slate-50/50"
             >
-              <div className="h-10 w-10 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors flex-shrink-0">
-                <Plus className="h-5 w-5 text-slate-600" />
+              <div className="flex items-start justify-between mb-4">
+                <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
+                  <Plus className="h-6 w-6 text-slate-600" />
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-sm text-slate-900">
-                  Create New Cover Letter
+              <div className="mb-4">
+                <h3 className="font-semibold text-lg text-slate-900 line-clamp-2 leading-tight">
+                  Create New
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
+              </div>
+              <div className="mt-auto">
+                <p className="text-sm text-slate-600 font-medium">
                   Start writing your cover letter
                 </p>
               </div>
@@ -287,54 +261,62 @@ export default function App() {
                 <Link
                   key={coverLetter.id}
                   to={`/dashboard/cover-letter/${coverLetter.id}`}
-                  className="group relative rounded-lg bg-white border border-slate-200 transition-all duration-200 p-4 flex items-center gap-4 hover:border-slate-300 hover:bg-slate-50"
+                  className="group relative rounded-2xl bg-white border border-slate-200 transition-all duration-300 hover:scale-105 p-6 flex flex-col h-[200px]"
                 >
-                  <div
-                    style={{ backgroundColor: coverLetter.bgColor || "#f1f5f9" }}
-                    className="h-10 w-10 rounded-lg flex items-center justify-center border border-slate-200 flex-shrink-0"
-                  >
-                    <FileText className="h-5 w-5 text-slate-700" />
+                  <div className="flex items-start justify-between mb-4">
+                    <span className="text-4xl">📄</span>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 p-0 bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/40 text-slate-700 hover:text-slate-900 rounded-lg transition-all duration-200"
+                          aria-label="More"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent 
+                        className="w-44 p-1 border border-slate-200 bg-white/90 backdrop-blur-sm shadow-lg rounded-xl"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleRename(coverLetter);
+                          }}
+                          className="flex items-center gap-2 px-3 py-2 text-sm font-medium hover:bg-slate-50 rounded-lg cursor-pointer"
+                        >
+                          <Pencil className="h-4 w-4" />
+                          Rename
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg cursor-pointer"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleDelete(coverLetter);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-sm text-slate-900 truncate">
+
+                  <div className="mb-4">
+                    <h3 className="font-semibold text-lg text-slate-900 line-clamp-2 leading-tight">
                       {coverLetter.title}
                     </h3>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Created {new Date(coverLetter.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </div>
+
+                  <div className="mt-auto">
+                    <p className="text-sm text-slate-600 font-medium">
+                      {new Date(coverLetter.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </p>
                   </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        <MoreVertical className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-44">
-                      <DropdownMenuItem
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleRename(coverLetter);
-                        }}
-                      >
-                        <Pencil className="w-4 h-4 mr-2" /> Rename
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        className="text-destructive"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleDelete(coverLetter);
-                        }}
-                      >
-                        <Trash2 className="w-4 h-4 mr-2" /> Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
                 </Link>
               ))}
           </div>

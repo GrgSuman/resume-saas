@@ -375,7 +375,7 @@ const handleKeyPress = (e: React.KeyboardEvent) => {
                       "bg-gray-50 hover:bg-gray-100 text-gray-600 hover:text-gray-700 border-gray-200/50"
                   }`}
                 >
-                  @ {hasJobDescription ? "Edit Job" : "Add Job"}
+                  @ {hasJobDescription ? "Edit Job Description" : "Paste Job Description"}
                 </button>
                 <Button
                   size="icon"
