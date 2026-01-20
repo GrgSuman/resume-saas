@@ -60,6 +60,9 @@ const CreativeTemplate = ({
     
     const contactInfo: ContactItem[] = [];
     if (data.personalInfo.phone) contactInfo.push({ type: "text", value: data.personalInfo.phone });
+    if (data.personalInfo.address) {
+      contactInfo.push({ type: "text", value: data.personalInfo.address });
+    }
     if (data.personalInfo.email) contactInfo.push({ type: "text", value: data.personalInfo.email });
     if (data.personalInfo.website) {
       contactInfo.push({ type: "link", label: "Website", url: formatUrl(data.personalInfo.website) });
@@ -73,6 +76,7 @@ const CreativeTemplate = ({
     if (data.personalInfo.twitter) {
       contactInfo.push({ type: "link", label: "Twitter", url: formatUrl(data.personalInfo.twitter) });
     }
+
 
     return (
       <div className="text-center mb-4">
@@ -240,7 +244,7 @@ const CreativeTemplate = ({
             .sort((a, b) => a.order - b.order)
             .map((skillGroup, index) => (
               <div key={index} className="text-black">
-                <span className="font-bold">{skillGroup.categoryName}: </span>
+                <span className="font-bold">{skillGroup.categoryName ? `${skillGroup.categoryName}: ` : ""}</span>
                 <span>
                   {skillGroup.items
                     .slice()
