@@ -1,392 +1,205 @@
-import { useState } from "react";
-import { useNavigate } from "react-router";
-import {
-  ListFilter,
-  Plus,
-  LayoutList,
-  Grid3x3,
-  ExternalLink,
-} from "lucide-react";
-
-import { Button } from "../../../components/ui/button";
-import { cn } from "../../../lib/utils";
+import { useMemo, useState } from "react";
+import { Plus } from "lucide-react";
+import TrackJobForm from "./TrackJobForm";
 import {
   Tabs,
   TabsList,
   TabsTrigger,
   TabsContent,
 } from "../../../components/ui/tabs";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "../../../components/ui/dropdown-menu";
-import TrackJobForm from "./TrackJobForm";
+import { Skeleton } from "../../../components/ui/skeleton";
+import { Button } from "../../../components/ui/button";
+import type { Job } from "../types/jobs";
+import JobListCard from "./JobListCard";
+import axiosInstance from "../../../api/axios";
+import { useQuery } from "@tanstack/react-query";
 
-type Status = "applied" | "interviewing" | "rejected";
-
-type Job = {
-  id: string;
-  title: string;
-  company: string;
-  location: string;
-  status: string;
-  statusType: Status;
-  appliedAt: string;
-};
-
-const mockJobs: Job[] = [
-  {
-    id: "1",
-    title: "Software Engineer",
-    company: "Google",
-    location: "Mountain View, CA",
-    status: "applied",
-    statusType: "applied",
-    appliedAt: "2021-01-01",
-  },
-  {
-    id: "2",
-    title: "Software Engineer",
-    company: "Facebook",
-    location: "Menlo Park, CA",
-    status: "interviewing",
-    statusType: "interviewing",
-    appliedAt: "2021-01-01",
-  },
-];
-
-const statusChip: Record<Status, { bg: string; text: string }> = {
-  applied: { bg: "bg-blue-100", text: "text-blue-700" },
-  interviewing: { bg: "bg-amber-100", text: "text-amber-700" },
-  rejected: { bg: "bg-slate-100", text: "text-slate-600" },
-};
-
-const filterJobs = (status?: Status): Job[] =>
-  status ? mockJobs.filter((j) => j.statusType === status) : mockJobs;
-
-/* ------------------ VARIANT 1: COMPACT LIST ------------------ */
-
-const JobListCompact = ({ jobs }: { jobs: Job[] }) => {
-  const navigate = useNavigate();
-
-  if (jobs.length === 0) {
-    return (
-      <div className="rounded-lg border border-slate-200 bg-white px-6 py-8">
-        <div className="flex max-w-lg">
-          <div className="flex-1">
-            <p className="text-sm font-medium text-slate-900">
-              No jobs tracked yet
-            </p>
-            <p className="mt-1 text-sm text-slate-500 leading-relaxed">
-              Start tracking your job applications to create tailored resumes
-              and cover letters. You can add jobs manually or use the{" "}
-              <span className="font-medium text-slate-700">
-                Chrome Extension
-              </span>{" "}
-              to quickly capture job postings.
-            </p>
-            <div className="mt-4 flex gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => navigate("/dashboard/jobs/new")}
-                className="gap-1.5"
-              >
-                <Plus className="h-4 w-4" />
-                Add Job Manually
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => navigate("/dashboard/extension")}
-                className="gap-1.5"
-              >
-                <ExternalLink className="h-4 w-4" />
-                Get Extension
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-2">
-      {jobs.map((job) => {
-        const chipStyle = statusChip[job.statusType as Status];
-        return (
-          <button
-            key={job.id}
-            onClick={() => navigate(`/dashboard/jobs/${job.id}`)}
-            className="w-full text-left px-4 py-3 rounded-lg border border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 transition-all"
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-slate-900 truncate">
-                  {job.title}
-                </p>
-                <p className="text-xs text-slate-500 mt-0.5 truncate">
-                  {job.company} · {job.location} · {job.appliedAt}
-                </p>
-              </div>
-              <span
-                className={cn(
-                  "text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap",
-                  chipStyle.bg,
-                  chipStyle.text
-                )}
-              >
-                {job.status}
-              </span>
-            </div>
-          </button>
-        );
-      })}
-    </div>
-  );
-};
-
-/* ------------------ VARIANT 2: CARD GRID ------------------ */
-
-const JobListGrid = ({ jobs }: { jobs: Job[] }) => {
-  const navigate = useNavigate();
-
-  if (jobs.length === 0) {
-    return (
-      <div className="rounded-lg border border-slate-200 bg-white px-6 py-8">
-        <div className="flex max-w-lg">
-          <div className="flex-1">
-            <p className="text-sm font-medium text-slate-900">
-              No jobs tracked yet
-            </p>
-            <p className="mt-1 text-sm text-slate-500 leading-relaxed">
-              Start tracking your job applications to create tailored resumes
-              and cover letters. You can add jobs manually or use the{" "}
-              <span className="font-medium text-slate-700">
-                Chrome Extension
-              </span>{" "}
-              to quickly capture job postings.
-            </p>
-            <div className="mt-4 flex gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => navigate("/dashboard/jobs/new")}
-                className="gap-1.5"
-              >
-                <Plus className="h-4 w-4" />
-                Add Job Manually
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => navigate("/dashboard/extension")}
-                className="gap-1.5"
-              >
-                <ExternalLink className="h-4 w-4" />
-                Get Extension
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-      {jobs.map((job) => {
-        const chipStyle = statusChip[job.statusType as Status];
-        return (
-          <button
-            key={job.id}
-            onClick={() => navigate(`/dashboard/jobs/${job.id}`)}
-            className="text-left p-4 rounded-xl border border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm transition-all"
-          >
-            <div className="flex items-start justify-between mb-3">
-              <h3 className="text-sm font-semibold text-slate-900 line-clamp-2 flex-1">
-                {job.title}
-              </h3>
-              <span
-                className={cn(
-                  "text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap ml-2 shrink-0",
-                  chipStyle.bg,
-                  chipStyle.text
-                )}
-              >
-                {job.status}
-              </span>
-            </div>
-            <p className="text-xs text-slate-600 mb-2">{job.company}</p>
-            <div className="flex items-center gap-2 text-xs text-slate-500">
-              <span>{job.location}</span>
-              <span>·</span>
-              <span>{job.appliedAt}</span>
-            </div>
-          </button>
-        );
-      })}
-    </div>
-  );
-};
-
-/* ------------------ MAIN ------------------ */
+const TABS = [
+  { value: "All", label: "All" },
+  { value: "Saved", label: "Saved" },
+  { value: "Applied", label: "Applied" },
+  { value: "Interviewing", label: "Interviewing" },
+  { value: "Offer", label: "Offer" },
+  { value: "Archived", label: "Archived" },
+  { value: "Rejected", label: "Rejected" },
+] as const;
 
 const JobSpace = () => {
-  const [variant, setVariant] = useState<"compact" | "grid">("compact");
-  const [activeTab, setActiveTab] = useState("all");
-  const [isTrackJobOpen, setIsTrackJobOpen] = useState(false);
+  const [isTrackOpen, setIsTrackOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("All");
 
-  const counts = {
-    all: mockJobs.length,
-    applied: filterJobs("applied").length,
-    interviewing: filterJobs("interviewing").length,
-    archive: filterJobs("rejected").length,
-  };
+  const {
+    data: jobs,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["jobs"],
+    queryFn: () => axiosInstance.get("/jobs/"),
+  });
 
-  const currentCount = counts[activeTab as keyof typeof counts] || counts.all;
+  const allJobs = useMemo(() => {
+    return (jobs?.data?.jobs || []) as Job[];
+  }, [jobs]);
 
-  const renderJobList = (jobs: Job[]) => {
-    switch (variant) {
-      case "compact":
-        return <JobListCompact jobs={jobs} />;
-      case "grid":
-        return <JobListGrid jobs={jobs} />;
-    }
-  };
+  const hasNoJobs = !isLoading && !isError && allJobs.length === 0;
+
+  const filteredJobs = useMemo(() => {
+    if (!jobs || allJobs.length === 0) return [];
+    if (activeTab === "All") return allJobs;
+    return allJobs.filter((job: Job) => job.status === activeTab);
+  }, [activeTab, jobs, allJobs]);
 
   return (
-    <div className="min-h-screen bg-background px-4 sm:px-6 lg:px-8 py-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-lg sm:text-xl font-semibold text-foreground">
-              Job Space
-            </h1>
-            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-              Track jobs, tailor resumes, capture notes, and prep for
-              interviews.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {/* View Toggle */}
-            <div className="hidden sm:flex items-center gap-0.5">
-              <button
-                onClick={() => setVariant("compact")}
-                className={cn(
-                  "p-1.5 rounded-md transition-colors",
-                  variant === "compact"
-                    ? "text-slate-900 bg-slate-100"
-                    : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
-                )}
-                title="List View"
-              >
-                <LayoutList className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => setVariant("grid")}
-                className={cn(
-                  "p-1.5 rounded-md transition-colors",
-                  variant === "grid"
-                    ? "text-slate-900 bg-slate-100"
-                    : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
-                )}
-                title="Grid View"
-              >
-                <Grid3x3 className="h-4 w-4" />
-              </button>
-            </div>
-
-            <Button
-              size="sm"
-              className="hidden sm:inline-flex gap-1.5"
-              onClick={() => setIsTrackJobOpen(true)}
-            >
-              <Plus className="h-4 w-4" />
-              Track Job
-            </Button>
-          </div>
+    <div className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        <div>
+          <h1 className="text-lg sm:text-xl font-semibold text-slate-900">
+            Job Space
+          </h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+            Create, manage, and track your job applications
+          </p>
         </div>
 
-        <TrackJobForm open={isTrackJobOpen} onOpenChange={setIsTrackJobOpen} />
+        <TrackJobForm open={isTrackOpen} onOpenChange={setIsTrackOpen} />
 
-        {/* Tabs + Sort */}
         <Tabs
-          defaultValue="all"
           value={activeTab}
-          onValueChange={setActiveTab}
-          className="w-full space-y-4"
+          onValueChange={(value) => setActiveTab(value)}
+          className="space-y-5"
         >
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex-1 overflow-x-auto scrollbar-hide">
-              <TabsList className="bg-slate-100 p-1 rounded-md inline-flex w-auto">
-                {[
-                  ["all", "All"],
-                  ["applied", "Applied"],
-                  ["interviewing", "Interviewing"],
-                  ["archive", "Archive"],
-                ].map(([value, label]) => (
-                  <TabsTrigger
-                    key={value}
-                    value={value as string}
-                    className="text-sm px-3 py-1.5 whitespace-nowrap data-[state=active]:bg-white data-[state=active]:shadow-sm"
-                  >
-                    {label}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </div>
-
-            <div className="flex items-center gap-2">
-              {/* Total count */}
-              <span className="text-sm font-bold text-slate-700">
-                Total: {currentCount}
-              </span>
-
-              {/* Sort icon */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className=" bg-white p-2 text-slate-500 hover:bg-slate-50">
-                    <ListFilter className="h-4 w-4" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem>Newest first</DropdownMenuItem>
-                  <DropdownMenuItem>Oldest first</DropdownMenuItem>
-                  <DropdownMenuItem>Job title (A–Z)</DropdownMenuItem>
-                  <DropdownMenuItem>Company (A–Z)</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+          <div className="flex items-center justify-between">
+            <TabsList className="bg-slate-100 p-1 rounded-md inline-flex overflow-x-auto max-w-full">
+              {TABS.map((tab) => (
+                <TabsTrigger
+                  key={tab.value}
+                  value={tab.value}
+                  className="text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2 whitespace-nowrap data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                >
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
           </div>
 
-          <TabsContent value="all">{renderJobList(mockJobs)}</TabsContent>
-          <TabsContent value="applied">
-            {renderJobList(filterJobs("applied"))}
-          </TabsContent>
-          <TabsContent value="interviewing">
-            {renderJobList(filterJobs("interviewing"))}
-          </TabsContent>
-          <TabsContent value="archive">
-            {renderJobList(filterJobs("rejected"))}
-          </TabsContent>
-        </Tabs>
+          {TABS.map((tab) => (
+            <TabsContent
+              key={tab.value}
+              value={tab.value}
+              className="mt-0 focus-visible:ring-0"
+            >
+              <div className="min-h-[400px] space-y-3">
+                {/* Track New Job Card - Always show */}
+                {activeTab === "All" && !hasNoJobs && (
+                  <div
+                    onClick={() => setIsTrackOpen(true)}
+                    className="group flex items-center gap-4 p-4 rounded-xl border-2 border-dashed border-slate-300 bg-white hover:border-slate-400 hover:bg-slate-50/50 cursor-pointer transition-all"
+                  >
+                    <div className="flex-shrink-0">
+                      <div className="h-10 w-10 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
+                        <Plus className="h-5 w-5 text-slate-600" />
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-slate-900 text-sm group-hover:text-slate-950">
+                        Track New Job
+                      </h3>
+                      <p className="text-slate-600 text-xs mt-1">
+                        Add a new job application
+                      </p>
+                    </div>
+                  </div>
+                )}
 
-        {/* Mobile CTA */}
-        <div className="sm:hidden fixed bottom-4 inset-x-4">
-          <Button
-            className="w-full gap-2"
-            onClick={() => setIsTrackJobOpen(true)}
-          >
-            <Plus className="h-4 w-4" />
-            Track New Job
-          </Button>
-        </div>
+                {isLoading ? (
+                  <>
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="group flex items-center gap-4 p-4 rounded-xl border border-slate-200 bg-white"
+                      >
+                        <div className="flex-shrink-0">
+                          <Skeleton className="h-10 w-10 rounded-lg" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <Skeleton className="h-4 w-3/4 mb-2" />
+                          <div className="flex items-center gap-2">
+                            <Skeleton className="h-3 w-24" />
+                            <Skeleton className="h-3 w-1" />
+                            <Skeleton className="h-3 w-20" />
+                            <Skeleton className="h-3 w-1 hidden sm:block" />
+                            <Skeleton className="h-3 w-16 hidden sm:block" />
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4 flex-shrink-0">
+                          <div className="hidden sm:block">
+                            <Skeleton className="h-5 w-20" />
+                          </div>
+                          <Skeleton className="h-3 w-16" />
+                        </div>
+                      </div>
+                    ))}
+                  </>
+                ) : isError ? (
+                  <div className="min-h-[50vh] flex flex-col items-center justify-center p-6">
+                    <div className="rounded-full bg-red-50 p-3 mb-4">
+                      <span className="text-2xl">⚠️</span>
+                    </div>
+                    <h3 className="text-sm font-medium text-slate-900 mb-1">
+                      Failed to load jobs
+                    </h3>
+                    <p className="text-xs text-slate-500 mb-4">
+                      There was an error loading your job applications
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.location.reload()}
+                      className="text-slate-700 border-slate-200 hover:bg-slate-50"
+                    >
+                      Try again
+                    </Button>
+                  </div>
+                ) : hasNoJobs && activeTab === "All" ? (
+                  <div className="space-y-3">
+                    <div
+                      onClick={() => setIsTrackOpen(true)}
+                      className="group relative overflow-hidden flex items-center gap-4 p-6 rounded-xl border-2 border-dashed border-slate-300 bg-gradient-to-br from-white to-slate-50/50 hover:border-slate-400 hover:from-white hover:to-slate-100/50 cursor-pointer transition-all"
+                    >
+                      <div className="flex-shrink-0">
+                        <div className="h-12 w-12 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
+                          <Plus className="h-6 w-6 text-slate-600" />
+                        </div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-slate-900 text-base group-hover:text-slate-950 mb-1">
+                          Track your first job
+                        </h3>
+                        <p className="text-slate-600 text-sm leading-relaxed">
+                          Add a job application, tailor your resume and cover letter to match the role, then start tracking your progress.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {filteredJobs.length === 0 ? (
+                      <div className="py-20 text-center rounded-lg border border-slate-200 bg-white">
+                        <p className="text-slate-500 text-sm">
+                          No jobs found matching your filter.
+                        </p>
+                      </div>
+                    ) : (
+                      filteredJobs.map((job: Job) => (
+                        <JobListCard key={job.id} job={job} />
+                      ))
+                    )}
+                  </>
+                )}
+              </div>
+            </TabsContent>
+          ))}
+        </Tabs>
       </div>
     </div>
   );

@@ -11,9 +11,11 @@ import {
   CreditCard,
   User,
   LogOut,
-  // Briefcase,
+  Briefcase,
+  // User2,
   // Puzzle,
   MessageSquare,
+  // Book,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -27,9 +29,11 @@ import { cn } from "../../../lib/utils";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
+  // { href: "/dashboard/personas", label: "Personas", icon: User2 },
   { href: "/dashboard/resume", label: "Resumes", icon: FileText },
   { href: "/dashboard/cover-letter", label: "Cover Letters", icon: Mail },
-  // { href: "/dashboard/jobs", label: "Job Space", icon: Briefcase },
+  { href: "/dashboard/jobs", label: "Job Space", icon: Briefcase },
+  // { href: "/dashboard/learning", label: "My Learning", icon: Book },
   { href: "/dashboard/subscription", label: "Billing and Usage", icon: CreditCard },
 ];
 
@@ -449,7 +453,7 @@ const BaseDashboardLayout = () => {
       {/* CONTENT */}
       <main
         className={cn(
-          "pt-14 transition-[margin] duration-300",
+          "pt-10 transition-[margin] duration-300",
           isMobile
             ? isSidebarOpen
               ? "lg:ml-64"

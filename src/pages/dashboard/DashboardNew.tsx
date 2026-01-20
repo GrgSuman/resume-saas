@@ -31,7 +31,7 @@ const DashboardNew = () => {
       count: dashboardData?.coverLetterCount || 0,
       href: "/dashboard/cover-letter",
       icon: PenSquare,
-    },
+    }
   ];
 
   return (

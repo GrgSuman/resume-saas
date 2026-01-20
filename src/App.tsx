@@ -24,6 +24,9 @@ import SpaceDetails from "./pages/dashboard/jobs/Details/SpaceDetails";
 import Extension from "./pages/dashboard/extension/Extension";
 import MySubscription from "./pages/dashboard/subscription/MySubscription";
 import Preference from "./pages/dashboard/preferences/Preference";
+import Learning from "./pages/dashboard/learning/Learning";
+// import Personas from "./pages/dashboard/personas/Personas";
+// import PersonDetails from "./pages/dashboard/personas/PersonDetails";
 function App() {
   const queryClient = new QueryClient();
   return (
@@ -50,6 +53,9 @@ function App() {
                   <Route path="/dashboard/profile" element={<UserDetails />} />
                   <Route path="/dashboard/jobs" element={<JobSpace />} />
                   <Route path="/dashboard/jobs/:id" element={<SpaceDetails />} />
+                  {/* <Route path="/dashboard/personas" element={<Personas />} /> */}
+                  {/* <Route path="/dashboard/personas/:id" element={<PersonDetails />} /> */}
+                  <Route path="/dashboard/learning" element={<Learning />} />
                   <Route path="/dashboard/extension" element={<Extension />} />
                   <Route path="/dashboard/subscription" element={<MySubscription />} />
                 </Route>

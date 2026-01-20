@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "../../../api/axios";
 import { Button } from "../../../components/ui/button";
-import { Plus, Briefcase } from "lucide-react";
+import { Plus, Briefcase, Info } from "lucide-react";
 import { Skeleton } from "../../../components/ui/skeleton";
 import { useLocation, useNavigate, useSearchParams } from "react-router";
 import ResumeCardUI from "./ResumeCardUI";
@@ -150,14 +150,14 @@ const ResumeList = () => {
 
   return (
     <div className="min-h-screen bg-background p-6 sm:p-8">
-      <div className="mx-auto space-y-8">
+      <div className="mx-auto space-y-6">
         {/* Header */}
         <div className="space-y-1">
           <h1 className="text-lg sm:text-xl font-semibold text-foreground">
-            My Resumes
+            Resumes
           </h1>
           <p className="text-xs sm:text-sm text-muted-foreground">
-            Create, manage, and customize your professional resumes
+          Create a main resume with all your experience, then let AI tailor it for each job you apply to.
           </p>
         </div>
 
@@ -259,7 +259,7 @@ const ResumeList = () => {
                   </div>
                   <div className="mb-4">
                     <h3 className="font-semibold text-lg text-slate-900 line-clamp-2 leading-tight">
-                      Create New Resume
+                      Create New
                     </h3>
                   </div>
                   <div className="mt-auto">
@@ -320,31 +320,23 @@ const ResumeList = () => {
                   )
                 ) : (
                   <div className="col-span-full">
-                    <div className="rounded-lg border border-slate-200 bg-white px-6 py-8">
-                      <div className="flex max-w-lg">
-                        {/* Content */}
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-slate-900">
-                            Job-tailored resumes will appear here
-                          </p>
-
-                          <p className="mt-1 text-sm text-slate-500 leading-relaxed">
-                            This section shows resumes that are generated for
-                            specific jobs. You can create them from{" "}
-                            <span className="font-medium text-slate-700">
-                              Job Space
-                            </span>
-                            or directly tailor a resume using the browser
-                            extension.
-                          </p>
-
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <div className="flex gap-3">
+                        <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <div className="space-y-3">
+                          <div className="text-sm text-gray-700 leading-relaxed">
+                            <strong className="text-gray-900">Tailored resumes</strong> are automatically generated for specific jobs. 
+                            Create them from <strong className="text-gray-900">Job Space</strong> when you track a job application, 
+                            or use the browser extension to tailor a resume directly from any job posting.
+                          </div>
+                          
                           {/* Action */}
-                          <div className="mt-4">
+                          <div>
                             <Button
                               size="sm"
                               variant="outline"
                               onClick={() => navigate("/dashboard/jobs")}
-                              className="gap-1.5"
+                              className="gap-1.5 bg-white hover:bg-white/80"
                             >
                               <Briefcase className="h-4 w-4" />
                               Go to Job Space
