@@ -1,6 +1,14 @@
 import React from "react";
 import { useState, useEffect, useRef, memo } from "react";
-import {ArrowUp,FileText,Target,PenTool,Star,Loader2,Sparkles} from "lucide-react";
+import {
+  ArrowUp,
+  FileText,
+  Target,
+  PenTool,
+  Star,
+  Loader2,
+  Sparkles,
+} from "lucide-react";
 import { ScrollArea } from "../../../../components/ui/scroll-area";
 import { Button } from "../../../../components/ui/button";
 import { useResume } from "../../../../hooks/useResume";
@@ -11,9 +19,11 @@ import { toast } from "react-toastify";
 import ReactMarkdown from "react-markdown";
 import "./MarkdownStyle.css";
 import Analyzer from "./features/Analyzer";
+import { fetchEventSource } from "@microsoft/fetch-event-source";
+import { manageLocalStorage } from "../../../../lib/localstorage";
 
 interface MessageItem {
-  role: "model" | "user";
+  role: "assistant" | "user";
   text: string;
 }
 
@@ -25,7 +35,7 @@ const Message = memo(({ msg }: { msg: MessageItem }) => (
   >
     <div
       className={`rounded-xl text-sm ${
-        msg.role === "model"
+        msg.role === "assistant"
           ? "text-gray-800 p-2 lg:p-3"
           : "bg-secondary p-2 px-3 lg:p-3 lg:px-4"
       }`}
@@ -45,6 +55,8 @@ const Chat = () => {
   const [showJobDescDialog, setShowJobDescDialog] = useState(false);
   const [chatLoading, setChatLoading] = useState(true);
   const [msgSending, setMsgSending] = useState(false);
+  const [streamStarted, setStreamStarted] = useState(false);
+  const [toolMessage, setToolMessage] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -67,12 +79,12 @@ const Chat = () => {
   const { id } = useParams<{ id: string }>();
   const hasJobDescription = state.jobDescription?.trim().length > 0;
 
-// Get conversation history
-useEffect(() => {
+  // Get conversation history
+  useEffect(() => {
     const getConversation = async () => {
       try {
         const response = await axiosInstance.get(`/resume/${id}/conversation`);
-        const msgHistory = response.data.conversation.map(
+        const msgHistory = response.data.conversation?.map(
           (message: { role: string; text: string }) => ({
             role: message.role as "model" | "user",
             text: message.text,
@@ -95,8 +107,8 @@ useEffect(() => {
     if (id) getConversation();
   }, [id]);
 
-// Handle Send Message
-const handleSend = async () => {
+  // Handle Send Message
+  const handleSend = async () => {
     if (!message.trim()) return;
 
     setMessages((prev) => [...prev, { role: "user", text: message }]);
@@ -106,38 +118,126 @@ const handleSend = async () => {
       textareaRef.current.style.height = isXL ? "48px" : "42px";
     }
     setMsgSending(true);
+    setStreamStarted(false);
+    setToolMessage(null);
+    const baseURL = axiosInstance.defaults.baseURL || "";
+    const url = `${baseURL}/resume/${id}/stream-agent-response`;
+
+    const token = manageLocalStorage.get("token");
 
     try {
-      const response = await axiosInstance.post(`/resume/${id}/conversation`, {
-        userPrompt: message,
-        resumeId: id,
-        jobDescription: state.jobDescription || "",
-        resumeData: state.resumeData,
-        resumeSectionSettings: state.resumeSettings?.sections,
-        messages: messages,
+      await fetchEventSource(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          resumeData: state.resumeData,
+          resumeSectionSettings: state.resumeSettings?.sections,
+          jobDescription: state.jobDescription || "No job description provided",
+          messages: messages,
+          userPrompt: message,
+        }),
+
+        onmessage(ev) {
+          if (ev.event === "content") {
+            const chunk = JSON.parse(ev.data) as string;
+            if (!chunk) return;
+            if (!streamStarted) setStreamStarted(true);
+            setToolMessage(null);
+
+            setMessages((prev) => {
+              if (
+                prev.length === 0 ||
+                prev[prev.length - 1].role !== "assistant"
+              ) {
+                return [...prev, { role: "assistant", text: chunk }];
+              }
+
+              const last = prev[prev.length - 1];
+              const updatedLast = { ...last, text: last.text + chunk };
+              return [...prev.slice(0, -1), updatedLast];
+            });
+          }
+          if (ev.event === "tool_calls") {
+            setToolMessage("Updating resume...");
+          }
+          if (ev.event === "tool_result") {
+            try {
+              let parsed = JSON.parse(ev.data);
+              // If it's still a string, parse again (double-encoded JSON)
+              if (typeof parsed === "string") {
+                parsed = JSON.parse(parsed);
+              }
+
+              if (parsed?.section && parsed?.data) {
+                if (parsed.section === "sectionSettings" && parsed.data) {
+                  dispatch({
+                    type: "UPDATE_RESUME_SETTINGS",
+                    payload: { sections: parsed.data },
+                  });
+                } else {
+                  dispatch({
+                    type: "UPDATE_RESUME_DATA",
+                    payload: { [parsed.section]: parsed.data },
+                  });
+                }
+              }
+            } catch (error) {
+              console.error("Error parsing tool_result:", error);
+            }
+          }
+        },
+
+        // Handle non-200 responses (like 429, 400, etc.)
+        async onopen(response) {
+          if (
+            response.ok &&
+            response.headers.get("content-type")?.includes("text/event-stream")
+          ) {
+            // SSE connection established successfully
+            return;
+          }
+
+          // Response is not SSE - likely an error JSON response
+          if (response.status === 429 || response.status === 400) {
+            const errorData = await response.json();
+
+            if (errorData?.message?.includes("Monthly limit reached")) {
+              toast.error(errorData.message, {
+                position: "top-right",
+              });
+            } else {
+              toast.error(
+                errorData?.message || "Something went wrong. Please try again.",
+                {
+                  position: "top-right",
+                }
+              );
+            }
+            throw new Error("Non-SSE response received");
+          } else if (!response.ok) {
+            // Other non-OK responses
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+        },
+
+        onerror(err) {
+          console.error("SSE error", err);
+          throw new Error("SSE error");
+        },
+        onclose() {
+          setMsgSending(false);
+          setStreamStarted(false);
+          setToolMessage(null);
+        },
+        openWhenHidden: false,
       });
-
-      // Add LLM message to chat
-      setMessages((prev) => [
-        ...prev,
-        { role: "model", text: response.data.response.message },
-      ]);
-
-      // Apply resume data changes if shouldApplyChanges is true
-      if (response.data?.response?.shouldApplyChanges) {
-        if(response.data?.response?.data) {
-          const payload = response.data.response.data;
-          dispatch({ type: "UPDATE_RESUME_DATA", payload: payload });
-        }
-        if(response.data?.response?.resumeSectionSettings) {
-          const payload = { sections: response.data.response.resumeSectionSettings };
-          dispatch({ type: "UPDATE_RESUME_SETTINGS", payload: payload });
-        }
-      }
     } catch (error) {
-
+      console.error("Error sending message:", error);
       if (axios.isAxiosError(error)) {
-        if(error?.response?.data?.message.includes("Monthly limit reached")){
+        if (error?.response?.data?.message.includes("Monthly limit reached")) {
           toast.error(error?.response?.data?.message, {
             position: "top-right",
           });
@@ -149,11 +249,56 @@ const handleSend = async () => {
       }
     } finally {
       setMsgSending(false);
+      setStreamStarted(false);
+      setToolMessage(null);
     }
+
+    // try {
+    //   const response = await axiosInstance.post(`/resume/${id}/stream-agent-response`, {
+    //     userPrompt: message,
+    //     resumeId: id,
+    //     jobDescription: state.jobDescription || "",
+    //     resumeData: state.resumeData,
+    //     resumeSectionSettings: state.resumeSettings?.sections,
+    //   });
+
+    //   // Add LLM message to chat
+    //   setMessages((prev) => [
+    //     ...prev,
+    //     { role: "model", text: response.data.response.message },
+    //   ]);
+
+    //   // Apply resume data changes if shouldApplyChanges is true
+    //   if (response.data?.response?.shouldApplyChanges) {
+    //     if(response.data?.response?.data) {
+    //       const payload = response.data.response.data;
+    //       dispatch({ type: "UPDATE_RESUME_DATA", payload: payload });
+    //     }
+    //     if(response.data?.response?.resumeSectionSettings) {
+    //       const payload = { sections: response.data.response.resumeSectionSettings };
+    //       dispatch({ type: "UPDATE_RESUME_SETTINGS", payload: payload });
+    //     }
+    //   }
+    // } catch (error) {
+
+    //   if (axios.isAxiosError(error)) {
+    //     if(error?.response?.data?.message.includes("Monthly limit reached")){
+    //       toast.error(error?.response?.data?.message, {
+    //         position: "top-right",
+    //       });
+    //     } else {
+    //       toast.error("Something went wrong. Please try again.", {
+    //         position: "top-right",
+    //       });
+    //     }
+    //   }
+    // } finally {
+    //   setMsgSending(false);
+    // }
   };
 
-// Handle Key Press enter to send message
-const handleKeyPress = (e: React.KeyboardEvent) => {
+  // Handle Key Press enter to send message
+  const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey && !msgSending) {
       e.preventDefault();
       handleSend();
@@ -161,11 +306,10 @@ const handleKeyPress = (e: React.KeyboardEvent) => {
   };
 
   // Handle Analyze Resume - opens dialog
- const handleAnalyzeResume = () => {
+  const handleAnalyzeResume = () => {
     if (msgSending) return;
     setShowAnalyzerDialog(true);
   };
-
 
   return (
     <>
@@ -299,14 +443,32 @@ const handleKeyPress = (e: React.KeyboardEvent) => {
                     {messages.map((msg, idx) => (
                       <Message key={idx} msg={msg} />
                     ))}
-                    {msgSending && (
-                      <div className="flex justify-start mb-2 lg:mb-4 animate-fade-in">
-                        <div className="rounded-xl px-4 py-2 text-gray-700 transition-all">
-                          <div className="flex items-center gap-1">
-                            <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                            <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                            <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                          </div>
+                    {msgSending && !streamStarted && (
+                      <div className="flex justify-start mb-2 lg:mb-4">
+                        <div className="rounded-xl text-gray-800 p-2 lg:p-3">
+                          {toolMessage ? (
+                            <div className="flex items-center gap-2">
+                              <Loader2 className="w-4 h-4 animate-spin text-gray-500" />
+                              <span className="text-sm text-gray-600">
+                                {toolMessage}
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-1.5">
+                              <span
+                                className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce"
+                                style={{ animationDelay: "0ms" }}
+                              />
+                              <span
+                                className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce"
+                                style={{ animationDelay: "150ms" }}
+                              />
+                              <span
+                                className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce"
+                                style={{ animationDelay: "300ms" }}
+                              />
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}
@@ -370,18 +532,27 @@ const handleKeyPress = (e: React.KeyboardEvent) => {
                 <button
                   onClick={() => setShowJobDescDialog(true)}
                   disabled={msgSending}
-                  title={hasJobDescription ? "Response will be tailored to job" : "Add Job Description for tailored results"}
-                  className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors border disabled:opacity-50 disabled:cursor-not-allowed ${
-                      "bg-gray-50 hover:bg-gray-100 text-gray-600 hover:text-gray-700 border-gray-200/50"
-                  }`}
+                  title={
+                    hasJobDescription
+                      ? "Response will be tailored to job"
+                      : "Add Job Description for tailored results"
+                  }
+                  className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors border disabled:opacity-50 disabled:cursor-not-allowed ${"bg-gray-50 hover:bg-gray-100 text-gray-600 hover:text-gray-700 border-gray-200/50"}`}
                 >
-                  @ {hasJobDescription ? "Edit Job Description" : "Paste Job Description"}
+                  @{" "}
+                  {hasJobDescription
+                    ? "Edit Job Description"
+                    : "Paste Job Description"}
                 </button>
                 <Button
                   size="icon"
                   onClick={handleSend}
                   disabled={!message.trim() || msgSending}
-                  className={`rounded-full ${hasJobDescription ? 'bg-black hover:bg-gray-900 text-white' : ''}`}
+                  className={`rounded-full ${
+                    hasJobDescription
+                      ? "bg-black hover:bg-gray-900 text-white"
+                      : ""
+                  }`}
                 >
                   {msgSending ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
