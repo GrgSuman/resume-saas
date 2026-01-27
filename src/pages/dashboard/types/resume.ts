@@ -1,5 +1,9 @@
 import { ResumeSectionKey } from "./constants"
 import type { ResumeAnalysis } from "./resumeAnalysis"
+import type { Message } from "../resume/resume-detail/chats/MarkdownMessage"
+
+// Generation status for tailored resumes
+export type GenerationStatus = "IDLE" | "GENERATING" | "COMPLETED"
 
 // Main Resume Data Type
 export type ResumeMetaData = {
@@ -13,6 +17,9 @@ export type ResumeMetaData = {
     jobDescription:string
     resumeTitle:string
     isResumeInitialized:boolean
+    messages:Message[],
+    jobId?:string,
+    isTailoredResume:boolean
 }
 
 // Resume Settings Type

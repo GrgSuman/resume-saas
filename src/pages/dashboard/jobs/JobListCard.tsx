@@ -1,92 +1,136 @@
-import { cn, formatRelativeTime } from '../../../lib/utils';
+import { formatRelativeTime } from '../../../lib/utils';
 import type { Job } from '../types/jobs';
-import { ArrowUpRight, Briefcase } from 'lucide-react';
-import { Link } from 'react-router';
-
+import { MoreVertical, ExternalLink } from 'lucide-react';
+import { useNavigate } from 'react-router';
+import { Button } from '../../../components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../components/ui/dropdown-menu';
+import { useState } from 'react';
 
 const getFaviconUrl = (companyUrl?: string): string | null => {
-    if (!companyUrl) return null;
-    const cleanDomain = companyUrl
-      .replace(/^https?:\/\//, "")
-      .replace(/^www\./, "")
-      .split("/")[0];
-    return `https://www.google.com/s2/favicons?domain=${cleanDomain}&sz=128`;
+  if (!companyUrl) return null;
+  const cleanDomain = companyUrl
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .split("/")[0];
+  return `https://www.google.com/s2/favicons?domain=${cleanDomain}&sz=128`;
 };
 
-const StatusDot = ({ status }: { status: string }) => {
-    const styles: Record<string, { dot: string; text: string }> = {
-      Saved: { dot: "bg-slate-300", text: "text-slate-600" },
-      Applied: { dot: "bg-blue-500", text: "text-blue-700" },
-      Interviewing: { dot: "bg-amber-500", text: "text-amber-700" },
-      Offer: { dot: "bg-green-500", text: "text-green-700" },
-      Rejected: { dot: "bg-slate-200", text: "text-slate-400" },
-      Archived: { dot: "bg-slate-200", text: "text-slate-400" },
-    };
-  
-    const style = styles[status] || styles.Saved;
-    const isRejected = status === "Rejected";
-  
-    return (
-      <div
-        className={cn(
-          "flex items-center gap-2 text-xs font-medium",
-          style.text,
-          isRejected && "line-through"
-        )}
-      >
-        <div className={cn("h-2 w-2 rounded-full", style.dot)} />
-        {status}
-      </div>
-    );
+const getStatusColor = (status: string): string => {
+  const colors: Record<string, string> = {
+    Saved: "#f1f5f9",      // slate-100
+    Applied: "#dbeafe",     // blue-100
+    Interviewing: "#fef3c7", // amber-100
+    Offer: "#dcfce7",       // green-100
+    Rejected: "#f1f5f9",    // slate-100
+    Archived: "#f1f5f9",    // slate-100
+  };
+  return colors[status] || colors.Saved;
+};
+
+const getStatusEmoji = (status: string): string => {
+  const emojis: Record<string, string> = {
+    Saved: "📌",
+    Applied: "✉️",
+    Interviewing: "💬",
+    Offer: "🎉",
+    Rejected: "❌",
+    Archived: "📦",
+  };
+  return emojis[status] || "📌";
+};
+
+const getStatusBadgeColor = (status: string): string => {
+  const colors: Record<string, string> = {
+    Saved: "bg-slate-100 text-slate-700",
+    Applied: "bg-blue-100 text-blue-700",
+    Interviewing: "bg-amber-100 text-amber-700",
+    Offer: "bg-green-100 text-green-700",
+    Rejected: "bg-red-100 text-red-700",
+    Archived: "bg-slate-100 text-slate-700",
+  };
+  return colors[status] || colors.Saved;
 };
 
 const JobListCard = ({ job }: { job: Job }) => {
+  const navigate = useNavigate();
+  const bgColor = getStatusColor(job.status);
+  const emoji = getStatusEmoji(job.status);
   const faviconUrl = getFaviconUrl(job.companyUrl);
+  const [faviconError, setFaviconError] = useState(false);
+
+  const handleCardClick = () => {
+    navigate(`/dashboard/jobs/${job.id}`);
+  };
+
   return (
-    <Link to={`/dashboard/jobs/${job.id}`} className="group flex items-center gap-4 p-4 my-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 cursor-pointer transition-all">
-    <div className="flex-shrink-0">
-      {faviconUrl ? (
-        <img
-          src={faviconUrl}
-          alt={job.companyName}
-          className="h-10 w-10 rounded-lg object-cover"
-          onError={(e) => {
-            e.currentTarget.style.display = "none";
-          }}
-        />
-      ) : (
-        <div className="h-10 w-10 rounded-lg bg-slate-100 flex items-center justify-center">
-          <Briefcase className="h-5 w-5 text-slate-700" />
+    <div 
+      className="group relative cursor-pointer rounded-2xl backdrop-blur-sm border transition-all duration-300 hover:scale-105 p-6 flex flex-col h-[200px]"
+      style={{ backgroundColor: bgColor }}
+      onClick={handleCardClick}
+    >
+      <div className="flex items-start justify-between mb-4">
+        {faviconUrl && !faviconError ? (
+          <img
+            src={faviconUrl}
+            alt={job.companyName}
+            className="h-10 w-10 rounded-lg object-cover"
+            onError={() => setFaviconError(true)}
+          />
+        ) : (
+          <span className="text-4xl">{emoji}</span>
+        )}
+        
+        {/* Dropdown Menu */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 p-0 bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/40 text-slate-700 hover:text-slate-900 rounded-lg transition-all duration-200"
+              aria-label="More"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent 
+            className="w-44 p-1 border border-slate-200 bg-white/90 backdrop-blur-sm shadow-lg rounded-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/dashboard/jobs/${job.id}`);
+              }}
+              className="flex items-center gap-2 px-3 py-2 text-sm font-medium hover:bg-slate-50 rounded-lg cursor-pointer"
+            >
+              <ExternalLink className="h-4 w-4" />
+              View Details
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      {/* Title */}
+      <div className="flex-1 flex flex-col">
+        <div className="mb-4">
+          <h3 className="font-semibold text-lg text-slate-900 line-clamp-2 leading-tight">
+            {job.title}
+          </h3>
         </div>
-      )}
-    </div>
 
-    <div className="flex-1 min-w-0">
-      <h3 className="font-semibold text-slate-900 text-sm group-hover:text-slate-950 truncate">
-        {job.title}
-      </h3>
-      <div className="flex items-center gap-2 mt-1">
-        <p className="text-slate-600 text-xs truncate">{job.companyName}</p>
-        <span className="text-slate-400">•</span>
-        <p className="text-slate-500 text-xs truncate">{job.location}</p>
-        <span className="text-slate-400 hidden sm:inline">•</span>
-        <p className="text-slate-500 text-xs hidden sm:inline">
-          {job.jobType}
-        </p>
+        {/* Date Info and Status */}
+        <div className="mt-auto flex items-center justify-between gap-2">
+          <p className="text-sm text-slate-600 font-medium">
+            {formatRelativeTime(job.createdAt)}
+          </p>
+          <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(job.status)}`}>
+            {job.status}
+          </span>
+        </div>
       </div>
     </div>
-
-    <div className="flex items-center gap-4 flex-shrink-0">
-      <div className="hidden sm:block">
-        <StatusDot status={job.status} />
-      </div>
-      <span className="text-xs text-slate-500 font-medium">
-        {formatRelativeTime(job.createdAt)}
-      </span>
-      <ArrowUpRight className="h-4 w-4 text-slate-400 group-hover:text-slate-600 transition-colors opacity-0 group-hover:opacity-100" />
-    </div>
-  </Link>
-  )
-}
+  );
+};
 
 export default JobListCard

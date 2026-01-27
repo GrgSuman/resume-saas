@@ -3,8 +3,11 @@ import type { ResumeMetaData } from "./resume";
 
 export const defaultResumeData: ResumeMetaData = {
     isResumeInitialized: false,
+    messages: [],
+    isTailoredResume: false,
     resumeTitle: "Alex Chen's Resume",
     jobDescription: "Full Stack MERN Developer",
+    jobId: "",
     resumeError: null,
     resumeLoading: false,
     resumeDownloading: false,

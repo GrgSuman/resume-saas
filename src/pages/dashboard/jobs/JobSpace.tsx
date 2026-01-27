@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 import { Plus } from "lucide-react";
-import TrackJobForm from "./TrackJobForm";
 import {
   Tabs,
   TabsList,
@@ -13,6 +12,7 @@ import type { Job } from "../types/jobs";
 import JobListCard from "./JobListCard";
 import axiosInstance from "../../../api/axios";
 import { useQuery } from "@tanstack/react-query";
+import StartApplication from "./components/StartApplication";
 
 const TABS = [
   { value: "All", label: "All" },
@@ -54,27 +54,27 @@ const JobSpace = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         <div>
           <h1 className="text-lg sm:text-xl font-semibold text-slate-900">
-            Job Space
+            Tailored Applications
           </h1>
           <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-            Create, manage, and track your job applications
+          Tailor resumes and cover letters for any job and track your applications
           </p>
         </div>
 
-        <TrackJobForm open={isTrackOpen} onOpenChange={setIsTrackOpen} />
+        <StartApplication open={isTrackOpen} onOpenChange={setIsTrackOpen}/>
 
         <Tabs
           value={activeTab}
           onValueChange={(value) => setActiveTab(value)}
           className="space-y-5"
         >
-          <div className="flex items-center justify-between">
-            <TabsList className="bg-slate-100 p-1 rounded-md inline-flex overflow-x-auto max-w-full">
+          <div className="w-full overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
+            <TabsList className="bg-slate-100 p-1 rounded-md inline-flex">
               {TABS.map((tab) => (
                 <TabsTrigger
                   key={tab.value}
                   value={tab.value}
-                  className="text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2 whitespace-nowrap data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                  className="text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 whitespace-nowrap data-[state=active]:bg-white data-[state=active]:shadow-sm flex-shrink-0"
                 >
                   {tab.label}
                 </TabsTrigger>
@@ -88,58 +88,23 @@ const JobSpace = () => {
               value={tab.value}
               className="mt-0 focus-visible:ring-0"
             >
-              <div className="min-h-[400px] space-y-3">
-                {/* Track New Job Card - Always show */}
-                {activeTab === "All" && !hasNoJobs && (
-                  <div
-                    onClick={() => setIsTrackOpen(true)}
-                    className="group flex items-center gap-4 p-4 rounded-xl border-2 border-dashed border-slate-300 bg-white hover:border-slate-400 hover:bg-slate-50/50 cursor-pointer transition-all"
-                  >
-                    <div className="flex-shrink-0">
-                      <div className="h-10 w-10 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
-                        <Plus className="h-5 w-5 text-slate-600" />
-                      </div>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-slate-900 text-sm group-hover:text-slate-950">
-                        Track New Job
-                      </h3>
-                      <p className="text-slate-600 text-xs mt-1">
-                        Add a new job application
-                      </p>
-                    </div>
-                  </div>
-                )}
-
+              <div className="min-h-[400px]">
                 {isLoading ? (
-                  <>
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {Array.from({ length: 6 }).map((_, i) => (
                       <div
                         key={i}
-                        className="group flex items-center gap-4 p-4 rounded-xl border border-slate-200 bg-white"
+                        className="rounded-2xl border p-6 h-[200px] bg-white"
                       >
-                        <div className="flex-shrink-0">
-                          <Skeleton className="h-10 w-10 rounded-lg" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <Skeleton className="h-4 w-3/4 mb-2" />
-                          <div className="flex items-center gap-2">
-                            <Skeleton className="h-3 w-24" />
-                            <Skeleton className="h-3 w-1" />
-                            <Skeleton className="h-3 w-20" />
-                            <Skeleton className="h-3 w-1 hidden sm:block" />
-                            <Skeleton className="h-3 w-16 hidden sm:block" />
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4 flex-shrink-0">
-                          <div className="hidden sm:block">
-                            <Skeleton className="h-5 w-20" />
-                          </div>
-                          <Skeleton className="h-3 w-16" />
+                        <Skeleton className="h-10 w-10 rounded-lg mb-4" />
+                        <Skeleton className="h-5 w-3/4 mb-2" />
+                        <Skeleton className="h-4 w-1/2 mb-4" />
+                        <div className="mt-auto">
+                          <Skeleton className="h-4 w-24" />
                         </div>
                       </div>
                     ))}
-                  </>
+                  </div>
                 ) : isError ? (
                   <div className="min-h-[50vh] flex flex-col items-center justify-center p-6">
                     <div className="rounded-full bg-red-50 p-3 mb-4">
@@ -161,22 +126,26 @@ const JobSpace = () => {
                     </Button>
                   </div>
                 ) : hasNoJobs && activeTab === "All" ? (
-                  <div className="space-y-3">
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     <div
                       onClick={() => setIsTrackOpen(true)}
-                      className="group relative overflow-hidden flex items-center gap-4 p-6 rounded-xl border-2 border-dashed border-slate-300 bg-gradient-to-br from-white to-slate-50/50 hover:border-slate-400 hover:from-white hover:to-slate-100/50 cursor-pointer transition-all"
+                      className="group relative cursor-pointer rounded-2xl bg-white border-2 border-dashed border-slate-300 hover:border-slate-400 transition-all duration-300 hover:scale-105 p-6 flex flex-col h-[200px] hover:bg-slate-50/50"
                     >
-                      <div className="flex-shrink-0">
-                        <div className="h-12 w-12 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
                           <Plus className="h-6 w-6 text-slate-600" />
                         </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-slate-900 text-base group-hover:text-slate-950 mb-1">
-                          Track your first job
+                      
+                      <div className="mb-4">
+                        <h3 className="font-semibold text-lg text-slate-900 line-clamp-2 leading-tight">
+                          Create New
                         </h3>
-                        <p className="text-slate-600 text-sm leading-relaxed">
-                          Add a job application, tailor your resume and cover letter to match the role, then start tracking your progress.
+                      </div>
+                      
+                      <div className="mt-auto">
+                        <p className="text-sm text-slate-600 font-medium">
+                          Create tailored application
                         </p>
                       </div>
                     </div>
@@ -190,9 +159,38 @@ const JobSpace = () => {
                         </p>
                       </div>
                     ) : (
-                      filteredJobs.map((job: Job) => (
-                        <JobListCard key={job.id} job={job} />
-                      ))
+                      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        {/* New Application Card - Always First in "All" Tab */}
+                        {activeTab === "All" && (
+                          <div
+                            onClick={() => setIsTrackOpen(true)}
+                            className="group relative cursor-pointer rounded-2xl bg-white border-2 border-dashed border-slate-300 hover:border-slate-400 transition-all duration-300 hover:scale-105 p-6 flex flex-col h-[200px] hover:bg-slate-50/50"
+                          >
+                            <div className="flex items-start justify-between mb-4">
+                              <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
+                                <Plus className="h-6 w-6 text-slate-600" />
+                              </div>
+                            </div>
+                            
+                            <div className="mb-4">
+                              <h3 className="font-semibold text-lg text-slate-900 line-clamp-2 leading-tight">
+                                Create New
+                              </h3>
+                            </div>
+                            
+                            <div className="mt-auto">
+                              <p className="text-sm text-slate-600 font-medium">
+                                Create tailored application
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Job Cards */}
+                        {filteredJobs.map((job: Job) => (
+                          <JobListCard key={job.id} job={job} />
+                        ))}
+                      </div>
                     )}
                   </>
                 )}

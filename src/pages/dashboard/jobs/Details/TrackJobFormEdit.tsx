@@ -167,8 +167,8 @@ const TrackJobFormEdit = ({ open, onOpenChange, job }: TrackJobFormEditProps) =>
       title: formData.jobTitle,
       companyName: formData.company,
       location: formData.location,
-      jobUrl: formData.jobUrl || null,
-      companyUrl: formData.companyUrl || null,
+      jobUrl: formData.jobUrl,
+      companyUrl: formData.companyUrl,
       jobType: formData.jobType,
       jobDescription: formData.jobDescription,
     };
