@@ -11,10 +11,10 @@ import SuccessPage from "./pages/dashboard/pricing/SuccessPage";
 import Home from "./pages/home/Home";
 import { ToastContainer } from "react-toastify";
 import DashboardNew from "./pages/dashboard/DashboardNew";
-import ResumeList from "./pages/dashboard/resume/ResumeList";
+import ResumeList from "./pages/dashboard/resume/ResumeListPage";
 import BaseDashboardLayout from "./pages/dashboard/components/BaseDashboardLayout";
-import ResumeDetail from "./pages/dashboard/resume/resume-detail/ResumeDetail";
-import { ResumeProvider } from "./pages/dashboard/context/ResumeContext";
+import ResumeDetail from "./pages/dashboard/resume/resume-detail/ResumeDetailPage";
+import { ResumeProvider } from "./pages/dashboard/resume/context/ResumeContext";
 // import NotificationBannar from "./components/layouts/NotificationBannar";
 import CoverLetterList from "./pages/dashboard/cover-letter/CoverLetterList";
 import Pricing from "./pages/dashboard/pricing/Pricing";
@@ -25,8 +25,8 @@ import Extension from "./pages/dashboard/extension/Extension";
 import MySubscription from "./pages/dashboard/subscription/MySubscription";
 import Preference from "./pages/dashboard/preferences/Preference";
 import Learning from "./pages/dashboard/learning/Learning";
-// import Personas from "./pages/dashboard/personas/Personas";
-// import PersonDetails from "./pages/dashboard/personas/PersonDetails";
+import ResumeAnalyzer from "./pages/dashboard/analyzer/ResumeAnalyzer";
+
 function App() {
   const queryClient = new QueryClient();
   return (
@@ -53,11 +53,10 @@ function App() {
                   <Route path="/dashboard/profile" element={<UserDetails />} />
                   <Route path="/dashboard/jobs" element={<JobSpace />} />
                   <Route path="/dashboard/jobs/:id" element={<SpaceDetails />} />
-                  {/* <Route path="/dashboard/personas" element={<Personas />} /> */}
-                  {/* <Route path="/dashboard/personas/:id" element={<PersonDetails />} /> */}
                   <Route path="/dashboard/learning" element={<Learning />} />
                   <Route path="/dashboard/extension" element={<Extension />} />
                   <Route path="/dashboard/subscription" element={<MySubscription />} />
+                  <Route path="/dashboard/analyzer" element={<ResumeAnalyzer />} />
                 </Route>
                 <Route path="/dashboard/resume/:id" element={
                   <ResumeProvider>

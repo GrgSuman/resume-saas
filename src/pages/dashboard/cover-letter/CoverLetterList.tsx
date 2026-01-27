@@ -21,12 +21,14 @@ import axiosInstance from "../../../api/axios";
 import { toast } from "react-toastify";
 import { Skeleton } from "../../../components/ui/skeleton";
 import { AxiosError } from "axios";
+import type { QuestionWithAnswer } from "../jobs/components/Quiz";
 
 interface CoverLetter {
   id: number;
   title: string;
   createdAt: string;
   bgColor?: string;
+  isTailoredCoverLetter: boolean;
 }
 
 export default function App() {
@@ -41,7 +43,7 @@ export default function App() {
     queryFn: () => axiosInstance.get("/cover-letter/user"),
   });
 
-  const coverLetters = coverLetterData?.data?.coverLetters || [];
+  const coverLetters = coverLetterData?.data?.coverLetters.filter((coverLetter: CoverLetter) => coverLetter.isTailoredCoverLetter === false) || [];
   
   // Sort by date (newest first)
   const sortedCoverLetters = [...coverLetters].sort((a: CoverLetter, b: CoverLetter) => 
@@ -110,45 +112,15 @@ export default function App() {
   const createCoverLetterMutation = useMutation({
     mutationFn: async (data: {
       name: string;
-      resumeId: string;
       jobDescription: string;
-      resumeFile?: File;
-      personalization?: {
-        excitement: string;
-        achievement: string;
-        tone: string;
-      };
+      resumeData: string;
+      questionsWithAnswers: QuestionWithAnswer[];
     }) => {
-      // Create FormData for file upload
-      const formData = new FormData();
-      formData.append("name", data.name);
-      formData.append("resumeId", data.resumeId);
-      formData.append("jobDescription", data.jobDescription);
-      
-      // Append file if it exists
-      if (data.resumeFile) {
-        formData.append("resumeFile", data.resumeFile);
-      }
-      
-      // Append personalization data as JSON string
-      if (data.personalization) {
-        formData.append("personalization", JSON.stringify({
-          excitement: data.personalization.excitement || "",
-          achievement: data.personalization.achievement || "",
-          tone: data.personalization.tone || "",
-        }));
-      }
-
-      const response = await axiosInstance.post("/cover-letter", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axiosInstance.post("/cover-letter", data);
       return response.data;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["cover-letter"] });
-
       setIsDialogOpen(false);
       navigate(`/dashboard/cover-letter/${data.coverLetter.id}`);
     },

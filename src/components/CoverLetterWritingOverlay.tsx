@@ -1,6 +1,6 @@
 import { RefreshCw } from "lucide-react";
 
-const CoverLetterWritingLoader = () => {
+const CoverLetterWritingOverlay = () => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
       <div className="flex flex-col items-center gap-4 rounded-lg border border-border bg-card p-8 shadow-lg">
@@ -18,4 +18,6 @@ const CoverLetterWritingLoader = () => {
   );
 };
 
-export default CoverLetterWritingLoader;
+export default CoverLetterWritingOverlay;
+
+

@@ -11,11 +11,12 @@ import {
   CreditCard,
   User,
   LogOut,
-  Briefcase,
+  Sparkles,
   // User2,
   // Puzzle,
   MessageSquare,
   // Book,
+  // ScanEye,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -29,10 +30,10 @@ import { cn } from "../../../lib/utils";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
-  // { href: "/dashboard/personas", label: "Personas", icon: User2 },
+  { href: "/dashboard/jobs", label: "Tailored Applications", icon: Sparkles },
   { href: "/dashboard/resume", label: "Resumes", icon: FileText },
   { href: "/dashboard/cover-letter", label: "Cover Letters", icon: Mail },
-  { href: "/dashboard/jobs", label: "Job Space", icon: Briefcase },
+  // { href: "/dashboard/analyzer", label: "ATS Resume Checker", icon: ScanEye  },
   // { href: "/dashboard/learning", label: "My Learning", icon: Book },
   { href: "/dashboard/subscription", label: "Billing and Usage", icon: CreditCard },
 ];
@@ -406,7 +407,7 @@ const BaseDashboardLayout = () => {
 
                 {/* Menu */}
                 <div className="py-1">
-                  <DropdownMenuItem asChild>
+                  {/* <DropdownMenuItem asChild>
                     <Link
                       to="/dashboard/profile"
                       className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
@@ -414,7 +415,7 @@ const BaseDashboardLayout = () => {
                       <User className="h-4 w-4" />
                       Profile
                     </Link>
-                  </DropdownMenuItem>
+                  </DropdownMenuItem> */}
 
                     <DropdownMenuItem
                       onClick={() => navigate("/dashboard/subscription")}

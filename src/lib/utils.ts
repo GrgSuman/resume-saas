@@ -42,3 +42,13 @@ export function formatRelativeTime(dateString: string | Date): string {
     return `${diffInYears} years ago`;
   }
 }
+
+export const getFaviconUrl = (companyUrl: string): string | null => {
+  if (!companyUrl) return null;
+  const cleanDomain = companyUrl
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .split("/")[0];
+  return `https://www.google.com/s2/favicons?domain=${cleanDomain}&sz=128`;
+};
+

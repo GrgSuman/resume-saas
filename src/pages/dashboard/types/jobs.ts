@@ -1,3 +1,4 @@
+import type { QuestionWithAnswer } from "../jobs/components/Quiz";
 export type Status = "Saved" | "Applied" | "Interviewing" | "Offer" | "Rejected" | "Archived";
 
 export interface TimelineEntry {
@@ -12,7 +13,6 @@ export interface Document {
   title: string;
 }
 
-
 export interface Job {
   id?: string;
   title: string;
@@ -26,6 +26,10 @@ export interface Job {
   timeline: TimelineEntry[];
   resume?: Document;
   coverLetter?: Document;
+  resumeQuestions?: QuestionWithAnswer[];
+  coverLetterQuestions?: QuestionWithAnswer[];
+  resumeStatus?: "IDLE" | "GENERATING" | "COMPLETED" | "FAILED";
+  coverLetterStatus?: "IDLE" | "GENERATING" | "COMPLETED" | "FAILED";
   notes: string[];
   createdAt: string;
   updatedAt: string;
