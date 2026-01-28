@@ -12,6 +12,7 @@ import { cn } from "../../../lib/utils"
 import Quiz, { type QuestionWithAnswer } from "../jobs/components/Quiz"
 import { toast } from "react-toastify"
 import axios from "axios"
+import { useNavigate } from "react-router"
 
 interface CoverLetterDialogProps {
   open: boolean
@@ -34,6 +35,7 @@ export default function CoverLetterDialog({ open, onOpenChange, onSubmit, isCrea
   const [questions, setQuestions] = useState<QuestionWithAnswer[]>([])
   const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false)
 
+  const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const jobDescriptionWordCount = jobDescription.trim() ? jobDescription.trim().split(/\s+/).length : 0
@@ -100,7 +102,13 @@ export default function CoverLetterDialog({ open, onOpenChange, onSubmit, isCrea
     } catch (e) {
       console.error("Error generating cover letter questions:", e)
       if (axios.isAxiosError(e)) {
-        toast.error(e.response?.data?.message || "Failed to generate cover letter questions")
+        if (e?.response?.data?.message.includes("Monthly limit reached")) {
+          navigate("/dashboard/pricing");
+        } else {
+          toast.error("Something went wrong. Please try again.", {
+            position: "top-right",
+          });
+        }
       } else {
         toast.error("Failed to generate cover letter questions")
       }

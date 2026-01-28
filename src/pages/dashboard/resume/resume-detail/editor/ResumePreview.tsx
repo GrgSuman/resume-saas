@@ -5,9 +5,9 @@ import Forms from "./forms/Forms";
 import { ResumeSectionKey } from "../../../types/constants";
 import TEMPLATE_REGISTRY from "./templates/TemplateRegistry";
 import ResumeWritingLoader from "./ResumeWritingLoader";
-import { manageLocalStorage } from "../../../../../lib/localstorage";
 import axiosInstance from "../../../../../api/axios";
-
+import { useNavigate, useParams } from "react-router";
+import { toast } from "sonner";
 
 interface ResumePreviewProps {
   zoomLevel: number;
@@ -15,6 +15,8 @@ interface ResumePreviewProps {
 
 const ResumePreview = ({ zoomLevel }: ResumePreviewProps) => {
   const { state, dispatch } = useResume();
+  const {id} = useParams()
+  const navigate = useNavigate()
   const checkHeightRef = useRef<HTMLDivElement>(null); //checking the height of the page
   const [height, setHeight] = useState(0); //height of the page
   const [isFormsOpen, setIsFormsOpen] = useState(false);
@@ -27,20 +29,25 @@ const ResumePreview = ({ zoomLevel }: ResumePreviewProps) => {
 
   useEffect(() => {
     const fetchResumeData = async () => {
-      const jobTitleForResume = manageLocalStorage.get("jobTitleForResume");
+      // const jobTitleForResume = manageLocalStorage.get("jobTitleForResume");
+      const ENDPOINT = "/resume/generate-sample-resume";
 
-      if (!jobTitleForResume) {
+      const creationType = state.creationType;
+      const userData = state.userData;
+
+      if (!userData || creationType === "scratch" || creationType === "tailored") {
         setShowSkeleton(false);
         return;
       }
-  
-      setShowSkeleton(true);
 
+      setShowSkeleton(true);
       try {
-        const response = await axiosInstance.post("/resume/generate-sample-resume", {
-          jobTitle: jobTitleForResume,
+       const response = await axiosInstance.post(ENDPOINT, {
+          data: userData,
+          resumeId: id,
+          creationType: creationType
         });
-        
+
         dispatch({
           type: "UPDATE_RESUME_SETTINGS",
           payload: response.data.resumeSettings
@@ -51,15 +58,17 @@ const ResumePreview = ({ zoomLevel }: ResumePreviewProps) => {
           payload: response.data.resumeData
         });
 
-        manageLocalStorage.remove("jobTitleForResume");
       } catch (error) {
         console.error("Error generating resume:", error);
+          toast.error("Something went wrong", {
+            position: "top-right",
+        });
       } finally {
         setShowSkeleton(false);
       }
     };
     fetchResumeData();
-  }, [dispatch]);
+  }, [dispatch, state.creationType, state.userData,id,navigate]);
 
   useEffect(() => {
     checkHeight();

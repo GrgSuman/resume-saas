@@ -21,7 +21,8 @@ const initialState: ResumeMetaData={
     messages: [],
     isTailoredResume: false,
     jobId: "",
-    // generationStatus: "IDLE",
+    creationType: "scratch",
+    userData: ""
 }
 
 // Action Types
@@ -36,7 +37,18 @@ export type ResumeAction =
   | { type: 'SET_JOB_DESCRIPTION'; payload: string }
 
   // Initial load
-  | { type: 'INITIALIZE_RESUME_DATA'; payload: { resumeData: ResumeData; resumeSettings: ResumeSettings; resumeTitle: string; jobDescription: string; messages: Message[]; isTailoredResume: boolean; jobId: string; generationStatus: "IDLE" | "GENERATING" | "COMPLETED",isInitialized?: boolean }}
+  | { type: 'INITIALIZE_RESUME_DATA'; payload: { resumeData: ResumeData; 
+    resumeSettings: ResumeSettings; 
+    resumeTitle: string; 
+    jobDescription: string; 
+    messages: Message[]; 
+    isTailoredResume: boolean; 
+    jobId: string; 
+    generationStatus: "IDLE" | "GENERATING" | "COMPLETED",
+    creationType: "scratch" | "jobTitle" | "upload" | "tailored",
+    userData: string,
+    isInitialized?: boolean
+ }}
   
   // Data updates
   | { type: 'UPDATE_RESUME_DATA'; payload: Partial<ResumeData> }
@@ -91,6 +103,8 @@ const resumeReducer = (state: ResumeMetaData | null, action: ResumeAction) => {
                  messages: action.payload.messages,
                  isTailoredResume: action.payload.isTailoredResume,
                  jobId: action.payload.jobId,
+                 creationType: action.payload.creationType,
+                 userData: action.payload.userData,
                 };
 
         case 'INITIALIZE_RESUME_ANALYSIS':
@@ -127,8 +141,11 @@ export const ResumeProvider: React.FC<{children: React.ReactNode}> = ({ children
                       messages: response.data.resume.conversations,
                       isTailoredResume: response.data.resume.isTailoredResume,
                       jobId: response.data.resume.jobId,
-                      generationStatus: "GENERATING"
+                      generationStatus: "GENERATING",
+                      creationType: response.data.resume.creationType,
+                      userData: response.data.resume.userData
                 }});
+                console.log(response.data.resume);
                 dispatch({type: 'INITIALIZE_RESUME_ANALYSIS', payload: response.data.resume.resumeAnalysis});
             } catch (error) {
                 if(error instanceof AxiosError){

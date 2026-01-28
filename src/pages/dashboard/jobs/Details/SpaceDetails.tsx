@@ -19,6 +19,7 @@ import AutoCoverletterDialog from "./AutoCoverletterDialog";
 import { getFaviconUrl } from "../../../../lib/utils";
 import type { QuestionWithAnswer } from "../components/Quiz";
 import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
 const STATUS_CONFIG: Record<
   Status,
@@ -288,10 +289,15 @@ const SpaceDetails = () => {
       });
       changeResumeStatus(response.data.resumeStatus);
     } catch (error) {
-      console.error("Error retrying resume generation:", error);
-      toast.error("Failed to retry resume generation", {
-        position: "top-right",
-      });
+      if (axios.isAxiosError(error)) {
+        if (error?.response?.data?.message.includes("Monthly limit reached")) {
+          navigate("/dashboard/pricing");
+        } else {
+          toast.error("Something went wrong. Please try again.", {
+            position: "top-right",
+          });
+        }
+      }
     }
   };
 
@@ -307,9 +313,15 @@ const SpaceDetails = () => {
     } catch (error) {
       changeResumeStatus("FAILED");
       console.error("Error generating resume questions:", error);
-      toast.error("Please try again", {
-        position: "top-right",
-      });
+      if (axios.isAxiosError(error)) {
+        if (error?.response?.data?.message.includes("Monthly limit reached")) {
+          navigate("/dashboard/pricing");
+        } else {
+          toast.error("Something went wrong. Please try again.", {
+            position: "top-right",
+          });
+        }
+      }
     }
   };
 
@@ -328,9 +340,15 @@ const SpaceDetails = () => {
       setIsAutoCoverletterDialogOpen(false);
     } catch (error) {
       console.error("Error generating cover letter:", error);
-      toast.error("Please try again", {
-        position: "top-right",
-      });
+      if (axios.isAxiosError(error)) {
+        if (error?.response?.data?.message.includes("Monthly limit reached")) {
+          navigate("/dashboard/pricing");
+        } else {
+          toast.error("Something went wrong. Please try again.", {
+            position: "top-right",
+          });
+        }
+      }
     } finally {
       setIsCoverLetterLoading(false);
     }

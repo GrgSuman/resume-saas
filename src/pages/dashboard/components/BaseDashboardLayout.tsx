@@ -309,7 +309,7 @@ const BaseDashboardLayout = () => {
               variant="outline"
               onClick={() => {
                 // You can replace this with your feedback link/modal
-                window.open("mailto:support@clonecv.com?subject=Feedback", "_blank");
+                window.open("mailto:suman.grg401@gmail.com?subject=Feedback", "_blank");
               }}
               className="flex items-center gap-1.5 text-slate-700 border-slate-200 hover:bg-slate-100 shadow-none"
             >

@@ -6,7 +6,7 @@ import { Button } from "../../../../../components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../../../../components/ui/dropdown-menu";
 import { useResume } from "../../../../../hooks/useResume";
 import EditTitleModal from "../../components/EditTitleModal";
-import { Link, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import axiosInstance from "../../../../../api/axios";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -29,6 +29,8 @@ const Chat = () => {
   const [toolMessage, setToolMessage] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "auto" });
@@ -68,34 +70,6 @@ const Chat = () => {
       }
     }
   };
-
-  // Get conversation history
-  // useEffect(() => {
-  //   const getConversation = async () => {
-  //     try {
-  //       const response = await axiosInstance.get(`/resume/${id}/conversation`);
-  //       const msgHistory = response.data.conversation?.map(
-  //         (message: { role: string; text: string }) => ({
-  //           role: message.role as "model" | "user",
-  //           text: message.text,
-  //         })
-  //       );
-  //       setMessages(msgHistory);
-  //     } catch (error) {
-  //       if (axios.isAxiosError(error)) {
-  //         toast.error(
-  //           error?.response?.data?.message || "Error loading conversation",
-  //           {
-  //             position: "top-right",
-  //           }
-  //         );
-  //       }
-  //     } finally {
-  //       setChatLoading(false);
-  //     }
-  //   };
-  //   if (id) getConversation();
-  // }, [id]);
 
   // Handle Send Message
   const handleSend = async () => {
@@ -195,9 +169,7 @@ const Chat = () => {
             const errorData = await response.json();
 
             if (errorData?.message?.includes("Monthly limit reached")) {
-              toast.error(errorData.message, {
-                position: "top-right",
-              });
+              navigate("/dashboard/pricing");
             } else {
               toast.error(
                 errorData?.message || "Something went wrong. Please try again.",
@@ -228,9 +200,7 @@ const Chat = () => {
       console.error("Error sending message:", error);
       if (axios.isAxiosError(error)) {
         if (error?.response?.data?.message.includes("Monthly limit reached")) {
-          toast.error(error?.response?.data?.message, {
-            position: "top-right",
-          });
+          navigate("/dashboard/pricing");
         } else {
           toast.error("Something went wrong. Please try again.", {
             position: "top-right",

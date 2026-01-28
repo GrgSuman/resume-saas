@@ -1,15 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogPortal } from "../../../../components/ui/dialog";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Button } from "../../../../components/ui/button";
 import { Input } from "../../../../components/ui/input";
-import { Upload, Linkedin, FileText, Rocket } from "lucide-react";
-import { manageLocalStorage } from "../../../../lib/localstorage";
+import { Upload, FileText, Rocket, X } from "lucide-react";
 
 interface NewResumeFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (resumeName: string, jobTitle?: string) => void;
+  onSubmit: (resumeName: string, jobTitle?: string, resumeFile?: File | null) => void;
   isLoading?: boolean;
   isError?: boolean;
 }
@@ -24,6 +23,8 @@ export default function NewResumeDialog({
   const [method, setMethod] = useState<"upload" | "linkedin" | "empty" | "ai" | null>(null);
   const [resumeName, setResumeName] = useState("");
   const [jobTitle, setJobTitle] = useState("");
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!open) {
@@ -31,20 +32,11 @@ export default function NewResumeDialog({
       setMethod(null);
       setResumeName("");
       setJobTitle("");
+      setResumeFile(null);
     }
   }, [open]);
 
-  const handleMethodSelect = (selectedMethod: "upload" | "linkedin" | "empty" | "ai") => {
-    if (selectedMethod === "upload") {
-      console.log("Upload Existing Resume clicked");
-      // TODO: Implement upload functionality
-      return;
-    }
-    if (selectedMethod === "linkedin") {
-      console.log("Import LinkedIn clicked");
-      // TODO: Implement LinkedIn import functionality
-      return;
-    }
+  const handleMethodSelect = (selectedMethod: "upload" | "empty" | "ai") => {
     setMethod(selectedMethod);
     setStep("details");
   };
@@ -52,21 +44,34 @@ export default function NewResumeDialog({
   const handleContinue = async () => {
     if (!resumeName.trim()) return;
     if (method === "ai" && !jobTitle.trim()) return;
+    if (method === "upload" && !resumeFile) return;
 
-    if(method === "ai"){
-      manageLocalStorage.set("jobTitleForResume", jobTitle.trim());
+    if (method === "ai") {
+      onSubmit(resumeName.trim(), jobTitle.trim());
+      return;
     }
-    onSubmit(resumeName.trim(), method === "ai" ? jobTitle.trim() : undefined);
+
+    if (method === "upload") {
+      onSubmit(resumeName.trim(), undefined, resumeFile);
+      return;
+    }
+
+    onSubmit(resumeName.trim());
   };
 
   const handleBack = () => {
     setStep("method");
     setMethod(null);
+    setResumeName("");
+    setJobTitle("");
+    setResumeFile(null);
   };
 
   const canContinue =
     resumeName.trim() &&
-    (method === "empty" || (method === "ai" && jobTitle.trim()));
+    (method === "empty" ||
+      (method === "ai" && jobTitle.trim()) ||
+      (method === "upload" && !!resumeFile));
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -88,15 +93,15 @@ export default function NewResumeDialog({
                 {step === "method"
                   ? "How would you like to create your resume?"
                   : method === "ai"
-                  ? "What would you like to call your resume?"
-                  : "What would you like to call your resume?"}
+                    ? "What would you like to call your resume?"
+                    : "What would you like to call your resume?"}
               </DialogTitle>
               <DialogDescription className="text-sm text-slate-500 mt-1">
                 {step === "method"
                   ? ""
                   : method === "ai"
-                  ? ""
-                  : ""}
+                    ? ""
+                    : ""}
               </DialogDescription>
             </DialogHeader>
 
@@ -106,6 +111,27 @@ export default function NewResumeDialog({
                   {/* Scrollable Content */}
                   <div className="flex-1 flex flex-col min-h-0 px-6 pt-0 pb-4 overflow-y-auto">
                     <div className="space-y-3">
+                      {/* Start from Scratch */}
+                      <button
+                        type="button"
+                        onClick={() => handleMethodSelect("empty")}
+                        className="w-full p-4 rounded-xl text-left transition-all border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-900 group"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                            <FileText className="w-5 h-5 text-blue-600" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-sm font-semibold text-slate-900 mb-1">
+                              Start from Scratch
+                            </h3>
+                            <p className="text-xs text-slate-500">
+                              Build from scratch with AI assistance anytime
+                            </p>
+                          </div>
+                        </div>
+                      </button>
+
                       {/* Upload Existing Resume */}
                       <button
                         type="button"
@@ -121,49 +147,7 @@ export default function NewResumeDialog({
                               Upload Existing Resume
                             </h3>
                             <p className="text-xs text-slate-500">
-                              Upload PDF or Word document to enhance with AI
-                            </p>
-                          </div>
-                        </div>
-                      </button>
-
-                      {/* Import LinkedIn */}
-                      <button
-                        type="button"
-                        onClick={() => handleMethodSelect("linkedin")}
-                        className="w-full p-4 rounded-xl text-left transition-all border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-900 group"
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                            <Linkedin className="w-5 h-5 text-blue-700" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="text-sm font-semibold text-slate-900 mb-1">
-                              Import from LinkedIn
-                            </h3>
-                            <p className="text-xs text-slate-500">
-                              Import experience, skills, and education from LinkedIn
-                            </p>
-                          </div>
-                        </div>
-                      </button>
-
-                      {/* Start from Scratch */}
-                      <button
-                        type="button"
-                        onClick={() => handleMethodSelect("empty")}
-                        className="w-full p-4 rounded-xl text-left transition-all border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-900 group"
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
-                            <FileText className="w-5 h-5 text-slate-700" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="text-sm font-semibold text-slate-900 mb-1">
-                              Start from Scratch
-                            </h3>
-                            <p className="text-xs text-slate-500">
-                              Build from scratch with AI assistance anytime
+                              Upload PDF document
                             </p>
                           </div>
                         </div>
@@ -249,6 +233,93 @@ export default function NewResumeDialog({
                             className="h-11 shadow-none"
                             autoFocus={false}
                           />
+                        </div>
+                      )}
+
+                      {/* Job title field - only for AI method */}
+                      {method === "upload" && (
+                        <div>
+                          <label className="block text-sm font-medium text-slate-900 mb-1.5">
+                            Upload Resume
+                          </label>
+                          {resumeFile ? (
+                            <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2">
+                              <FileText className="h-4 w-4 text-slate-600" />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm truncate">{resumeFile.name}</p>
+                                <p className="text-[11px] text-slate-500">
+                                  {(resumeFile.size / 1024).toFixed(0)} KB
+                                </p>
+                              </div>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7"
+                                onClick={() => {
+                                  setResumeFile(null);
+                                  if (fileInputRef.current) fileInputRef.current.value = "";
+                                }}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <>
+                              <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept=".pdf,application/pdf"
+                                className="hidden"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (!file) return;
+
+                                  // PDF only (same UX as cover letter)
+                                  if (file.type !== "application/pdf") {
+                                    if (fileInputRef.current) fileInputRef.current.value = "";
+                                    return;
+                                  }
+
+                                  // Max 5MB
+                                  if (file.size > 5 * 1024 * 1024) {
+                                    alert("File size must be less than 5MB");
+                                    if (fileInputRef.current) fileInputRef.current.value = "";
+                                    setResumeFile(null);
+                                    return;
+                                  }
+
+                                  setResumeFile(file);
+                                }}
+                              />
+
+                              <div
+                                className="flex cursor-pointer items-center justify-between rounded-lg border border-slate-200 bg-white px-3 h-11 text-sm transition hover:border-slate-300"
+                                onClick={() => fileInputRef.current?.click()}
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter" || e.key === " ") {
+                                    e.preventDefault();
+                                    fileInputRef.current?.click();
+                                  }
+                                }}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className="h-7 w-7 flex items-center justify-center rounded-md bg-slate-100">
+                                    <Upload className="h-4 w-4 text-slate-600" />
+                                  </div>
+                                  <span className="text-sm text-slate-700">
+                                    Upload resume{" "}
+                                    <span className="text-[10px] text-slate-500">PDF only</span>
+                                  </span>
+                                </div>
+                                <span className="text-[11px] uppercase tracking-wide text-slate-400">
+                                  Browse
+                                </span>
+                              </div>
+                            </>
+                          )}
                         </div>
                       )}
                     </div>

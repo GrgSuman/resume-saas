@@ -20,7 +20,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "../../../api/axios";
 import { toast } from "react-toastify";
 import { Skeleton } from "../../../components/ui/skeleton";
-import { AxiosError } from "axios";
+import axios, { AxiosError } from "axios";
 import type { QuestionWithAnswer } from "../jobs/components/Quiz";
 
 interface CoverLetter {
@@ -125,9 +125,15 @@ export default function App() {
       navigate(`/dashboard/cover-letter/${data.coverLetter.id}`);
     },
     onError: (error) => {
-      toast.error(error?.message || "Something went wrong", {
-        position: "top-right",
-      });
+      if (axios.isAxiosError(error)) {
+        if (error?.response?.data?.message.includes("Monthly limit reached")) {
+          navigate("/dashboard/pricing");
+        } else {
+          toast.error("Something went wrong. Please try again.", {
+            position: "top-right",
+          });
+        }
+      }
     },
   });
 

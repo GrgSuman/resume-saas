@@ -19,7 +19,10 @@ export type ResumeMetaData = {
     isResumeInitialized:boolean
     messages:Message[],
     jobId?:string,
-    isTailoredResume:boolean
+    isTailoredResume:boolean,
+    creationType: "scratch" | "jobTitle" | "upload" | "tailored"
+    userData: string
+
 }
 
 // Resume Settings Type

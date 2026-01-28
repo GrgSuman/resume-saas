@@ -13,6 +13,9 @@ import {
   TabsTrigger,
   TabsContent,
 } from "../../../../components/ui/tabs";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router";
 
 interface AutoResumeDialogProps {
   open: boolean;
@@ -39,6 +42,8 @@ const AutoResumeDialog = ({
   const [demoQuestions, setDemoQuestions] = useState<QuestionWithAnswer[]>([]);
   const [activeTab, setActiveTab] = useState<"main" | "tailored">("main");
   
+  const navigate = useNavigate();
+
   // Fetch resumes
   const { data: mainResumes, isLoading } = useQuery({
     queryKey: ["resumes"],
@@ -70,6 +75,15 @@ const AutoResumeDialog = ({
       setStep("questions");
     }
     catch(error){
+      if (axios.isAxiosError(error)) {
+        if (error?.response?.data?.message.includes("Monthly limit reached")) {
+          navigate("/dashboard/pricing");
+        } else {
+          toast.error("Something went wrong. Please try again.", {
+            position: "top-right",
+          });
+        }
+      }
       console.error("Error tailoring resume:", error);
     }
     finally{

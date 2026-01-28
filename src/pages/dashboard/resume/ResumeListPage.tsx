@@ -71,15 +71,40 @@ const ResumeList = () => {
     mutationFn: async ({
       resumeName,
       jobTitle,
+      resumeFile,
     }: {
       resumeName: string;
       jobTitle?: string;
+      resumeFile?: File | null;
     }) => {
-      const response = await axiosInstance.post("/resume", {
-        title: resumeName,
-        jobTitle: jobTitle || "",
-      });
-      return response.data;
+        // Create FormData for file upload
+        const formData = new FormData();
+        let resumeId = "skip";
+        let creationType = "scratch";
+        formData.append("title", resumeName);
+
+        //creation type: scratch, jobTitle, upload
+
+        if (jobTitle) {
+          formData.append("jobTitle", jobTitle);
+          creationType = "jobTitle";
+        }
+
+        if (resumeFile) {
+          formData.append("resumeFile", resumeFile);
+          creationType = "upload";
+          resumeId = "upload";
+        }
+
+        formData.append("resumeId", resumeId);
+        formData.append("creationType", creationType);
+
+        const response = await axiosInstance.post("/resume", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        return response.data;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["resumes"] });
@@ -103,8 +128,8 @@ const ResumeList = () => {
     },
   });
 
-  const handleCreateResume = (resumeName: string, jobTitle?: string) => {
-    createResumeMutation.mutate({ resumeName, jobTitle });
+  const handleCreateResume = (resumeName: string, jobTitle?: string, resumeFile?: File | null) => {
+    createResumeMutation.mutate({ resumeName, jobTitle, resumeFile });
   };
 
   return (

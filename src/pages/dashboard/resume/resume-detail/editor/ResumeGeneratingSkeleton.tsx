@@ -119,10 +119,10 @@ const ResumeGeneratingSkeleton = ({ zoomLevel }: ResumeGeneratingSkeletonProps) 
       <style>{`
         @keyframes shimmer {
           0% {
-            transform: translateX(-100%) skewX(-15deg);
+            transform: translateX(-100%);
           }
           100% {
-            transform: translateX(200%) skewX(-15deg);
+            transform: translateX(100%);
           }
         }
         .animate-shimmer {
