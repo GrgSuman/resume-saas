@@ -340,17 +340,23 @@ const CoverDetail = () => {
                 <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
                   {title}
                 </h1>
-                <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  <span>{wordCount} words</span>
-                  {saveStatus === "saving" && (
-                    <span className="text-muted-foreground">Saving...</span>
-                  )}
-                  {saveStatus === "saved" && savedAt && (
-                    <span className="text-green-600">Saved at {savedAt}</span>
-                  )}
-                  {saveStatus === "error" && (
-                    <span className="text-red-600">Save failed</span>
-                  )}
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <div className="flex items-center gap-3">
+                    <span>{wordCount} words</span>
+                    <p className="text-[12px] mx-0.5">
+                    Auto‑saved while you type
+                  </p>
+                    {saveStatus === "saving" && (
+                      <span>Saving...</span>
+                    )}
+                    {saveStatus === "saved" && savedAt && (
+                      <span className="text-green-600"> Saved at {savedAt} </span>
+                    )}
+                    {saveStatus === "error" && (
+                      <span className="text-red-600"> Save failed !</span>
+                    )}
+                  </div>
+
                 </div>
               </div>
 
@@ -373,9 +379,10 @@ const CoverDetail = () => {
 
             {/* Text Editor */}
             <Textarea
+              autoFocus={true}
               value={versionDetails.generatedText || ""}
               onChange={(e) => handleContentChange(e.target.value)}
-              className="min-h-[500px] resize-none rounded-lg border border-border bg-background p-4 text-sm leading-relaxed text-foreground focus-visible:ring-1 focus-visible:ring-ring focus-visible:border-input sm:min-h-[600px] sm:p-6 sm:text-base"
+              className="min-h-[500px] resize-none rounded-lg border border-black bg-background p-4 text-sm leading-relaxed text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black focus-visible:border-black sm:min-h-[600px] sm:p-6 sm:text-base"
               placeholder="Your cover letter content..."
             />
           </div>

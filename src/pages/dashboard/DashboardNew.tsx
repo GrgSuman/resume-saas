@@ -21,7 +21,7 @@ const DashboardNew = () => {
 
   const summaryCards = [
     {
-      title: "My Tailored Applications",
+      title: "Tailored Applications",
       count: dashboardData?.applicationsCount || 0,
       href: "/dashboard/jobs",
       icon: Sparkles,

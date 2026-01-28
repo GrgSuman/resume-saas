@@ -7,7 +7,7 @@ import {
   Loader2, 
   MessageSquare,
   FileText,
-  Sparkles,
+  // Sparkles,
   Download,
   Check,
   AlertCircle
@@ -46,7 +46,7 @@ const MySubscription = () => {
   }
 
   const userPlan = data.data.userUsage.subscription?.plan;
-  const usageData = data.data.userUsage.usage?.[0];
+  const usageData = data.data.userUsage.usage;
   const isPro = userPlan === "PRO";
 
   const manageSubscription = async () => {
@@ -170,17 +170,17 @@ const MySubscription = () => {
                 />
                 <div className="h-px bg-slate-100" />
 
-                <UsageItem 
+                {/* <UsageItem 
                   label="Resume Analysis"
                   count={usageData.resumeAnalyzeFeedback}
                   limit={SUBSCRIPTION_PLAN_LIMITS[userPlan as keyof typeof SUBSCRIPTION_PLAN_LIMITS]?.analyzerAndFeedback ?? 0}
                   isUnlimited={isPro}
                   icon={Sparkles}
                 />
-                <div className="h-px bg-slate-100" />
+                <div className="h-px bg-slate-100" /> */}
 
                 <UsageItem 
-                  label="PDF Downloads"
+                  label="Resume Downloads"
                   count={usageData.downloadsAndTemplates}
                   limit={SUBSCRIPTION_PLAN_LIMITS[userPlan as keyof typeof SUBSCRIPTION_PLAN_LIMITS]?.downloadsAndTemplates ?? 0}
                   isUnlimited={userPlan !== "FREE"}
@@ -252,11 +252,11 @@ const MySubscription = () => {
                       "20 AI messages / month",
                       "2 job-tailored resumes",
                       "2 job-tailored cover letters",
-                      "2 resume analyzer runs (basic)",
+                      // "2 resume analyzer runs (basic)",
                       "Unlimited job tracking",
                       "Chrome extension",
                       "Manual resume editing",
-                      "10 PDF downloads / month",
+                      "10 resume downloads / month",
                     ].map((feature, i) => (
                       <li key={i} className="flex items-center gap-2 text-sm text-slate-600">
                         <Check className="h-3.5 w-3.5 text-emerald-500 flex-shrink-0" />
@@ -270,10 +270,10 @@ const MySubscription = () => {
                       "100 AI messages / month",
                       "50 job-tailored resumes",
                       "50 job-tailored cover letters",
-                      "50 resume analyzer runs (advanced)",
+                      // "50 resume analyzer runs (advanced)",
                       "Chrome extension (full workflow)",
                       "Unlimited job tracking",
-                      "Unlimited PDF downloads",
+                      "Unlimited Resume downloads",
                     ].map((feature, i) => (
                       <li key={i} className="flex items-center gap-2 text-sm text-slate-600">
                         <Check className="h-3.5 w-3.5 text-emerald-500 flex-shrink-0" />
@@ -287,10 +287,10 @@ const MySubscription = () => {
                       "Unlimited AI messages",
                       "Unlimited job-tailored resumes",
                       "Unlimited job-tailored cover letters",
-                      "Unlimited resume analyzer runs (advanced)",
+                      // "Unlimited resume analyzer runs (advanced)",
                       "Chrome extension (full workflow)",
                       "Unlimited job tracking",
-                      "Unlimited PDF downloads",
+                      "Unlimited Resume downloads",
                       "Priority Support",
                     ].map((feature, i) => (
                       <li key={i} className="flex items-center gap-2 text-sm text-slate-600">
