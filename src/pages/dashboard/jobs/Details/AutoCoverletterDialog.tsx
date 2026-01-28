@@ -45,7 +45,7 @@ const AutoCoverletterDialog = ({
   // Fetch resumes
   const { data: mainResumes, isLoading } = useQuery({
     queryKey: ["resumes"],
-    queryFn: () => axiosInstance.get("/resume/"),
+    queryFn: () => axiosInstance.get("/resume?getAllResumes=true"),
     enabled: open,
   });
 
