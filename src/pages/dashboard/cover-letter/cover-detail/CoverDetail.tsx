@@ -214,7 +214,7 @@ const CoverDetail = () => {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error?.response?.data?.message.includes("Monthly limit reached")) {
-          toast.error(error.response.data.message);
+          navigate("/dashboard/pricing");
         } else {
           toast.error("Something went wrong. Please try again.");
         }
@@ -263,7 +263,7 @@ const CoverDetail = () => {
           `/cover-letter/${id}/version/${currentVersionId}`,
           { generatedText: content }
         );
-
+        queryClient.invalidateQueries({ queryKey: ["coverLetter", id] });
         setSaveStatus("saved");
         setSavedAt(
           new Date().toLocaleTimeString([], {
@@ -286,7 +286,7 @@ const CoverDetail = () => {
 
       {/* Header */}
       <header className="sticky top-0 z-10 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
           <Button
             variant="ghost"
             size="sm"
@@ -330,7 +330,7 @@ const CoverDetail = () => {
       </header>
 
       {/* Main Content */}
-      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
         <div className="grid gap-6 lg:grid-cols-[1fr_280px] lg:gap-8">
           {/* Editor Section */}
           <div className="space-y-4">

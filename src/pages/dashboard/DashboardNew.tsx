@@ -1,7 +1,7 @@
 import { useAuth } from "../../hooks/useAuth";
 import { Button } from "../../components/ui/button";
 import { Link } from "react-router";
-import { ArrowUpRight, FileText, PenSquare, Plus } from "lucide-react";
+import { ArrowUpRight, FileText, PenSquare, Plus, Sparkles } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "../../api/axios";
 import { formatRelativeTime } from "../../lib/utils";
@@ -20,6 +20,12 @@ const DashboardNew = () => {
   const dashboardData = data?.data;
 
   const summaryCards = [
+    {
+      title: "My Tailored Applications",
+      count: dashboardData?.applicationsCount || 0,
+      href: "/dashboard/jobs",
+      icon: Sparkles,
+    },
     {
       title: "Resumes",
       count: dashboardData?.resumeCount || 0,
@@ -49,7 +55,7 @@ const DashboardNew = () => {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-3">
         {isLoading ? (
           <>
             {[1, 2].map((i) => (

@@ -33,6 +33,7 @@ import { useResume } from "../../../../../hooks/useResume";
 import { TEMPLATES, FONT_FAMILIES } from "../../../types/constants";
 import axiosInstance from "../../../../../api/axios";
 import { cn } from "../../../../../lib/utils";
+import axios from "axios";
 
 interface SettingsNewProps {
   htmlRef: React.RefObject<HTMLDivElement | null>;
@@ -121,7 +122,15 @@ const SettingsNew = ({
         window.URL.revokeObjectURL(url);
       } catch (error) {
         console.error(error);
-        toast.error("Failed to download PDF");
+        if (axios.isAxiosError(error)) {
+          if (error?.response?.data?.message.includes("Monthly limit reached")) {
+            navigate("/dashboard/pricing");
+          } else {
+            toast.error("Something went wrong. Please try again.", {
+              position: "top-right",
+            });
+          }
+        }
       } finally {
         flushSync(() => {
           dispatch({ type: "SET_EDITING_MODE", payload: previousEditMode });

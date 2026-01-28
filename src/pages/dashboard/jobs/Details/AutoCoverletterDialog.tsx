@@ -15,6 +15,7 @@ import {
 } from "../../../../components/ui/tabs";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router";
 
 interface AutoCoverletterDialogProps {
   open: boolean;
@@ -48,6 +49,7 @@ const AutoCoverletterDialog = ({
     enabled: open,
   });
 
+  const navigate = useNavigate();
 
   const handleStartQuestions = async () => {
     if (!selectedResume) return;
@@ -62,7 +64,13 @@ const AutoCoverletterDialog = ({
     } catch (error) {
       console.error("Error generating cover letter questions:", error);
       if(axios.isAxiosError(error)){
-        toast.error(error.response?.data?.message || "Failed to generate cover letter questions");
+        if (error?.response?.data?.message.includes("Monthly limit reached")) {
+          navigate("/dashboard/pricing");
+        } else {
+          toast.error("Something went wrong. Please try again.", {
+            position: "top-right",
+          });
+        }
       } else {
         toast.error("Failed to generate cover letter questions");
       }

@@ -1,4 +1,4 @@
-import type { ResumeData, ResumeSettings } from '../../../../types/resume'
+import type { AchievementItem, ResumeData, ResumeSettings } from '../../../../types/resume'
 import { ResumeSectionKey } from '../../../../types/constants'
 import {useResume} from  '../../../../../../hooks/useResume'
 import { Button } from '../../../../../../components/ui/button'
@@ -247,7 +247,7 @@ const ProfessionalTemplate = ({resumeData, resumeSettings, openForms }: {resumeD
           <div key={index} className="mb-5">
             {section.name && <h2 className="font-bold tracking-wide border-b border-black pb-1 mb-3">{section.name}</h2>}
             <div>
-              {section.achievements.map((item) => (
+              {section.achievements?.map((item: AchievementItem) => (
                 <p key={item.order}>{item.content}</p>
               ))}
             </div>
