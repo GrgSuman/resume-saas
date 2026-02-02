@@ -31,7 +31,7 @@ const Footer = () => {
 
         {/* Copyright */}
         <div className="mt-8 text-xs text-slate-500">
-          © 2025 CloneCV. All rights reserved.
+          © 2026 CloneCV. All rights reserved.
         </div>
       </div>
     </footer>

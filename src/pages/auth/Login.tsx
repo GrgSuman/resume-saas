@@ -39,7 +39,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-[80vh] flex flex-col">
+    <div className="min-h-[80vh] mt-20 flex flex-col">
       <div className="flex-1 flex items-center justify-center px-6 py-16">
         <div className="max-w-2xl w-full">
           {/* Login Card */}
