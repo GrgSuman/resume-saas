@@ -120,7 +120,7 @@ const BaseDashboardLayout = () => {
               <img src="/icon.png" alt="CloneCV" className="h-7 w-7" />
               {isSidebarOpen && (
                 <span className="text-lg font-semibold tracking-tight text-slate-900 whitespace-nowrap">
-                  Clone<span className="text-[#7060fc]">CV</span>
+                  CloneCV
                 </span>
               )}
             </Link>
